@@ -6,10 +6,15 @@
 
 \lhead{Chapter X. \emph{Introduction}} % Change X to a consecutive number; this is for the header on each page - perhaps a shortened title
 
+Native Client \cite{yee2009native} is a new technology by Google that allows running binary code in a sandboxed environment in the Chrome browser. This new technology will allow web developers to write and use computation-heavy programs that run inside a web application, whilst mantaining the security levels we expect when visiting web applications.
+
+The native code is typically written in C++, though other languages can be supported. The web application, written in Javascript, can communicate to and from the native code using message passing. This allows for straight forward, asynchronous communication between the native code and the web application. Modern web browsers support the postMessage API which is used for message passing between a web application and one or more web workers. This makes this communication scheme effective.
+
+However, message passing puts more burden on the developer to write the required communication code between the native code and the application. The purpose of this project is to research other methods of communication to see if there is a more effective method that will allow developers to easily call native functions from Javascript. One challenge we immediately face is that the only way communication is supported is through message passing. This means any other communication method, such as remote proceural calls, will need to be implemented on top of the existing message passing framework.
+
 %----------------------------------------------------------------------------------------
 %	Background
 %----------------------------------------------------------------------------------------
 
-\section{Background}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam ultricies lacinia euismod. Nam tempus risus in dolor rhoncus in interdum enim tincidunt. Donec vel nunc neque. In condimentum ullamcorper quam non consequat. Fusce sagittis tempor feugiat. Fusce magna erat, molestie eu convallis ut, tempus sed arcu. Quisque molestie, ante a tincidunt ullamcorper, sapien enim dignissim lacus, in semper nibh erat lobortis purus. Integer dapibus ligula ac risus convallis pellentesque. \cite{yee2009native}
+\section{Background}
