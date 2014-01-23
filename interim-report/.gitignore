@@ -22,3 +22,4 @@
 *.out
 *.synctex.gz
 main.pdf
+node_modules
