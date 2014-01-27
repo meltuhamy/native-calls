@@ -16,12 +16,3 @@ The native code is typically written in C++, though other languages can be suppo
 The way Native Client modules can communicate with the JavaScript web application (and vice versa) is through message passing. This allows for straight forward, asynchronous communication between the native code and the web application. Modern web browsers support the postMessage API which is used for message passing between a web application and one or more web workers\footnote{Web workers\cite{webworkersw3c} are scripts that run in the background of a web page, independent of the web page itself. It is a way of carrying out computations while not blocking the main page's execution. Although they allow concurrency, they are relatively heavy and are not intended to be spawned in large numbers. Typically a web application would have one web worker to carry out computations, and the main page to do most of the view logic (such as click listening, etc.)}. This makes this communication scheme effective.
 
 However, message passing puts more burden on the developer to write the required communication code between the native code and the application. The purpose of this project is to allow developers to easily write Native Client modules by creating a Remote Procedure Call (RPC) framework on top of the existing message passing mechanism. This will allow developers to write Native Client modules in C++ and call the functions directly from JavaScript without having to write the communication code by hand. Similar to how RPC is implemented in SunRPC (need reference), a tool will be provided to compile Interface Definition Language (IDL) files and generate JavaScript and C++ files that can be used as stubs to call the C++ functions directly from JavaScript.
-
-
-
-%----------------------------------------------------------------------------------------
-%	Background
-%----------------------------------------------------------------------------------------
-
-
-\section{Background}
