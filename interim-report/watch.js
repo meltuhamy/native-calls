@@ -4,10 +4,7 @@ var gaze = require('gaze'),
 
     compileBibtex = function(cb){
       var bibtex      = spawn('bibtex', ['main']);
-      // bibtex.stderr.pipe(process.stderr);
-      // bibtex.stdout.pipe(process.stdout);
       bibtex.on('exit', function (code) {
-        // console.log('bibtex: ' + code);
         if(code != 0){
           console.error("bibtex exited with error " + code);
         }
@@ -22,11 +19,18 @@ var gaze = require('gaze'),
     },
 
     compileLatex = function(cb){
+      var latex      = spawn('latex', ['-interaction=nonstopmode','main']);
+      latex.on('exit', function (code) {
+        if(code != 0){
+          console.error("latex exited with error " + code);
+          displayErrors();
+        } else if(cb != undefined) cb();
+      });
+    },
+
+    compilePDFLatex = function(cb){
       var pdflatex      = spawn('pdflatex', ['-interaction=nonstopmode','main']);
-      // pdflatex.stderr.pipe(process.stderr);
-      // pdflatex.stdout.pipe(process.stdout);
       pdflatex.on('exit', function (code) {
-        // console.log('pdflatex: ' + code);
         if(code != 0){
           console.error("pdflatex exited with error " + code);
           displayErrors();
@@ -39,7 +43,7 @@ var gaze = require('gaze'),
       compileLatex(function(){
         compileBibtex(function(){
           compileLatex(function(){
-            compileLatex(function(){
+            compilePDFLatex(function(){
               console.log("Done.");
             });
           });
@@ -50,43 +54,15 @@ var gaze = require('gaze'),
 // compile first now.
 compileAll();
 
-// Watch all .js files/dirs in process.cwd()
-gaze(['**/*.tex'], function(err, watcher) {
-  // Files have all started watching
-  // watcher === this
+// Watch all .tex files/dirs in process.cwd()
+gaze(['**/*.tex', '**/*.bib'], function(err, watcher) {
 
-  // Get all watched files
   console.log("Watching")
-  // console.log(this.watched());
-
-  // On file changed
-  this.on('changed', function(filepath) {
-    console.log(filepath + ' was changed');
-    compileAll();
-  });
-
-  // On file added
-  this.on('added', function(filepath) {
-    console.log(filepath + ' was added');
-    compileAll();
-  });
-
-  // On file deleted
-  this.on('deleted', function(filepath) {
-    console.log(filepath + ' was deleted');
-  });
 
   // On changed/added/deleted
   this.on('all', function(event, filepath) {
-    // console.log(filepath + ' was ' + event);
+    console.log(filepath + ' was ' + event);
+    compileAll();
   });
 
-  // Get watched files with relative paths
-  // console.log(this.relative());
 });
-
-// // Also accepts an array of patterns
-// gaze(['stylesheets/*.css', 'images/**/*.png'], function() {
-//   // Add more patterns later to be watched
-//   this.add(['js/*.js']);
-// });

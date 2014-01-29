@@ -2,7 +2,7 @@
   "name": "latex-watcher",
   "version": "0.0.1",
   "author": "Mohamed Eltuhamy <tuhamy@gmail.com>",
-  "description": "a simple file watcher for latex auto-compiling",
+  "description": "a simple file watcher for pdflatex auto-compiling",
   "contributors": [ 
     {
       "name": "Mohamed Eltuhamy",
