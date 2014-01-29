@@ -24,7 +24,8 @@ var gaze = require('gaze'),
         if(code != 0){
           console.error("latex exited with error " + code);
           displayErrors();
-        } else if(cb != undefined) cb();
+        }
+        if(cb != undefined) cb();
       });
     },
 
