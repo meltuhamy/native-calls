@@ -24,7 +24,27 @@ The HTML5 postMessage API was designed to allow web workers to communicate with 
 
 In a similar way, postMessage allows message passing to and from NaCl modules. However, sending objects with cycles will cause an error. NaCl allows sending and receiving primitive JavaScript objects (Numbers, Strings, Booleans, null) as well as dictionaries (key-value Objects), arrays, and ArrayBuffers. ArrayBuffers are a new type of JavaScript object based on Typed Arrays \cite{typedarraysw3c} that allows the storing of binary data. Another key difference is that message types need to be converted into the correct type on the receiving end. For example, sending a JavaScript Object should translate into a dictionary type. Type conversions are quite subtle. The JavaScript types are very dynamic in nature. A JavaScript Number object could be an integer, a float, a double, `infinity', exponential, and so on. Sending C++ data to JavaScript is simple since it is converting from a more specific type to a less specific type (e.g. from `int' in C++ to `Number' in JavaScript). But converting from a JavaScript type to a C++ type requires more thought. The C++ Pepper API provides several functions to determine the JavaScript type (e.g. \verb+bool is_double()+), then we can extract and cast the data into our required type, also using Pepper (e.g. \verb+double AsDouble()+). From there, we can use the standard C++ type to perform the required computations.
 
-\section{Remote Procedural Calls}
+
+\section{Remote Procedural Call (RPC)}
+RPC is used to uniformly call a procedure that is on a different machine, or on the same machine but on different processes. RPC is implemented on top of a transmission protocol and should work regardless of the communication method we decide to use. For example, we could use TCP/IP for network communications, or any Inter-Process Communication (IPC) method if the caller and callee are on the same machine but in different processes. Normally, remote procedural call implementations would consist of the following steps, as shown in figure \ref{fig:rpc-components}.
+
+\begin{enumerate}
+  \item The caller code is written normally, and so is the server code, but the stubs are automatically generated using interface definition files (which we explain later in ...)
+  \item When the remote call is made, it calls the user stub which packs the parameters and function call information into a packet.
+  \item The packet gets transferred to its destination (either across the network as in figure \ref{fig:rpc-components}, or across the processes on the same machine using IPC). This is done through the RPCRuntime, which is a library that works on both ends (caller and callee) to handle communication details.
+  \item The packet is received at the callee end by the RPCRuntime. It is then passed on to the server stub.
+  \item The arguments and function call information are unpacked and a normal call is made to the actual procedure.
+  \item When the procedure returns, it is passed back to the server stub where it is packed and transmitted back to the caller, which unpacks it and uses the result.
+\end{enumerate}
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=\textwidth]{RPCDiagram_ImplementingRPC_ADBirrell_BJNelson.png}
+    \caption{The basic components of an RPC framework, from \cite{birrell1984implementing}}
+    \label{fig:rpc-components}
+\end{figure}
+
+\subsection{The role of the RPCRuntime}
 
 
 \subsection{Interface Definition Language}
