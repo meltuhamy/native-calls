@@ -40,7 +40,7 @@ RPC is used to uniformly call a procedure that is on a different machine, or on 
 
 \begin{figure}
     \centering
-    % \includegraphics[width=\textwidth]{RPCDiagram_ImplementingRPC_ADBirrell_BJNelson.png} %uncomment to enable image
+    \includegraphics[width=\textwidth]{RPCDiagram_ImplementingRPC_ADBirrell_BJNelson.png} %uncomment to enable image
     \caption{The basic components of an RPC framework, from \cite{birrell1984implementing}}
     \label{fig:rpc-components}
 \end{figure}
@@ -128,5 +128,27 @@ Finally, we call the remote procedure from the client, which includes the same h
 
 
 \section{WebIDL}
+WebIDL is a new specification for an IDL that can be used by web browsers. It is used in several projects, including Google Chrome's Blink project http://www.chromium.org/blink/webidl 
 
+This section is incomplete. Points I should mention:
+\begin{itemize}
+	\item WebIDL basics, using example
+	\item How it can be used to generate C header files
+	\item Existing implementations of C/C++ bindings (Including es OS). How bindings work?
+	\item Parsers available
+\end{itemize}
+
+\textbf{Comment: } I'm actually not entirely sure I need this / how it can be used. NaCl already provides some functions to change types. I can use IDL to specify the functions I want to be available by RPC and what the parameters are. This will be used to generate stubs. The stubs use the NaCl functions available in the pp::Var class, such as AsDouble() to change types. Am I right? maybe I am getting confused as to what the IDL file is used for.
+
+\section{Message Transfer}
+This section is incomplete. Points I should mention:
+
+\begin{itemize}
+	\item NaCl allows representing data into any form. Examples are XDR or Protocol Buffers.
+	\item Explain how the message format could increase performance
+	\item Explain that the changing of message format is done in the client and server side stubs. This mean the message format will need to be supported in both JavaScript and NaCl
+	\item Examine both XDR and protocol buffers
+\end{itemize}
+
+\textbf{Comment: } Technically, it is possible to do it all in JSON, right? Using protocol buffers for example is simply a way to improve performance.
 
