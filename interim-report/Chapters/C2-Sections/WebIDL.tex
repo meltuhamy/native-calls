@@ -1,0 +1,13 @@
+
+\section{WebIDL}
+WebIDL is a new specification for an IDL that can be used by web browsers. It is used in several projects, including Google Chrome's Blink project http://www.chromium.org/blink/webidl 
+
+This section is incomplete. Points I should mention:
+\begin{itemize}
+	\item WebIDL basics, using example
+	\item How it can be used to generate C header files
+	\item Existing implementations of C/C++ bindings (Including es OS). How bindings work?
+	\item Parsers available
+\end{itemize}
+
+\textbf{Comment: } I'm actually not entirely sure I need this / how it can be used. NaCl already provides some functions to change types. I can use IDL to specify the functions I want to be available by RPC and what the parameters are. This will be used to generate stubs. The stubs use the NaCl functions available in the pp::Var class, such as AsDouble() to change types. Am I right? maybe I am getting confused as to what the IDL file is used for.

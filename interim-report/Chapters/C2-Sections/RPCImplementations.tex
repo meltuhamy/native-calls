@@ -1,0 +1,63 @@
+\section{RPC Implementations}
+Here, we talk 
+
+\subsection{Open Network Computing RPC}
+\label{ONCRPCBackgroundSection} 
+Open Network Computing (ONC) is a suite of software originally developed by Sun Microsystems. It provides a Remote Procedure Call (RPC) system along with an External Data Representation (XDR) format used alongside it. The ONC RPC system implements some tools and libraries that make it easy for developers to specify and use remote functions. These are:
+
+\begin{enumerate}
+	\item \textbf{RPCGen Compiler:} As mentioned earlier, the role of the user and server stubs is to pack and unpack arguments and results of function calls. To pack the arguments, the stub looks at the argument types and matches them with the number of arguments and their types of the server (callee) function definition. Thus, the stubs need to be written with knowledge of the interface of the actual procedures that will be called. We can define these interfaces in an abstract way, so that we could generate these stubs automatically even if the languages used in the different endpoints are different. In ONC RPC and many other systems, this abstract representation is in the form of an Interface Definition Language (IDL) file. When we pass the IDL file into the RPCGen compiler, it automatically generates the stubs we need to perform remote procedure calls.
+	\item \textbf{XDR Routines:} These convert the types of the parameters and return values to and from the external data representation. XDR routines exist for many C types, and the system allows you to write your own XDR routines for complex types.
+	\item \textbf{RPC API library:} This is an implementation that fulfils the role of the RPCRuntime described in \ref{RPCRuntimeBackgroundSection}. It provides a set of API functions that set up the lower level communication details, binding, and so on.
+\end{enumerate}
+
+Remote procedures in ONC RPC are identified by a program number, a version number, and a procedure number. There also exists a port mapper that map the program number to a port, so that several programs can run on the same remote machine. 
+
+\subsection{Interface Definition Language files}
+In ONC RPC, the XDR is used to define RPC definitions. For example, the RPC definition in listing \ref{samplerpc} defines an interface for a simple function that takes in a character string  and returns a structure containing two fields. As discussed in \ref{ONCRPCBackgroundSection}, we can see the program number is \verb+80000+ and the procedure number of the \verb+generate_keypair+ function is \verb+1+.
+
+\lstset{language=c,caption={An example RPC definition for a key-pair generator function},label=samplerpc}
+\begin{lstlisting}
+/* File: keypairgen.x */
+struct key_pair_t
+{
+  string  public_key<500>;
+  string  private_key<500>;
+};
+
+program KEYPAIRGEN_PROGRAM
+{
+  version KEYPAIRGEN_VERSION
+  {
+    /* Produce a public/private key pair using a passphrase  */
+    key_pair_t generate_keypair (string) = 1;
+  } = 0;
+} = 80000;
+\end{lstlisting}
+
+We can use the RPCGen compiler to then create client and server stubs. Passing the definition file \verb+keypairgen.x+ (shown in listing \ref{samplerpc}) into \verb+rpcgen+ will produce the following files:
+
+\begin{itemize}
+	\item \textbf{keypairgen.h} The header file, which would be included in both client and server code. Includes the actual C definition of the result\_t structure we defined in the XDR.
+	\item \textbf{keypairgen\_clnt.c} The client stub, which packs the parameters and uses the RPC API library to execute the actual remote procedure call.
+	\item \textbf{keypairgen\_svc.c} The server stub, which uses the RPC API to set up a listener for RPC calls. RPC calls are received, parameters are unpacked, and the actual function implementation (of \verb+generate_keypair+) is called.
+	\item \textbf{keypairgen\_xdr.c} Defines methods for packing more complex structures, such as the \verb+key_pair_t+ structure we defined.
+\end{itemize}
+
+Now we need to write the actual implementation of the RPC procedure we wish to call remotely, namely \verb+generate_keypair+. This will include the generated header file and follow the specification we defined, as shown in listing \ref{samplerpcImp}. \\
+
+
+\lstset{language=c,caption={An example server-side implementation of the procedure defined in \ref{samplerpc}},label=samplerpcImp}
+\begin{lstlisting}
+#include "keypairgen.h"
+
+key_pair_t *
+generate_keypair_0_svc(char **argp, struct svc_req *rqstp)
+{
+  static key_pair_t  result;
+  // TODO: Actual implementation
+  return(&result);
+}
+\end{lstlisting}
+
+Finally, we call the remote procedure from the client, which includes the same header file and simply calls \verb+generate_keypair_0+, passing in the string parameter.
