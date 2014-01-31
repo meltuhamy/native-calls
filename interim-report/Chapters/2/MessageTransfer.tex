@@ -1,35 +1,105 @@
 \section{Data representation}
 % This section is incomplete. Points I should mention:
 
-% \begin{itemize}
-% 	\item NaCl allows representing data into any form. Examples are XDR or Protocol Buffers.
-% 	\item Explain how the message format could increase performance
-% 	\item Explain that the changing of message format is done in the client and server side stubs. This mean the message format will need to be supported in both JavaScript and NaCl
-% 	\item Examine both XDR and protocol buffers
-% \end{itemize}
-
 When designing RPC systems, the data representation of the messages being transferred, including how the parameters are marshalled, needs to be defined. This is because the client and sever might have different architectures that affect how data is represented. There are two types of data representation: implicit typing and explicit typing.
 
 Implicit typing refers to representations which do not encode the names or the types of the parameters when marshalling them. Only the values of the parameters are sent. It is up to the sender and receiver to ensure that the types being sent/received are correct, and this is normally done statically through the IDL files which specify how the message will be structured. 
 
 Explicit typing refers to when the parameter names and types are encoded with the message during marshalling. This increases the size of the messages, but simplifies the process of de-marshalling the parameters.
 
-
-%---------------------------------------------------------------------------------------------------------------------%
-% Implicit message typing
-%---------------------------------------------------------------------------------------------------------------------%
-\subsection{Implicit Typing}
+This section gives an overview of some of the different message formats that can be used with RPC.
 
 
-%---------------------------------------------------------------------------------------------------------------------%
-% Explicit message typing
-%---------------------------------------------------------------------------------------------------------------------%
-\subsection{Explicit Typing}
+\begin{description}
+	\item[XML and JSON] 
+	~\\
+	XML and JSON are widely used data representation formats that are supported by many languages. They are supported by default in all web browsers, which include XML and JSON parsers. XML and JSON - based RPC implementations exist, and we discuss them in Section \ref{sec:XMLJSOBRPC}.
+
+	Although XML and JSON are both intended to be human-readable, JSON is often more readable. JSON is also more compact, as it requires less syntax to represent complex structures, in contrast to XML which requires opening and closing tags. Here is an example of representing a phone book in XML and JSON.
+
+	\lstset{language=c,caption={Representing a phone book using JSON},label=phonebookjson}
+	\begin{lstlisting}
+[
+	{
+		"name" : "John Smith",
+		"id"   : 1,
+		"phonenumber": "+447813945734"
+	},
+	{
+		"name" : "Jane Taylor",
+		"id"   : 2,
+		"phonenumber": "+442383045711"
+	},
+]
+	\end{lstlisting}
+	\lstset{language=xml,caption={Representing a phone book using XML},label=phonebookjson}
+	\begin{lstlisting}
+<numbers type="array">
+    <entry>
+    	<field name="name">John Smith</field>
+    	<field name="id">1</field>
+    	<field name="phonenumber">+447813945734</field>
+    </entry>
+    <entry>
+    	<field name="name">Jane Taylor</field>
+    	<field name="id">2</field>
+    	<field name="phonenumber">+442383045711</field>
+    </entry>
+</numbers>
+	\end{lstlisting}
+
+	The XML would also need to be parsed to make sense of the data. For example, a `field' tag could be parsed and converted into a C++ data structure, but that would require us to understand the structure we're using. Sometimes the structure is well defined, like in the XML-RPC protocol (see Section \ref{sec:XMLJSOBRPC}). However, this strict parsing requirement is easier to error check, since if the XML was parsed successfully, we can be more confident that the data type is correct. 
+
+	\item[Protocol Buffers] 
+	~\\
+	Google Protocol Buffers are ``a language-neutral, platform-neutral, extensible way of serializing structured data for use in communications protocols, data storage, and more", according to the developer guide\footnote{\label{googleprotobuff}https://developers.google.com/protocol-buffers/docs/overview}. They are used extensively within many Google products, including AppEngine\footnote{Google AppEngine is a Platform as a Service that allows developers to run their applications on the cloud}. 
+
+	Messages are defined in .proto files. Listing \ref{exampleproto} shows an example, adapted from the Developer Overview.
+	~\\
+
+	\lstset{language=c,caption={A .proto file},label=exampleproto}
+	\begin{lstlisting}
+message Person {
+  required string name = 1;
+  required int32 id = 2;
+  optional string email = 3;
+
+  enum PhoneType {
+    MOBILE = 0;
+    HOME = 1;
+    WORK = 2;
+  }
+
+  message PhoneNumber {
+    required string number = 1;
+    optional PhoneType type = 2 [default = HOME];
+  }
+
+  repeated PhoneNumber phone = 4;
+}
+	\end{lstlisting}
+
+	The .proto file is then parsed and compiled, to generate data access classes used to change the content of an instance of the representation. They also provide the methods required for serialization. These methods are shown in Listing \ref{exampleprotoserialisation}. When serialised data is converted to raw binary.
+
+	\lstset{language=c,caption={Manipulating and serialising a .proto-generated class},label=exampleprotoserialisation}
+	\begin{lstlisting}
+// Serialization
+Person person;
+person.set_name("John Doe");
+person.set_id(1234);
+person.set_email("jdoe@example.com");
+fstream output("myfile", ios::out | ios::binary);
+person.SerializeToOstream(&output);
+
+// De-serialisation 
+fstream input("myfile", ios::in | ios::binary);
+Person person;
+person.ParseFromIstream(&input);
+cout << "Name: " << person.name() << endl;
+cout << "E-mail: " << person.email() << endl;
+	\end{lstlisting}
 
 
+	Many RPC implementations which use protocol buffers exist. Although Java, C++, and Python are the languages that are officially supported, people have created open source  implementations for other languages, including JavaScript\footnote{https://github.com/dcodeIO/ProtoBuf.js}.
+\end{description}
 
-%% PROTCOL BUFFERS
-\subsubsection{Protocol Buffers}
-Google Protocol Buffers are ``a language-neutral, platform-neutral, extensible way of serializing structured data for use in communications protocols, data storage, and more" according to the developer guide\footnote{https://developers.google.com/protocol-buffers/docs/overview}. They are used extensively within many Google products, including AppEngine\footnote{Google AppEngine is a Platform as a Service that allows developers to run their applications on the cloud}.
-
-Many RPC implementations which use protocol buffers exist.

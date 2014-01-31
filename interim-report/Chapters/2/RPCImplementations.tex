@@ -17,6 +17,7 @@ ONC is a suite of software originally developed and released in 1985 by Sun Micr
 Remote procedures in ONC RPC are identified by a program number, a version number, and a procedure number. There also exists a port mapper that map the program number to a port, so that several programs can run on the same remote machine. 
 
 \subsubsection{XDR files}
+\label{sec:xdrsyntax}
 In ONC RPC, the XDR format is used to define RPC definitions. For example, the RPC definition in listing \ref{samplerpc} defines an interface for a simple function that takes in a character string  and returns a structure containing two fields. As discussed in \ref{ONCRPCBackgroundSection}, we can see the program number is \lstinline+80000+ and the procedure number of the \lstinline+generate_keypair+ function is \lstinline+1+.
 
 \lstset{language=c,caption={An example RPC definition for a key-pair generator function},label=samplerpc}
@@ -77,7 +78,7 @@ Remote objects could also be invoked dynamically at runtime, as CORBA supports d
 
 \begin{figure}
     \centering
-    % \includegraphics[width=\textwidth]{corba-client-object.png} %uncomment to enable image
+    \includegraphics[width=\textwidth]{corba-client-object.png} %uncomment to enable image
     \caption{Interface and Implementation Repositories in CORBA, from \cite{isocorba}}
     \label{fig:corba-interfaces}
 \end{figure}
@@ -89,6 +90,7 @@ TODO: Write more about CORBA using the CORBA paper. \cite{vinoski1997corba}
 % JSON-RPC and XML-RPC
 %---------------------------------------------------------------------------------------------------------------------%
 \subsection{JSON-RPC and XML-RPC}
+\label{sec:XMLJSOBRPC}
 XML-RPC is a simple RPC protocol which uses XML (Extended Mark-up Language) to define remote method calls and responses. It uses explicit data typing - the method name and parameters are hard-coded in the message itself. Messages are typically transported to remote servers over HTTP\footnote{Hyper-text transport protocol (HTTP) is the most common transfer protocol used by clients and servers to transfer data on the web}. Many implementations of XML-RPC exist in several different languages. 
 
 For example, we could represent the RPC function call we defined before (Listing \ref{samplerpc}) as the XML-RPC function call shown in Listing \ref{examplexmlcall}.
@@ -159,7 +161,29 @@ XML-RPC and JSON-RPC are very similar. JavaScript Object Notation (JSON) is a si
 
 Both XML-RPC and JSON-RPC have well-defined protocols \cite{jsonrpcspec}\cite{xmlrpcspec}, and are implemented in many different languages.
 
-\subsection{Apache Thrift}
-Apache Thrift is another RPC system designed and open-sourced by Facebook in the Apache project. It provides a way to implement scalable, cross-language services \cite{thrift}.
+% \subsection{Apache Thrift}
+% Apache Thrift is another RPC system designed and open-sourced by Facebook in the Apache project. It provides a way to implement scalable, cross-language services \cite{thrift}.
 
-//TODO: More about thrift and how it works.
+
+\subsection{WebIDL}
+WebIDL is a specification \cite{webidlw3c} for an interface definition language that can be used by web browsers. It is used in several projects, including Google Chrome's Blink project\footnote{http://www.chromium.org/blink/webidl}.
+
+The WebIDL syntax is similar to ONC RPC's XDR syntax (see section \ref{sec:xdrsyntax}). Listing \ref{webIDLExample} shows the same interface as Listing \ref{samplerpc}, but this time using WebIDL.
+
+\lstset{language=c,caption={An example interface definition written in WebIDL},label=webIDLExample}
+\begin{lstlisting}
+dictionary keypair {
+  DOMString public_key;
+  DOMString private_key;
+};
+
+interface KEYPAIRGEN {
+  keypair generate_keypair(DOMString passphrase);
+};
+\end{lstlisting}
+
+Just like in ONC RPC, the WebIDL files can be parsed and used to generate stub methods for the client and server. Because they are language independent, the client and server files that are generated could be in different languages. 
+
+Open source parsers exist for WebIDL, and a standard-compliant one is provided in the Chromium project\footnote{\lstinline+https://code.google.com/p/chromium/codesearch#chromium/src/tools/idl_parser/idl_parser.py+}. 
+
+There are also open source C++ bindings for WebIDL, such as esidl\footnote{esidl is a library provided with the es Operating System project, which is an experimental operating system whose API is written in WebIDL. The WebIDL compiler can be obtained from: https://github.com/esrille/esidl and documentation can be found here: http://code.google.com/p/es-operating-system/wiki/esidl}. Similarly, bindings for JavaScript also exist\footnote{https://github.com/extensibleweb/webidl.js}. 
