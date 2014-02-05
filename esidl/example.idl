@@ -1,8 +1,0 @@
-dictionary keypair {
-  DOMString public_key;
-  DOMString private_key;
-};
-
-interface KEYPAIRGEN {
-  keypair generate_keypair(DOMString passphrase);
-};
