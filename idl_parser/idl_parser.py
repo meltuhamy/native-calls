@@ -155,17 +155,10 @@ def TokenTypeName(t):
 
 
 class IDLParser(object):
-#
-# We force all input files to start with two comments.  The first comment is a
-# Copyright notice followed by a file comment and finally by file level
-# productions.
-#
-  # [0] Insert a TOP definition for Copyright and Comments
+  # [0] Insert a TOP definition
   def p_Top(self, p):
-    """Top : COMMENT COMMENT Definitions"""
-    Copyright = self.BuildComment('Copyright', p, 1)
-    Filedoc = self.BuildComment('Comment', p, 2)
-    p[0] = ListFromConcat(Copyright, Filedoc, p[3])
+    """Top : Definitions"""
+    p[0] = ListFromConcat(p[1])
 
   # [0.1] Add support for Multiple COMMENTS
   def p_Comments(self, p):
