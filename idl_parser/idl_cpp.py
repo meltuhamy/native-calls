@@ -80,13 +80,13 @@ class CPPCompiler:
         out.append(self.CompileType(type))
 
         # compile operation name
-        out.append(' '+str(node.GetName()))
+        out.append(str(node.GetName()))
 
         # compile arguments
         out.append('(')
         if arguments is not None:
             for (i, arg) in enumerate(arguments):
-                out.append((', ' if i>0 else '') + self.CompileArgument(arg))
+                out.append((',' if i>0 else '') + self.CompileArgument(arg))
 
         out.append(');\n')
 
