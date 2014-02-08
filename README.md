@@ -1,7 +1,11 @@
 # Native Calls
 
-Welcome to my Native Calls project :)
+Native Calls allows developers to write IDL files that get compiled into C++ and JavaScript stubs that implement RPC calls over ```postMessage```. The result is a nice, clean way of using Native Code straight from JavaScript!
 
-Here are some links
+Part of my final year project at Imperial College London.
 
-- [Google Drive Folder](https://drive.google.com/?authuser=0#folders/0B34PR0XFhrUYMWMwb0htRFJZd1E)
+This is still work in progress. Check the [milestones](https://github.com/meltuhamy/native-calls/issues/milestones) for details.
+
+## WebIDL
+
+The project uses WebIDL to define interfaces. The WebIDL is compiled into C++ and JavaScript stubs. Implementation details are in the [idl_parser directory](https://github.com/meltuhamy/native-calls/tree/master/idl_parser).
