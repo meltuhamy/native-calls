@@ -9,28 +9,28 @@ import time
 # directory.
 #
 try:
-  # Disable lint check which fails to find the ply module.
-  # pylint: disable=F0401
-  from ply import lex
-  from ply import yacc
+    # Disable lint check which fails to find the ply module.
+    # pylint: disable=F0401
+    from ply import lex
+    from ply import yacc
 except ImportError:
-  module_path, module_name = os.path.split(__file__)
-  third_party = os.path.join(module_path, os.par, os.par, 'third_party')
-  sys.path.append(third_party)
-  # pylint: disable=F0401
-  from ply import lex
-  from ply import yacc
-
+    module_path, module_name = os.path.split(__file__)
+    third_party = os.path.join(module_path, os.par, os.par, 'third_party')
+    sys.path.append(third_party)
+    # pylint: disable=F0401
+    from ply import lex
+    from ply import yacc
 
 from idl_lexer import IDLLexer
 from idl_parser import IDLParser, ParseFile
+
 
 class CPPCompiler:
     def __init__(self, parser):
         self.parser = parser
 
     def CompileText(self, text):
-        return self.flatten(self.CompileNode(self.parser.ParseText('',text)))
+        return self.flatten(self.CompileNode(self.parser.ParseText('', text)))
 
     def CompileFile(self, filename):
         return self.flatten(self.CompileNode(ParseFile(self.parser, filename)))
@@ -56,7 +56,7 @@ class CPPCompiler:
                 out.append(self.CompileNode(child))
             return out
         elif node.IsA('Interface'):
-            out = ['/* interface: '+str(node.GetName())+'*/\n']
+            out = ['/* interface: ' + str(node.GetName()) + '*/\n']
             for child in node.GetChildren():
                 out.append(self.CompileNode(child))
             return out
@@ -85,7 +85,7 @@ class CPPCompiler:
         out.append('(')
         if arguments is not None:
             for (i, arg) in enumerate(arguments):
-                out.append((', ' if i>0 else '') + self.CompileArgument(arg))
+                out.append((', ' if i > 0 else '') + self.CompileArgument(arg))
 
         out.append(');\n')
 
@@ -126,11 +126,6 @@ class CPPCompiler:
             return out
 
 
-
-# compiler = CPPCompiler(IDLParser(IDLLexer()))
-# print(compiler.CompileText('interface NaClAMTest {float sumFloatArray(float[] floats, long length);void subFloatArrays(float[] src1_dst, float[] src2, long length);};'))
-
-
 def main(argv):
     compiler = CPPCompiler(IDLParser(IDLLexer()))
     for filename in argv:
@@ -138,5 +133,6 @@ def main(argv):
 
     return 0
 
+
 if __name__ == '__main__':
-  sys.exit(main(sys.argv[1:]))
+    sys.exit(main(sys.argv[1:]))
