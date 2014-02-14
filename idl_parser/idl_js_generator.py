@@ -6,7 +6,7 @@ from idl_parser import IDLParser
 from idl_generator import Generator
 
 
-class CGenerator(Generator):
+class JSGenerator(Generator):
     def CompileNode(self, node):
         if node.IsA('File'):
             out = ''
@@ -14,7 +14,7 @@ class CGenerator(Generator):
                 out += self.CompileNode(child)
             return out
         elif node.IsA('Interface'):
-            out = '/* Interface: ' + str(node.GetName()) + ' */\n\n'
+            out = '/* Interface: ' + str(node.GetName()) + '*/\n\n'
             for child in node.GetChildren():
                 out += self.CompileNode(child)
             return out
@@ -34,18 +34,24 @@ class CGenerator(Generator):
                 arguments = child.GetChildren()
 
         # compile return type
-        out += self.CompileType(type)
+        out += '/* Returns: ' + self.CompileType(type) + ' */ \n'
 
         # compile operation name
-        out += str(node.GetName())
+        out += 'function ' + str(node.GetName())
 
         # compile arguments
         out += '('
+        argTypes = {}
         if arguments is not None:
             for (i, arg) in enumerate(arguments):
-                out += (', ' if i > 0 else '') + self.CompileArgument(arg)
+                out += (', ' if i > 0 else '') + arg.GetName()
+                argTypes[arg.GetName()] = self.getArgumentType(arg)
 
-        out += ');\n'
+        out += '){\n'
+        out += '  /* TODO Check these argument types: \n   * '
+        for (argName, argType) in argTypes.items():
+            out += argName + ':' + argType + ' '
+        out += '\n   */\n}\n\n'
 
         return out
 
@@ -60,14 +66,14 @@ class CGenerator(Generator):
                 if child.IsA('PrimitiveType'):
                     primitiveType = child.GetName()
                 if child.IsA('Array'):
-                    isArray = '*'
+                    isArray = '[]'
                     temp = child
                     while len(temp.GetChildren()) > 0:
-                        isArray += '*'
+                        isArray += '[]'
                         temp = temp.GetChildren()[0]
             return str(primitiveType) + str(isArray) + ' '
 
-    def CompileArgument(self, arg):
+    def getArgumentType(self, arg):
         if arg is None:
             return ''
         else:
@@ -79,13 +85,11 @@ class CGenerator(Generator):
             for child in children:
                 if child.IsA('Type'):
                     out += (self.CompileType(child.GetChildren()))
-
-            out += (str(arg.GetName()))
             return out
 
 
 def main(argv):
-    compiler = CGenerator(IDLParser(IDLLexer()))
+    compiler = JSGenerator(IDLParser(IDLLexer()))
     for filename in argv:
         print(compiler.CompileFile(filename))
 
