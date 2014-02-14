@@ -13,12 +13,12 @@ from idl_parser import IDLParser
 from idl_cpp import CPPCompiler
 from pycparser import parse_file, c_parser, c_ast, c_generator
 
-class WebIDLCompiler(unittest.TestCase):
 
+class WebIDLCompiler(unittest.TestCase):
     def setUp(self):
         self.parser = IDLParser(IDLLexer(), mute_error=True)
         self.cparser = c_parser.CParser()
-        self.compiler = CPPCompiler(self.parser);
+        self.compiler = CPPCompiler(self.parser)
         self.filenames = glob.glob('test_cpp/*.idl')
 
     def translate_to_c(self, string):
@@ -28,16 +28,13 @@ class WebIDLCompiler(unittest.TestCase):
         generator = c_generator.CGenerator()
         return generator.visit(ast)
 
-
-
-
     def testOutput(self):
         for filename in self.filenames:
             compiledOutput = self.compiler.CompileFile(filename)
-            expectedOutput = open(filename.replace('.idl','.h')).read()
-            self.assertEqual(self.translate_to_c(compiledOutput), self.translate_to_c(expectedOutput), 'Expecting output in %s.' % filename)
+            expectedOutput = open(filename.replace('.idl', '.h')).read()
+            self.assertEqual(self.translate_to_c(compiledOutput), self.translate_to_c(expectedOutput),
+                             'Expecting output in %s.' % filename)
 
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
-

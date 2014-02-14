@@ -44,24 +44,23 @@ class CPPCompiler:
 
         out = ''
         for token in tokenList:
-            out += ' ' + recursiveStringify(token)
+            out += recursiveStringify(token)
 
         return out
 
 
     def CompileNode(self, node):
-        cls = node._cls
-        if cls == 'File':
+        if node.IsA('File'):
             out = []
             for child in node.GetChildren():
                 out.append(self.CompileNode(child))
             return out
-        elif cls == 'Interface':
+        elif node.IsA('Interface'):
             out = ['/* interface: '+str(node.GetName())+'*/\n']
             for child in node.GetChildren():
                 out.append(self.CompileNode(child))
             return out
-        elif cls == 'Operation':
+        elif node.IsA('Operation'):
             return self.CompileOperation(node)
 
     def CompileOperation(self, node):
@@ -71,9 +70,9 @@ class CPPCompiler:
         type = None
         arguments = None
         for child in children:
-            if child._cls == 'Type':
+            if child.IsA('Type'):
                 type = child.GetChildren()
-            elif child._cls == 'Arguments':
+            elif child.IsA('Arguments'):
                 arguments = child.GetChildren()
 
         # compile return type
@@ -86,7 +85,7 @@ class CPPCompiler:
         out.append('(')
         if arguments is not None:
             for (i, arg) in enumerate(arguments):
-                out.append((',' if i>0 else '') + self.CompileArgument(arg))
+                out.append((', ' if i>0 else '') + self.CompileArgument(arg))
 
         out.append(');\n')
 
@@ -94,21 +93,21 @@ class CPPCompiler:
 
     def CompileType(self, type):
         if type is None:
-            return 'void'
+            return 'void '
         else:
 
             primitiveType = 'void'
             isArray = ''
             for child in type:
-                if child._cls == 'PrimitiveType':
+                if child.IsA('PrimitiveType'):
                     primitiveType = child.GetName()
-                if child._cls == 'Array':
+                if child.IsA('Array'):
                     isArray = '*'
                     temp = child
                     while len(temp.GetChildren()) > 0:
                         isArray += '*'
                         temp = temp.GetChildren()[0]
-            return str(primitiveType) + str(isArray)
+            return str(primitiveType) + str(isArray) + ' '
 
     def CompileArgument(self, arg):
         if arg is None:
@@ -120,10 +119,10 @@ class CPPCompiler:
             children = arg.GetChildren()
 
             for child in children:
-                if child._cls == 'Type':
+                if child.IsA('Type'):
                     out += (self.CompileType(child.GetChildren()))
 
-            out += (' '+str(arg.GetName()))
+            out += (str(arg.GetName()))
             return out
 
 
