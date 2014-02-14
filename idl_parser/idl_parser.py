@@ -1011,6 +1011,9 @@ class IDLParser(object):
             sys.stderr.write('Error in token: %s\n' % str(lexError))
         return None
 
+    def ParseFile(self, filename):
+        return ParseFile(self, filename)
+
 
 def ParseFile(parser, filename):
     """Parse a file and return a File type of node."""

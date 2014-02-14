@@ -1,70 +1,28 @@
 #!/usr/bin/env python
-import os.path
 import sys
-import time
-
-
-#
-# Try to load the ply module, if not, then assume it is in the third_party
-# directory.
-#
-try:
-    # Disable lint check which fails to find the ply module.
-    # pylint: disable=F0401
-    from ply import lex
-    from ply import yacc
-except ImportError:
-    module_path, module_name = os.path.split(__file__)
-    third_party = os.path.join(module_path, os.par, os.par, 'third_party')
-    sys.path.append(third_party)
-    # pylint: disable=F0401
-    from ply import lex
-    from ply import yacc
 
 from idl_lexer import IDLLexer
-from idl_parser import IDLParser, ParseFile
+from idl_parser import IDLParser
+from idl_generator import Generator
 
 
-class CPPCompiler:
-    def __init__(self, parser):
-        self.parser = parser
-
-    def CompileText(self, text):
-        return self.flatten(self.CompileNode(self.parser.ParseText('', text)))
-
-    def CompileFile(self, filename):
-        return self.flatten(self.CompileNode(ParseFile(self.parser, filename)))
-
-    def flatten(self, tokenList):
-        def recursiveStringify(x):
-            if type(x) is list:
-                return self.flatten(x)
-            else:
-                return str(x)
-
-        out = ''
-        for token in tokenList:
-            out += recursiveStringify(token)
-
-        return out
-
-
+class CGenerator(Generator):
     def CompileNode(self, node):
         if node.IsA('File'):
-            out = []
+            out = ''
             for child in node.GetChildren():
-                out.append(self.CompileNode(child))
+                out += self.CompileNode(child)
             return out
         elif node.IsA('Interface'):
-            out = ['/* interface: ' + str(node.GetName()) + '*/\n']
+            out = '/* interface: ' + str(node.GetName()) + '*/\n'
             for child in node.GetChildren():
-                out.append(self.CompileNode(child))
+                out += self.CompileNode(child)
             return out
         elif node.IsA('Operation'):
             return self.CompileOperation(node)
 
     def CompileOperation(self, node):
-        out = []
+        out = ''
         children = node.GetChildren()
         # get type and arguments
         type = None
@@ -76,18 +34,18 @@ class CPPCompiler:
                 arguments = child.GetChildren()
 
         # compile return type
-        out.append(self.CompileType(type))
+        out += self.CompileType(type)
 
         # compile operation name
-        out.append(str(node.GetName()))
+        out += str(node.GetName())
 
         # compile arguments
-        out.append('(')
+        out += '('
         if arguments is not None:
             for (i, arg) in enumerate(arguments):
-                out.append((', ' if i > 0 else '') + self.CompileArgument(arg))
+                out += (', ' if i > 0 else '') + self.CompileArgument(arg)
 
-        out.append(');\n')
+        out += ');\n'
 
         return out
 
@@ -127,7 +85,7 @@ class CPPCompiler:
 
 
 def main(argv):
-    compiler = CPPCompiler(IDLParser(IDLLexer()))
+    compiler = CGenerator(IDLParser(IDLLexer()))
     for filename in argv:
         print(compiler.CompileFile(filename))
 

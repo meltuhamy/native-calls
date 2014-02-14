@@ -10,7 +10,7 @@ import unittest
 
 from idl_lexer import IDLLexer
 from idl_parser import IDLParser
-from idl_cpp import CPPCompiler
+from idl_c_generator import CGenerator
 from pycparser import parse_file, c_parser, c_ast, c_generator
 
 
@@ -18,8 +18,8 @@ class WebIDLCompiler(unittest.TestCase):
     def setUp(self):
         self.parser = IDLParser(IDLLexer(), mute_error=True)
         self.cparser = c_parser.CParser()
-        self.compiler = CPPCompiler(self.parser)
-        self.filenames = glob.glob('test_cpp/*.idl')
+        self.compiler = CGenerator(self.parser)
+        self.filenames = glob.glob('test_generator/*.idl')
 
     def translate_to_c(self, string):
         # remove comments
