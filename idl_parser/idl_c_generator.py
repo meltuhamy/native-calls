@@ -14,7 +14,7 @@ class CGenerator(Generator):
                 out += self.CompileNode(child)
             return out
         elif node.IsA('Interface'):
-            out = '/* Interface: ' + str(node.GetName()) + ' */\n\n'
+            out = '/* Interface: {0} */\n\n'.format(str(node.GetName()))
             for child in node.GetChildren():
                 out += self.CompileNode(child)
             return out

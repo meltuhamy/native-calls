@@ -14,7 +14,7 @@ class JSGenerator(Generator):
                 out += self.CompileNode(child)
             return out
         elif node.IsA('Interface'):
-            out = '/* Interface: ' + str(node.GetName()) + '*/\n\n'
+            out = '/* Interface: {0} */\n\n'.format(str(node.GetName()))
             for child in node.GetChildren():
                 out += self.CompileNode(child)
             return out
@@ -33,25 +33,19 @@ class JSGenerator(Generator):
             elif child.IsA('Arguments'):
                 arguments = child.GetChildren()
 
-        # compile return type
-        out += '/* Returns: ' + self.CompileType(type) + ' */ \n'
-
-        # compile operation name
-        out += 'function ' + str(node.GetName())
-
-        # compile arguments
-        out += '('
-        argTypes = {}
+        paramsString = ''
+        paramsTypesString = ''
         if arguments is not None:
             for (i, arg) in enumerate(arguments):
-                out += (', ' if i > 0 else '') + arg.GetName()
-                argTypes[arg.GetName()] = self.getArgumentType(arg)
+                paramsString += (', ' if i > 0 else '') + arg.GetName()
+                paramsTypesString += (', ' if i > 0 else '') + arg.GetName() + ':' + self.getArgumentType(arg)
 
-        out += '){\n'
-        out += '  /* TODO Check these argument types: \n   * '
-        for (argName, argType) in argTypes.items():
-            out += argName + ':' + argType + ' '
-        out += '\n   */\n}\n\n'
+        out += ("/* Returns: {returntype} */\n"
+                "function {fname}({params}) {{\n"
+                "  /* TODO Check these argument types:\n"
+                "   * {paramtypes}\n"
+                "   */\n"
+                "}}\n\n").format(returntype=self.CompileType(type),fname=str(node.GetName()), params=paramsString, paramtypes=paramsTypesString)
 
         return out
 
