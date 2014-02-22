@@ -4,12 +4,12 @@ function moduleDidLoad() {
 }
 
 function handleMessage(message) {
-  console.log(message.data);
+  // console.log(message.data);
   d = message.data;
   if(d.jsonrpc && d.jsonrpc == "2.0"){
-  	// RPC call
-  	if (rpcfunctions[d.method] != undefined && d.params != undefined) {
-  		rpcfunctions[d.method].apply(this, d.params);
+  	// It's a RPC call
+  	if (RPCReceiveFunctions[d.method] != undefined && d.params != undefined) {
+  		RPCReceiveFunctions[d.method].apply(this, d.params);
   	};
   }
 }
