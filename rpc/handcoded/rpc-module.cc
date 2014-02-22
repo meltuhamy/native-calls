@@ -12,18 +12,37 @@ class RPCInstance : public pp::Instance {
 
   virtual void HandleMessage(const pp::Var& var_message) {
     std::string message = var_message.AsString();
-    std::vector<int> params;
-    params.push_back(1234);
-    params.push_back(5678);
-    NaClRPC rpc("log", params);
-    pp::VarDictionary myDict = *rpc.rpcDict;
+    
+    // look, ma! console logging from C++!
+    ConsoleLog(pp::Var("logging from C++!"));
 
-    PostMessage(myDict);
-    PostMessage(var_message); // echo message back for debugging.
+    // works with ints
+    ConsoleLog(pp::Var(123));
+
+    // ... and arrays
+    pp::VarArray myArray;
+    myArray.Set(0,"item1");
+    myArray.Set(1,"item2");
+    myArray.Set(2,"item3");
+    ConsoleLog(myArray);
+
+    // ... and objects
+    pp::VarDictionary myDict;
+    myDict.Set("Name","Mohamed Eltuhamy");
+    myDict.Set("Project","Native Calls");
+    ConsoleLog(myDict);
+
+    // PostMessage(var_message); // echo message back for debugging.
   
   }
 
-  
+  virtual void ConsoleLog(pp::Var data){
+    NaClRPC rpc("log", &data, 1);
+    pp::VarDictionary dict = *rpc.rpcDict;
+    PostMessage(dict);
+  }
+
+
 };
 
 class RPCModule : public pp::Module {
