@@ -9,41 +9,47 @@ class RPCInstance : public pp::Instance {
   explicit RPCInstance(PP_Instance instance)
       : pp::Instance(instance) {}
   virtual ~RPCInstance() {}
-
   virtual void HandleMessage(const pp::Var& var_message) {
-    if (var_message.is_dictionary()){
-      // decode json-rpc.
-      pp::VarDictionary jsonrpc(var_message);
-      if(jsonrpc.HasKey("json-rpc")){
-        pp::Var rpcVersion = jsonrpc.Get("json-rpc");
-        if(rpcVersion.is_string() && rpcVersion.AsString() == "2.0"){
-          pp::Var rpcMethodName = jsonrpc.Get("method");
-          pp::Var rpcArgs = jsonrpc.Get("params");
-          pp::VarArray paramsArray;
-          if(rpcArgs.is_array()){
-            paramsArray = pp::VarArray(rpcArgs);
-          }
-          if(rpcMethodName.is_string()){
-            std::string methodName = rpcMethodName.AsString();
-            //massive if check here lol.
-            if(methodName == "echo"){
-              // do the echo function. Expecting one argument: a string.
-              Echo(paramsArray.Get(0).AsString());
-            } else if(methodName == "consoleLogTester"){
-              // do consoleLogTester function, no arguments.
-              ConsoleLogTester();
-            }
-          }
+    std::string methodName; pp::VarArray methodParams;
+    if(VerifyRPC(var_message, methodName, methodParams)){
+      if(methodName == "echo"){
+        // Expect 1 string paramater
+        if(methodParams.GetLength() > 0 && methodParams.Get(0).is_string()){
+          Echo(methodParams.Get(0).AsString());
+        } else {
+          ConsoleLog(pp::Var("Echo failed because incorrect arguments."));
+        }
+      } else if(methodName == "consoleLogTester") {
+        ConsoleLogTester();
+      }
+    } else {
+      // It's a normal message!
+    }
+  }
+
+  virtual bool VerifyRPC(pp::Var d, std::string& methodName, pp::VarArray& params){
+    bool success = false;
+    if (d.is_dictionary()){
+      pp::VarDictionary rpcDict = pp::VarDictionary(d);
+      if(rpcDict.HasKey("json-rpc") && 
+         rpcDict.HasKey("method") && 
+         rpcDict.HasKey("params") && 
+         rpcDict.Get("json-rpc").AsString() == "2.0"){
+        pp::Var methodVar = rpcDict.Get("method");
+        pp::Var paramsVar = rpcDict.Get("params");
+        if(methodVar.is_string() && paramsVar.is_array()){
+          methodName = methodVar.AsString();
+          params = pp::VarArray(paramsVar);
+          success = true;
         }
       }
     }
-    
+
+    return success;
   }
 
   virtual void ConsoleLog(pp::Var data){
-    NaClRPC rpc("log", &data, 1);
-    pp::VarDictionary dict = *rpc.rpcDict;
-    PostMessage(dict);
+    PostMessage(*NaClRPC::getInstance()->ConstructDictionary("log", &data, 1));
   }
 
   virtual void ConsoleLogTester(){
