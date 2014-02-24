@@ -12,8 +12,10 @@ public:
 		isInstance = false;
 	}
 	static NaClRPC* getInstance();
-	pp::VarDictionary * ConstructDictionary(std::string method, pp::Var* params, int length);
-	pp::VarDictionary * ConstructDictionary(std::string method, std::vector<pp::Var> params);
+	pp::VarDictionary * ConstructResponseDictionary(int responseID, pp::Var* responseParams, int length);
+	pp::VarDictionary * ConstructResponseDictionary(int responseID, std::vector<pp::Var> responseParams);
+	pp::VarDictionary * ConstructRequestDictionary(std::string method, pp::Var* params, int length);
+	pp::VarDictionary * ConstructRequestDictionary(std::string method, std::vector<pp::Var> params);
 	
 private:
 	// singleton class.
@@ -25,6 +27,8 @@ private:
 	
 	// private methods and fields.
 	int id;
-	pp::VarDictionary * ConstructBasicDictionary(std::string method);
+	pp::VarDictionary * ConstructBasicResponseDictionary(int methodID);
+	pp::VarDictionary * ConstructBasicRequestDictionary(std::string method);
+	pp::VarDictionary * ConstructBasicDictionary();
 };
 #endif

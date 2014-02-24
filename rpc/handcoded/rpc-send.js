@@ -2,11 +2,14 @@ window.RPCSendFunctions = {
 	echo: function(data) {
 		// goes to the server with data, 
 		// the server should do a rpc-console.log
-		common.naclModule.postMessage(this.constructRPC("echo", [data]));
+		this.sendRPC(this.constructRPC("echo", [data]), function(data){
+			// Come back here when the data comes back.
+			console.log("In callback:"+JSON.stringify(data));
+		});
 	},
 	consoleLogTester: function(data){
 		// asks the server to do some awesome console logging
-		common.naclModule.postMessage(this.constructRPC("consoleLogTester", []));
+		this.sendRPC(this.constructRPC("consoleLogTester", []));
 	},
 	constructRPC: function(method, argumentsArray){
 		// constructs a json-rpc object
@@ -17,5 +20,12 @@ window.RPCSendFunctions = {
 			"id" : this.id++
 		};
 	},
-	id: 0
+	id: 0,
+	RPCCallbacks: {},
+	sendRPC: function(data, callback){
+		if(callback != undefined){
+			this.RPCCallbacks[data.id] = callback;
+		}
+		common.naclModule.postMessage(data);
+	}
 };

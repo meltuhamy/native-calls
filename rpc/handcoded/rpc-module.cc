@@ -10,12 +10,14 @@ class RPCInstance : public pp::Instance {
       : pp::Instance(instance) {}
   virtual ~RPCInstance() {}
   virtual void HandleMessage(const pp::Var& var_message) {
-    std::string methodName; pp::VarArray methodParams;
-    if(VerifyRPC(var_message, methodName, methodParams)){
+    std::string methodName; pp::VarArray methodParams; int id;
+    if(VerifyRPC(var_message, methodName, methodParams, id)){
       if(methodName == "echo"){
         // Expect 1 string paramater
         if(methodParams.GetLength() > 0 && methodParams.Get(0).is_string()){
-          Echo(methodParams.Get(0).AsString());
+          // function has a callback, get id.
+
+          Echo(methodParams.Get(0), id);
         } else {
           ConsoleLog(pp::Var("Echo failed because incorrect arguments."));
         }
@@ -27,19 +29,22 @@ class RPCInstance : public pp::Instance {
     }
   }
 
-  virtual bool VerifyRPC(pp::Var d, std::string& methodName, pp::VarArray& params){
+  virtual bool VerifyRPC(pp::Var d, std::string& methodName, pp::VarArray& params, int& id){
     bool success = false;
     if (d.is_dictionary()){
       pp::VarDictionary rpcDict = pp::VarDictionary(d);
       if(rpcDict.HasKey("json-rpc") && 
          rpcDict.HasKey("method") && 
          rpcDict.HasKey("params") && 
+         rpcDict.HasKey("id") && 
          rpcDict.Get("json-rpc").AsString() == "2.0"){
         pp::Var methodVar = rpcDict.Get("method");
         pp::Var paramsVar = rpcDict.Get("params");
-        if(methodVar.is_string() && paramsVar.is_array()){
+        pp::Var idVar     = rpcDict.Get("id");
+        if(methodVar.is_string() && paramsVar.is_array() && idVar.is_int()){
           methodName = methodVar.AsString();
           params = pp::VarArray(paramsVar);
+          id = idVar.AsInt();
           success = true;
         }
       }
@@ -49,7 +54,7 @@ class RPCInstance : public pp::Instance {
   }
 
   virtual void ConsoleLog(pp::Var data){
-    PostMessage(*NaClRPC::getInstance()->ConstructDictionary("log", &data, 1));
+    PostMessage(*NaClRPC::getInstance()->ConstructRequestDictionary("log", &data, 1));
   }
 
   virtual void ConsoleLogTester(){
@@ -74,8 +79,10 @@ class RPCInstance : public pp::Instance {
     ConsoleLog(myDict);
   }
 
-  virtual void Echo(std::string data){
-    ConsoleLog(pp::Var(data));
+  virtual void Echo(pp::Var data, int id){
+    // call callback
+    PostMessage(*NaClRPC::getInstance()->ConstructResponseDictionary(id, &data, 1));
+
   }
 
 

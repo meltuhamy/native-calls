@@ -6,9 +6,19 @@ function moduleDidLoad() {
 function handleMessage(message) {
   // console.log(message.data);
   d = message.data;
-  if(d.jsonrpc && d.jsonrpc == "2.0"){
-  	// It's a RPC call
-  	if (RPCReceiveFunctions[d.method] != undefined && d.params != undefined) {
+  if(d.jsonrpc != undefined && d.jsonrpc == "2.0"){
+    // We called NaCl and we got a response...
+    if(d.result != undefined && d.id != undefined){
+      // look up id's context callback
+      var callbacks = RPCSendFunctions.RPCCallbacks;
+      if(callbacks[d.id] != undefined){
+        callbacks[d.id].apply(this, d.result);
+        callbacks[d.id] = undefined;
+        delete(callbacks[d.id]);
+      }
+    }
+  	// NaCl called us...
+  	if (d.method != undefined && RPCReceiveFunctions[d.method] != undefined && d.params != undefined) {
   		RPCReceiveFunctions[d.method].apply(this, d.params);
   	};
   }
