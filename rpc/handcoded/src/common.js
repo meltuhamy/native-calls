@@ -8,7 +8,7 @@ var isTest = false;
 
 // Set to true when loading a "Release" NaCl module, false when loading a
 // "Debug" NaCl module.
-var isRelease = false;
+var isRelease = true;
 
 // Javascript module pattern:
 //   see http://en.wikipedia.org/wiki/Unobtrusive_JavaScript#Namespaces
@@ -121,6 +121,7 @@ var common = (function() {
    * @param {Object} attrs Dictionary of attributes to set on the module.
    */
   function createNaClModule(name, tool, path, width, height, attrs) {
+    attachDefaultListeners();
     var moduleEl = document.createElement('embed');
     moduleEl.setAttribute('name', 'nacl_module');
     moduleEl.setAttribute('id', 'nacl_module');
@@ -343,7 +344,6 @@ var common = (function() {
       // plug-in graphic, if there is a problem.
       width = typeof width !== 'undefined' ? width : 200;
       height = typeof height !== 'undefined' ? height : 200;
-      attachDefaultListeners();
       createNaClModule(name, tool, path, width, height, attrs);
     } else {
       // It's possible that the Native Client module onload event fired
@@ -416,7 +416,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
 
-    if (loadFunction) {
+    if (loadFunction && body.dataset.tools != undefined) {
       var toolchains = body.dataset.tools.split(' ');
       var configs = body.dataset.configs.split(' ');
 

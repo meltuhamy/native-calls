@@ -1,4 +1,6 @@
 .cproject
-newlib
-glibc
 .settings
+node_modules
+*.bc
+*.o
+*.pexe
