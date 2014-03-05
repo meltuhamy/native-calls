@@ -9,21 +9,22 @@ module.exports = function(config) {
 
 
     // frameworks to use
-    frameworks: ['jasmine'],
+    frameworks: ['jasmine', 'requirejs'],
 
 
     // list of files / patterns to load in the browser
     files: [
-      {pattern: 'src/*.nmf', included: false, served: true},
-      {pattern: 'src/*.pexe', included: false, served: true},
-      'src/*.js',
-      'test/**/*Spec.js'
+      {pattern: 'src/scripts/*.js', included: false},
+      {pattern: 'test/**/*Spec.js', included: false},
+      {pattern: 'src/*.nmf', included: false},
+      {pattern: 'src/*.pexe', included: false},
+      'test/test-main.js',
     ],
 
 
     // list of files to exclude
     exclude: [
-      
+      'src/scripts/main.js'
     ],
 
 
