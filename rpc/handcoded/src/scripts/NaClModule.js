@@ -55,6 +55,8 @@ define(['lodash'], function(_){
     }, true);
     listenerDiv.addEventListener("crash"   , function(e){
       thisModule.status = STATUSES.CRASHED;
+      thisModule.exitCode = thisModule.moduleEl.exitStatus;
+
       onCrash.call(thisModule,e);
     }, true);
     this.listenerDiv = listenerDiv; //expose to object
@@ -147,7 +149,7 @@ define(['lodash'], function(_){
    * @param {Object} data
    */
   NaClModule.prototype.postMessage = function(data) {
-    if(this.status === STATUSES.loaded){
+    if(this.status === STATUSES.LOADED){
       this.moduleEl.postMessage(data);
       console.info("["+ this.name + "] " + "message sent to module.");
     } else {
