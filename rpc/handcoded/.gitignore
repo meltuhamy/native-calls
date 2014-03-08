@@ -4,3 +4,4 @@ node_modules
 *.bc
 *.o
 *.pexe
+src/scripts/lib

@@ -10,4 +10,4 @@ clean:
 
 test: project_code
 	npm install
-	./node_modules/karma/bin/karma start --single-run
+	npm test

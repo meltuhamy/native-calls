@@ -7,14 +7,18 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/.bin/karma start --single-run",
+    "install" : "./node_modules/.bin/bower install"
   },
-  "repository" :
-  { "type" : "git", 
-    "url" : "https://github.com/meltuhamy/native-calls"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/meltuhamy/native-calls"
   },
   "author": "Mohamed Eltuhamy",
   "license": "BSD-2-Clause",
+  "dependencies": {
+    "bower": "~1.2.8"
+  },
   "devDependencies": {
     "karma": "~0.10.9"
   }
