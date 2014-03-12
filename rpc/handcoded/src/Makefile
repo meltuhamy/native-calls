@@ -44,10 +44,10 @@ export CYGWIN
 all: rpc-module.pexe
 
 clean:
-	$(RM) rpc-module.pexe rpc-module.bc
+	$(RM) *.pexe *.bc
 
-rpc-module.bc: rpc-module.cc nacl-rpc.cc
-	$(PNACL_CXX) -o $@ nacl-rpc.cc rpc-module.cc -O2 $(CXXFLAGS) $(LDFLAGS)
+rpc-module.bc: NaClRPCInstance.cpp logger/gen/*.cpp logger/src/*.cpp
+	$(PNACL_CXX) -o $@ NaClRPCInstance.cpp logger/gen/*.cpp logger/src/*.cpp -O2 $(CXXFLAGS) $(LDFLAGS)
 
 rpc-module.pexe: rpc-module.bc
 	$(PNACL_FINALIZE) -o $@ $<

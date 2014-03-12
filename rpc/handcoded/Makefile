@@ -1,4 +1,5 @@
 CODE_DIR = src
+all: .PHONY
 
 .PHONY: project_code
 
