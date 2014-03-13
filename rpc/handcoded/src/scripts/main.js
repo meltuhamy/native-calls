@@ -2,7 +2,10 @@ requirejs.config({
   paths: REQUIRE_PATHS
 });
 
-require(["NaClModule"], function(NaClModule) {
+require(["NaClModule", "EchoRPCStub"], function(NaClModule, EchoRPCStub) {
+  // Does nothing, but just put it in here to get a feel of how it'll work.
+  window.EchoRPC = new EchoRPCStub();
+
   var loggerModule = new NaClModule({
     "name": "logger",
     "src" : "../../rpc-module.nmf",

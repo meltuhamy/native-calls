@@ -1,5 +1,6 @@
-var RPCTransport = (function(){
-	return function(naClModule){
+define(['NaClModule'], function(NaClModule){
+	function RPCTransport(rpcModule){
 		
 	}
-})();
+	return RPCTransport;
+});
