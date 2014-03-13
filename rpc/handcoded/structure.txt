@@ -1,0 +1,99 @@
+Example flow:
+From Javascript, I call a function with a callback.
+It should do stuff in C++ and get back to me by calling the callback.
+
+Here is JavaScript's side of the story:
+
+
++---------------------------x----------------------------+
+|                           x                            |
+| Echo("blah", func...);    x  CallCallback              |
+| Food(1, func..);          x                            | Stub
+| ...                       x                            |
+|           +               x           ^                |
++-----------|---------------x-----------|----------------+
+            |                           |
++-----------|---------------x-----------|----------------+
+|           v               x           +                |
+| RPCCall                   x  HandleCallback            |
+|                           x                            | Runtime
+|                           x                            |
+|           +               x           ^                |
++-----------|---------------x-----------|----------------+
+            |                           |
++-----------|---------------x-----------|----------------+
+|           v               x           +                |
+| CreateRPCRequest          x  CheckRPCCallback          |
+|                           x                            | JSON-RPC
+|                           x                            |
+|           +               x           ^                |
++-----------|---------------x-----------|----------------+
+            |                           |
++-----------|---------------x-----------|----------------+
+|           v               x           +                |
+| SendRPC                   x  HandleMessage             |
+|                           x                            | Transport
+|                           x                            |
+|                           x                            |
++---------------------------x----------------------------+
+
+Here are some more details about what happens at each stage:
+
+1. myRPCModule.echo("hello world!", function(response){ console.log(response)});
+	--> Enter Stub
+		1. echo expects a single string paramater. Check it.
+		2. arguments correct.
+		3. rpcCall("echo", ["hello world!"], function()...)
+		--> Enter Runtime
+			1. create a new id for function call. e.g. id = 11639
+			2. map new id with callback and function that is passed in.
+			3. createRPCRequest("echo", ["hello world!"], 11639)
+			--> Enter JSON-RPC
+				1. Check params filled in
+				2. Create JSON object {"json-rpc":"2.0", ...}
+				3. SendRPC(JSON Object)
+				--> Enter Transport
+					1. Marshalling / compression (optional for now.)
+					2. module.postMessage ***
+					3. return true if module is loaded etc.
+				<-- Leaving Transport
+			--> Return to JSON-RPC
+				4. return true if RPC sent.
+			<-- Leaving JSON-RPC
+		--> Return to Runtime
+			4. Return true if RPC sent.
+		<-- Leaving Runtime
+	--> Return to Stub
+		4. Return true if rpc was sent
+	<-- Leaving Stub
+2. Check if the rpc was succesful.
+
+
+***: C++ Receives a message through HandleMessage... It Creates a Callback object.
+===  TODO: C++ version of Jandle message
+     Eventually, C++ calls PostMessage which triggers the handleMessage on the module
+
+1. NaClModule: handleMessage(event)
+	--> Enter Transport
+		1. Unmarshall / uncompress (optional for now)
+		2. check RPC cb object
+		--> Enter JSON-RPC
+			1. Check stuff.
+			2. It's a callback. handleCallback(id, ["Hello World"]);
+			--> Enter Runtime
+				1. Handling callback, find callback by id.
+				2. Callback found. RunCallback(function()..., "Hello World")
+				--> Enter Stub
+					1. Running Callback, check return type etc.
+					2. Call callback function
+					3. Return true. The callback was called.
+					<-- Leaving Stub
+			--> Return to Runtime
+				3. Return true if succesful.
+				<-- Leaving Runtime
+		--> Return to JSON-RPC
+			3. Return true if succesful.
+			<-- Leaving JSON-RPC
+	--> Return to Transport
+		3. Callback succesful. Maybe do a handshake or something..
+		<-- Leaving Transport
