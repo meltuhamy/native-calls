@@ -17,7 +17,8 @@ module.exports = function(config) {
       'src/scripts/paths.require.js',
       {pattern: 'src/scripts/**/*.js', included: false},
       {pattern: 'test/**/*Spec.js', included: false},
-      {pattern: 'src/*.nmf', included: false},
+      {pattern: 'test/**/*.nmf', included: false},
+      {pattern: 'test/**/*.pexe', included: false},
       {pattern: 'src/*.pexe', included: false},
       'test/test-main.js'
     ],

@@ -1,4 +1,5 @@
 define(['lodash'], function(_){
+  var LOG_VERBOSE = false;
   /**
    * Creates a NaCl module wrapper that encapsulates the embed element.
    * @param attrs - The attributes to add to the embed element
@@ -17,6 +18,9 @@ define(['lodash'], function(_){
     }
 
     this.name = attrs.name;
+    if(attrs.verbose != undefined){
+      LOG_VERBOSE = attrs.verbose;
+    }
 
     // Make sure a module with that id doesn't already exist.
     if(!_.isNull(document.getElementById(attrs.id))){
@@ -109,7 +113,7 @@ define(['lodash'], function(_){
    * @param {DocumentEvent} e
    */
   var onLoad = function(e) {
-    console.info("["+ this.name + "]" + " module loaded");
+    if(LOG_VERBOSE) console.info("["+ this.name + "]" + " module loaded");
   };
 
   /**
@@ -117,7 +121,7 @@ define(['lodash'], function(_){
    * @param {DocumentEvent} e
    */
   var onMessage = function(e) {
-    console.info("["+ this.name + "]" + " message received");
+    if(LOG_VERBOSE) console.info("["+ this.name + "]" + " message received");
   };
 
   /**
@@ -125,7 +129,7 @@ define(['lodash'], function(_){
    * @param {DocumentEvent} e
    */
   var onCrash = function(e) {
-    console.error("["+ this.name + "]" + " module crashed");
+    if(LOG_VERBOSE) console.error("["+ this.name + "]" + " module crashed");
   };
 
   /**
@@ -151,9 +155,9 @@ define(['lodash'], function(_){
   NaClModule.prototype.postMessage = function(data) {
     if(this.status === STATUSES.LOADED){
       this.moduleEl.postMessage(data);
-      console.info("["+ this.name + "] " + "message sent to module.");
+      if(LOG_VERBOSE) console.info("["+ this.name + "] " + "message sent to module.");
     } else {
-      console.error("["+ this.name + "]" + " postMessage failed. Module not running.");
+      if(LOG_VERBOSE) console.error("["+ this.name + "]" + " postMessage failed. Module not running.");
     }
   };
 

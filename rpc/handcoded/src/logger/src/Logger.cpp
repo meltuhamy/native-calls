@@ -1,10 +1,3 @@
-/*
- * Logger.cpp
- *
- *  Created on: 12 Mar 2014
- *      Author: meltuhamy
- */
-
 #include "Logger.h"
 
 /**
