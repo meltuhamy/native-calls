@@ -65,7 +65,7 @@ module.exports = function(config) {
     customLaunchers: {
       "chrome --no-sandbox": {
         base: 'Chrome',
-        flags: ['--no-sandbox']
+        flags: ['--no-sandbox', '--enable-nacl', '--enable-pnacl']
       }
     },
 
