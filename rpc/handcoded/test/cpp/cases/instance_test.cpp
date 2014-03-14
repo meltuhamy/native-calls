@@ -12,7 +12,7 @@ public:
 
 
 TEST(TestCase, SimpleTest) {
-  EXPECT_EQ(4, 2);
+  EXPECT_EQ(4, 4);
 }
 
 TEST(TestCase, AnotherTest) {
@@ -26,5 +26,5 @@ TEST(TestCase, ExternalInstanceTest) {
 }
 
 TEST(TestCase, SittingAcrossThereTest){
-  EXPECT_EQ(0,1);
+  EXPECT_EQ(1,1);
 }

@@ -46,7 +46,7 @@ all: testing.pexe
 clean:
 	$(RM) *.pexe *.bc
 
-testing.bc: *.cpp
+testing.bc: **/*.cpp
 	$(PNACL_CXX) -o $@ testing.cpp -O2 $(CXXFLAGS) $(LDFLAGS)
 
 testing.pexe: testing.bc

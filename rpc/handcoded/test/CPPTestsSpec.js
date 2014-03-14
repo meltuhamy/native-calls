@@ -21,7 +21,7 @@ define(["NaClModule"], function(NaClModule){
         },
 
         endCommand: function(testName, testResult) {
-          console.info(testName + ": "+ testResult.toUpperCase());
+//          console.info(testName + ": "+ testResult.toUpperCase());
         }
       };
 
@@ -77,7 +77,7 @@ define(["NaClModule"], function(NaClModule){
 
       waitsFor(function(){
         return testingModuleLoaded
-      }, "the testing module to load", 10000);
+      }, "the testing module to load", 20000);
 
       runs(function(){
         expect(testingModuleLoaded).toBe(true);
