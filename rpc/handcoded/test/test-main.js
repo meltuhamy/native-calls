@@ -7,6 +7,9 @@ for (var file in window.__karma__.files) {
   }
 }
 
+//extra paths we use in our testing environment only
+REQUIRE_PATHS['fakemodule'] = '/base/test/lib/fakemodule';
+
 requirejs.config({
   // Karma serves files from '/base'
   baseUrl: '/base/src/scripts',

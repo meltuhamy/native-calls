@@ -70,7 +70,7 @@ Here are some more details about what happens at each stage:
 
 
 ***: C++ Receives a message through HandleMessage... It Creates a Callback object.
-===  TODO: C++ version of Jandle message
+===  TODO: C++ version of handle message
      Eventually, C++ calls PostMessage which triggers the handleMessage on the module
 
 1. NaClModule: handleMessage(event)

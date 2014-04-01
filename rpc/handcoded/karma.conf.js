@@ -20,6 +20,7 @@ module.exports = function(config) {
       {pattern: 'test/**/*.nmf', included: false},
       {pattern: 'test/**/*.pexe', included: false},
       {pattern: 'src/*.pexe', included: false},
+      {pattern: 'test/lib/**/*.js', included: false},
       'test/test-main.js'
     ],
 

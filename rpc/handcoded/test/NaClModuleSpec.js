@@ -1,79 +1,13 @@
-define(["NaClModule"], function(NaClModule){
+define(["NaClModule", "fakemodule"], function(NaClModule, fakemodule){
 
   describe("NaCl Module", function() {
     var testModuleId = "rpc-module";
+    var myModuleAttrs = {src:'rpc-module.nmf', name:'rpc', id:testModuleId,type:'application/x-pnacl'};
 
-    // Use this to set up a fake module
-    var createFakeEmbed = function(){
-      var fakeEmbed = document.createElement("embed");
-      fakeEmbed.loaded = false;
-      fakeEmbed.messageSent = false;
-      fakeEmbed.crashed = false;
 
-      // embeds don't normally have a postMessage function. We fake it here.
-      fakeEmbed.postMessage = function(){};
-
-      fakeEmbed.fakeLoad = function(ms){
-        setTimeout(function(){
-          // fake the load event
-          fakeEmbed.readyState = 1;
-          fakeEmbed.dispatchEvent(new CustomEvent('loadstart'));
-          fakeEmbed.readyState = 4;
-          fakeEmbed.dispatchEvent(new CustomEvent('load'));
-          fakeEmbed.dispatchEvent(new CustomEvent('loadend'));
-          fakeEmbed.loaded = true;
-        }, ms || 50);
-      };
-
-      fakeEmbed.fakeCrash = function(exitStatus, ms){
-        //PRE: The module should have already been loaded.
-        if(fakeEmbed.loaded){
-          setTimeout( function(){
-            fakeEmbed.exitStatus = exitStatus == undefined ? -1 : exitStatus;
-            fakeEmbed.dispatchEvent(new CustomEvent("crash"));
-            fakeEmbed.crashed = true;
-          } , ms || 50);
-        } else {
-          throw new Error("You're trying to fake crash a module that wasn't loaded.");
-        }
-      };
-
-      fakeEmbed.fakeMessage = function(data, ms){
-        //PRE: The module should have already been loaded.
-        if(fakeEmbed.loaded){
-          setTimeout( function(){
-            var e = new CustomEvent("message");
-            e.data = data;
-            fakeEmbed.dispatchEvent(e);
-            fakeEmbed.messageSent = true;
-          } , ms || 50);
-        } else {
-          throw new Error("You're trying to fake message  from a module that wasn't loaded.");
-        }
-      };
-
-      return fakeEmbed;
-
-    };
-
-    var createModuleWithFakeEmbed = function(){
-      var myModule = new NaClModule({src:'rpc-module.nmf', name:'rpc', id:testModuleId,type:'application/x-pnacl'}),
-          fakeEmbed = createFakeEmbed();
-      myModule.originalEmbed = myModule.moduleEl;
-      myModule.moduleEl = fakeEmbed;
-
-      // hack load so that it does a fake embed load
-      var normalLoad = myModule.load;
-      myModule.load = function(){
-        normalLoad.apply(myModule, arguments);
-        myModule.moduleEl.fakeLoad();
-      };
-      return myModule;
-    };
-
-    afterEach(function() {
+    beforeEach(function() {
       // remove the naclmodule after each test.
-      listenerElement = document.getElementById(testModuleId+'-listener');
+      var listenerElement = document.getElementById(testModuleId+'-listener');
       if(listenerElement){
         listenerElement.parentNode.removeChild(listenerElement);
       }
@@ -81,7 +15,7 @@ define(["NaClModule"], function(NaClModule){
 
 
     it("should construct",function(){
-      myModule = new NaClModule({src:'rpc-module.nmf', name:'rpc', id:testModuleId, type:'application/x-pnacl'});
+      var myModule = new NaClModule({src:'rpc-module.nmf', name:'rpc', id:testModuleId, type:'application/x-pnacl'});
       expect(myModule).toBeDefined();
     });
 
@@ -133,7 +67,7 @@ define(["NaClModule"], function(NaClModule){
 
 
     it("should load a module and call a callback we specify", function(){
-      var myModule = createModuleWithFakeEmbed();
+      var myModule = fakemodule.createModuleWithFakeEmbed(new NaClModule(myModuleAttrs));
 
       // we haven't called .load() yet, so the status should be 0.
       expect(myModule.status).toBe(0); // 0 means NO-STATUS
@@ -157,7 +91,7 @@ define(["NaClModule"], function(NaClModule){
     });
 
     it("should allow multiple load callbacks", function(){
-      var myModule = createModuleWithFakeEmbed(),
+      var myModule = fakemodule.createModuleWithFakeEmbed(new NaClModule(myModuleAttrs)),
           onload1  = jasmine.createSpy("load1"),
           onload2  = jasmine.createSpy("load2"),
           onload3  = jasmine.createSpy("load3");
@@ -183,7 +117,7 @@ define(["NaClModule"], function(NaClModule){
     });
 
     it("should handle messages", function(){
-      var myModule = createModuleWithFakeEmbed(),
+      var myModule = fakemodule.createModuleWithFakeEmbed(new NaClModule(myModuleAttrs)),
           onMessageSpy = jasmine.createSpy("onMessage"),
           onMessageSpy2 = jasmine.createSpy("onMessage2"),
           testData = "hello, world! I'm test number "+ (new Date()).getTime();
@@ -214,7 +148,7 @@ define(["NaClModule"], function(NaClModule){
     });
 
     it("should handle a module crash", function(){
-      var myModule = createModuleWithFakeEmbed(),
+      var myModule = fakemodule.createModuleWithFakeEmbed(new NaClModule(myModuleAttrs)),
           crashSpy = jasmine.createSpy("crashSpy");
 
       myModule.load();
@@ -239,8 +173,42 @@ define(["NaClModule"], function(NaClModule){
       });
     });
 
+    it("should handle events with thisReference", function(){
+      // two ways to do events: .load(fn) and .on(e, fn). We test adding a this reference to each of these.
+      var myModule = fakemodule.createModuleWithFakeEmbed(new NaClModule(myModuleAttrs));
+      var myObject = {};
+      var crazyFunctionName = "aMadeUpFunctionName"+(new Date()).getTime();
+      myObject[crazyFunctionName] = jasmine.createSpy("helloWorld");
+      myObject[crazyFunctionName+"2"] = jasmine.createSpy("helloWorld2");
+
+      var loaded1, loaded2 = false;
+
+      myModule.on("load", function(){
+        this[crazyFunctionName+"2"]();
+        loaded2 = true;
+      }, myObject);
+
+      myModule.load(function(){
+        this[crazyFunctionName]();
+        loaded1 = true;
+      }, myObject);
+
+      waitsFor(function(){
+        return loaded1 && loaded2;
+      }, "the module to load", 10000);
+
+      runs(function(){
+        expect(myObject[crazyFunctionName]).toHaveBeenCalled();
+        expect(myObject[crazyFunctionName+"2"]).toHaveBeenCalled();
+      });
+
+      // no test on method
+
+    });
+
+
     it("should postMessage to the embed", function(){
-      var myModule = createModuleWithFakeEmbed(),
+      var myModule = fakemodule.createModuleWithFakeEmbed(new NaClModule(myModuleAttrs)),
           testData = "Hello! I'm test number "+(new Date()).getTime();
 
       spyOn(myModule.moduleEl, "postMessage");
@@ -256,7 +224,7 @@ define(["NaClModule"], function(NaClModule){
     });
 
     it("shouldn't post the message if the module wasn't loaded", function(){
-      var myModule = createModuleWithFakeEmbed();
+      var myModule = fakemodule.createModuleWithFakeEmbed(new NaClModule(myModuleAttrs));
       spyOn(myModule.moduleEl, "postMessage");
       myModule.postMessage();
       expect(myModule.moduleEl.postMessage).not.toHaveBeenCalled();

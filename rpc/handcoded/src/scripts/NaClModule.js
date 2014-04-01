@@ -90,13 +90,15 @@ define(['lodash'], function(_){
   /**
    * Loads the NaCl module by appending it to the listener (which should be on the page by now).
    * @param {Function} [cb]
+   * @param thisArg What 'this' will be in the callback. Defualt: The module
    */
-  NaClModule.prototype.load = function(cb) {
+  NaClModule.prototype.load = function(cb, thisArg) {
     // Loads the module, then executes the callback.
     // append <embed> to the listener div.
+    var thisRef = _.isUndefined(thisArg) ? this : thisArg;
     this.on('load', function(e){
       if(_.isFunction(cb)){
-        cb.call(this, e);
+        cb.call(thisRef, e);
       }
       this.listenerDiv.removeEventListener('load', arguments.callee, true);
     });
@@ -136,14 +138,17 @@ define(['lodash'], function(_){
    * Adds event listener to the NaCl Module.
    * @param {string} eventName
    * @param {Function} cb
+   * @param thisArg What 'this' will be in the callback. Default: the module
    */
-  NaClModule.prototype.on = function(eventName, cb) {
+  NaClModule.prototype.on = function(eventName, cb, thisArg) {
     var thisModule = this;
+    var thisRef = _.isUndefined(thisArg) ? thisModule : thisArg;
+
     thisModule.listenerDiv.addEventListener(eventName, function(e){
       // wrap it around in case we want to do something first.
       // now call the callback, in the context of this module.
       if(_.isFunction(cb)){
-        cb.call(thisModule,e);
+        cb.call(thisRef,e);
       }
     }, true);
   };
