@@ -1,99 +1,117 @@
-Example flow:
-From Javascript, I call a function with a callback.
-It should do stuff in C++ and get back to me by calling the callback.
+The structure of Native calls is given below.
 
-Here is JavaScript's side of the story:
-
-
-+---------------------------x----------------------------+
-|                           x                            |
-| Echo("blah", func...);    x  CallCallback              |
-| Food(1, func..);          x                            | Stub
-| ...                       x                            |
-|           +               x           ^                |
-+-----------|---------------x-----------|----------------+
-            |                           |
-+-----------|---------------x-----------|----------------+
-|           v               x           +                |
-| RPCCall                   x  HandleCallback            |
-|                           x                            | Runtime
-|                           x                            |
-|           +               x           ^                |
-+-----------|---------------x-----------|----------------+
-            |                           |
-+-----------|---------------x-----------|----------------+
-|           v               x           +                |
-| CreateRPCRequest          x  CheckRPCCallback          |
-|                           x                            | JSON-RPC
-|                           x                            |
-|           +               x           ^                |
-+-----------|---------------x-----------|----------------+
-            |                           |
-+-----------|---------------x-----------|----------------+
-|           v               x           +                |
-| SendRPC                   x  HandleMessage             |
-|                           x                            | Transport
-|                           x                            |
-|                           x                            |
-+---------------------------x----------------------------+
-
-Here are some more details about what happens at each stage:
-
-1. myRPCModule.echo("hello world!", function(response){ console.log(response)});
-	--> Enter Stub
-		1. echo expects a single string paramater. Check it.
-		2. arguments correct.
-		3. rpcCall("echo", ["hello world!"], function()...)
-		--> Enter Runtime
-			1. create a new id for function call. e.g. id = 11639
-			2. map new id with callback and function that is passed in.
-			3. createRPCRequest("echo", ["hello world!"], 11639)
-			--> Enter JSON-RPC
-				1. Check params filled in
-				2. Create JSON object {"json-rpc":"2.0", ...}
-				3. SendRPC(JSON Object)
-				--> Enter Transport
-					1. Marshalling / compression (optional for now.)
-					2. module.postMessage ***
-					3. return true if module is loaded etc.
-				<-- Leaving Transport
-			--> Return to JSON-RPC
-				4. return true if RPC sent.
-			<-- Leaving JSON-RPC
-		--> Return to Runtime
-			4. Return true if RPC sent.
-		<-- Leaving Runtime
-	--> Return to Stub
-		4. Return true if rpc was sent
-	<-- Leaving Stub
-2. Check if the rpc was succesful.
+There are NaClRPCModules which can be thought of as name spaces that contain layers of implementation.
+These layers are shown below and explained below the diagram.
 
 
-***: C++ Receives a message through HandleMessage... It Creates a Callback object.
-===  TODO: C++ version of handle message
-     Eventually, C++ calls PostMessage which triggers the handleMessage on the module
+    +-------------------------------------------------------------------+
+    |                           NaClRPCModule                           |
+    |-------------------------------------------------------------------|
+    |                                                                   |
+    |                                                                   |
+    |     +-------------------------------------------------------+     |
+    |     |+-----------------------------------------------------+|     |
+    |     || +--------------------+ Stub +----------------------+|| 1   |
+    |     |+-----------------------------------------------------+|     |
+    |     +-------------------------------------------------------+     |
+    |                 +                      ^            ^             |
+    |                 |                      |            |             |
+    |                 |callRPC               |successCB   |errorCB      |
+    |                 |                      |            |             |
+    |                 v                      +            +             |
+    |     +-------------------------------------------------------+     |
+    |     |                        Runtime                        | 2   |
+    |     +-------------------------------------------------------+     |
+    |      +          +        +                ^           ^           |
+    |      |          |        |                |handle     |           |
+    |      |send      |send    |send            |Callback   |handle     |
+    |      |Callback  |Error   |Request         |/handleCall|Error      |
+    |      v          v        v                +           +           |
+    |     +-------------------------------------------------------+     |
+    |     |                        JSONRPC                        | 3   |
+    |     +-------------------------------------------------------+     |
+    |      +         +         +                ^                       |
+    |      |         |         |                |                       |
+    |      |sendRPC  |sendRPC  |sendRPC         |handleRPCCallback      |
+    |      |Callback |Error    |Request         |/ handleRPCCall        |
+    |      v         v         v                +                       |
+    |     +-------------------------------------------------------+     |
+    |     |                       Transport                       | 4   |
+    |     +-------------------------------------------------------+     |
+    |         +        +       +                ^                       |
+    |         |        |       |                |                       |
+    |         |        |       |                |                       |
+    |         |on      |load   |postMessage     |handleMessage          |
+    |         |        |       |                |                       |
+    |         v        v       v                +                       |
+    |     +-------------------------------------------------------+     |
+    |     |+-----------------------------------------------------+|     |
+    |     ||+-------------------+ NaClModule +------------------+|| 5   |
+    |     |+-----------------------------------------------------+|     |
+    |     +-------------------------------------------------------+     |
+    |                                                                   |
+    +-------------------------------------------------------------------+
 
-1. NaClModule: handleMessage(event)
-	--> Enter Transport
-		1. Unmarshall / uncompress (optional for now)
-		2. check RPC cb object
-		--> Enter JSON-RPC
-			1. Check stuff.
-			2. It's a callback. handleCallback(id, ["Hello World"]);
-			--> Enter Runtime
-				1. Handling callback, find callback by id.
-				2. Callback found. RunCallback(function()..., "Hello World")
-				--> Enter Stub
-					1. Running Callback, check return type etc.
-					2. Call callback function
-					3. Return true. The callback was called.
-					<-- Leaving Stub
-			--> Return to Runtime
-				3. Return true if succesful.
-				<-- Leaving Runtime
-		--> Return to JSON-RPC
-			3. Return true if succesful.
-			<-- Leaving JSON-RPC
-	--> Return to Transport
-		3. Callback succesful. Maybe do a handshake or something..
-		<-- Leaving Transport
+If we have a complicated calculation that needs to be done using a native application written in C++, we write a
+module for it in both C++ and JavaScript.
+
+The JavaScript module is explained here. It consists of method stubs whose implementations are in the native code.
+For example, we consider some functions that calculate some floating point arithmetic,. The module would be called
+FloatingArithmetic. Inside the module, we would have some stubs: float sum(float*), float product(float*), and
+float productSum(float*, float*).
+
+Inside a method stub, which is the top layer depicted above (1), some checks are made to ensure the right types have
+been passed in to the stub. Eventually, the callRPC method is called. The callRPC method is part of the Runtime library.
+Continuing from our example above, we consider the sum(float*) stub. In Javascript, this would be a function that
+takes in an array of Numbers and returns a float* representing their sum. But because our RPC system is asynchronous,
+the function would take in another parameter, a success callback, that gets called when the function returns. So the
+float sum(float*) function would look something like this:
+
+function sum(numbers, cb){
+   ...
+}
+
+This would be the JS stub, encapsulated inside the RPC Module. Somewhere inside the stub body, a call to the RPC Runtime
+layer would be made that would look like this:
+
+callRPC("sum", numbers, cb)
+
+The RPC Runtime (2) then constructs a json-rpc object. It also generates a new ID that uniquely identifies this function
+call. This ID is used to map callbacks with function calls. So when the C++ code finishes executing, the correct
+callback is made with the result of the RPC call. Eventually, the run time would construct a json-rpc object that looks
+like this:
+
+{
+  "jsonrpc"    : "2.0",
+  "method"     : "sum",
+  "id"         : 123,
+  "parameters" : numbers    /* the original array of numbers we passed in from the stub */
+}
+
+This JSON object is passed to the JSONRPC layer before being sent through the transport. The job of the JSONRPC layer (3)
+here (i.e. when the call is being made as opposed to received) is to verify that the object being sent actually matches
+the JSON-RPC spec before being sent. If it is validated successfully, it is passed to the transport layer.
+
+The transport layer (4) loads the module, and uses the module's postMessage method to finally post the message to the
+actual C++ native client module (5).
+
+The C++ code gets executed, a result is made on the C++ side, and is sent back to the javascript code using the pepper
+api with postMessage. The message that is sent is again a JSON-RPC object, that would look something like this:
+
+{
+  "jsonrpc" : "2.0",
+  "result"  : 7789.32123,
+  "id"      : 123
+}
+
+
+The postMessage is handled in JavaScript by the NaClModule, and passed to the Transport layer. It is then passed to the
+JSONRPC layer, where it identifies whether it is a callback, a call, or an error. If it is a callback, the handle
+callback method of the RPC Runtime is called with the result. Here, the runtime figures out which callback to call using
+the id. The callback is finally called with the result and the RPC is concluded.
+
+A similar process is done when the C++ code wishes to make a Javascript remote procedure call. The difference is that
+this time, the JSONRPC layer identifies that this is a call as opposed to a response. The method is looked up in the
+RPC Runtime. If it is found, it is executed. Any errors thrown are sent back to the caller using the JSON-RPC error
+format. If no errors are made, a response is made using the runtime, and sent in a similar way to how a request was sent
+as explained above.
