@@ -43,5 +43,10 @@ define(['NaClModule', 'lodash'], function(NaClModule, _){
     }
   };
 
+
+  RPCTransport.prototype.setJSONRPC = function(jsonRPC){
+    this.jsonRPC = jsonRPC;
+  };
+
 	return RPCTransport;
 });

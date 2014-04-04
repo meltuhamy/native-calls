@@ -90,6 +90,14 @@ define(["RPCTransport", "NaClModule", "fakemodule"], function(RPCTransport, NaCl
     });
 
 
+    it("should allow setting the json-rpc layer at runtime", function(){
+      var myModule = fakemodule.createModuleWithFakeEmbed(new NaClModule(fakeAttrs));
+      var jsonRPC = jasmine.createSpyObj("jsonRPC", ["checkRPCCallback"]);
+      var transport = new RPCTransport(myModule);
+      transport.setJSONRPC(jsonRPC);
+    });
+
+
 
     it("should handle messages coming from the module", function(){
       var myModule = fakemodule.createModuleWithFakeEmbed(new NaClModule(fakeAttrs));
