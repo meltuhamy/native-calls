@@ -86,7 +86,7 @@ define(["RPCTransport", "NaClModule", "fakemodule"], function(RPCTransport, NaCl
     it("should construct with a json-rpc layer", function(){
       var myModule = fakemodule.createModuleWithFakeEmbed(new NaClModule(fakeAttrs));
       var jsonRPC = jasmine.createSpyObj("jsonRPC", ["checkRPCCallback"]);
-      var transport = new RPCTransport(myModule, jsonRPC);
+      new RPCTransport(myModule, jsonRPC);
     });
 
 
@@ -133,8 +133,8 @@ define(["RPCTransport", "NaClModule", "fakemodule"], function(RPCTransport, NaCl
       var myModule = fakemodule.createModuleWithFakeEmbed(new NaClModule(fakeAttrs));
 
       // We mock the JSON RPC
-      var jsonRPC = jasmine.createSpyObj("jsonRPC", ["checkRPCCallback"]);
-      var transport = new RPCTransport(myModule, jsonRPC);
+      var jsonRPC = jasmine.createSpyObj("jsonRPC", ["handleRPCCallback"]);
+      transport = new RPCTransport(myModule, jsonRPC);
 
       // load and fake a message
       var loaded = false;
@@ -154,7 +154,7 @@ define(["RPCTransport", "NaClModule", "fakemodule"], function(RPCTransport, NaCl
       }, "module to load and receive a message", 10000);
 
       runs(function(){
-        expect(jsonRPC.checkRPCCallback).toHaveBeenCalled();
+        expect(jsonRPC.handleRPCCallback).toHaveBeenCalled();
       });
     });
 

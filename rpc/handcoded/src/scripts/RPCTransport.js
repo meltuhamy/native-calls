@@ -39,7 +39,7 @@ define(['NaClModule', 'lodash'], function(NaClModule, _){
 
   RPCTransport.prototype.handleMessage = function(message){
     if(!_.isUndefined(this.jsonRPC)){
-      this.jsonRPC.checkRPCCallback(message);
+      this.jsonRPC.handleRPCCallback(message);
     }
   };
 

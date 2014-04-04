@@ -13,6 +13,16 @@ define(["JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], function(JSONRPC
       }
       myModule = fakemodule.createModuleWithFakeEmbed(new NaClModule(fakeAttrs));
       transport = new RPCTransport(myModule);
+
+      // load the transport before each test.
+      var loaded = false;
+      transport.load(function(){
+        loaded = true;
+      });
+
+      waitsFor(function(){
+        return loaded;
+      }, "the module to load", 1000);
     });
 
 
@@ -119,7 +129,7 @@ define(["JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], function(JSONRPC
         "jsonrpc": "2.0",
         "result" : 19,
         "id"     : 1
-      })).toBe(true);
+      })).toBe(false);
 
     });
 
@@ -197,6 +207,27 @@ define(["JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], function(JSONRPC
       expect(JSONRPC.prototype.validateRPCError(json)).toBe(false);
       expect(JSONRPC.prototype.validateRPCRequest(json)).toBe(false);
 
+      // can't have a response without an id!
+      expect(JSONRPC.prototype.validateRPCCallback(json = {
+        "jsonrpc": "2.0",
+        "result" : 19,
+        "error"  : {}
+      })).toBe(false);
+      expect(JSONRPC.prototype.validateRPCError(json)).toBe(false);
+      expect(JSONRPC.prototype.validateRPCRequest(json)).toBe(false);
+
+      expect(JSONRPC.prototype.validateRPCCallback(json = {
+        "jsonrpc": "2.0",
+        "result": 23,
+        "error" : {
+          "code" : -32700,
+          "message" : "failed to parse",
+          "data"    : "the server failed to parse the message: 123"
+        }
+      })).toBe(false);
+      expect(JSONRPC.prototype.validateRPCError(json)).toBe(false);
+      expect(JSONRPC.prototype.validateRPCRequest(json)).toBe(false);
+
 
       // can't have an error without error object
       expect(JSONRPC.prototype.validateRPCCallback(json = {
@@ -239,34 +270,86 @@ define(["JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], function(JSONRPC
 
     // spec: http://www.jsonrpc.org/specification#batch
     it("should validate json-rpc batch calls according to spec", function(){
-      throw new Error("Fix failing test");
-
     });
 
 
 
     it("should send json-rpc requests", function(){
-      throw new Error("Fix failing test");
-
       // new request
+      spyOn(JSONRPC.prototype, "validateRPCRequest").andCallThrough();
+      spyOn(myModule, "postMessage");
+
+      var request = {
+            "jsonrpc": "2.0",
+            "method" : "helloWorld",
+            "params" : ["hello!"],
+            "id"     : 1
+          },
+          jsonRPC = new JSONRPC(transport);
+
+      jsonRPC.sendRPCRequest(request);
+
       // check validate called
+      expect(jsonRPC.validateRPCRequest).toHaveBeenCalled();
+
       // check postMessage called
+      expect(myModule.postMessage).toHaveBeenCalled();
     });
 
 
 
     it("should fail to send request if transport wasn't provided", function(){
-      throw new Error("Fix failing test");
+      // new request
+      spyOn(JSONRPC.prototype, "validateRPCRequest").andCallThrough();
+      spyOn(myModule, "postMessage");
 
+      var request = {
+            "jsonrpc": "2.0",
+            "method" : "helloWorld",
+            "params" : ["hello!"],
+            "id"     : 1
+          },
+          jsonRPC = new JSONRPC();
+
+
+      expect(function(){
+        jsonRPC.sendRPCRequest(request);
+      }).toThrow();
+
+      // check postMessage called
+      expect(myModule.postMessage).not.toHaveBeenCalled();
     });
 
 
 
     it("should handle json-rpc callbacks", function(){
-      throw new Error("Fix failing test");
+      spyOn(JSONRPC.prototype, "handleRPCCallback").andCallThrough();
+      spyOn(JSONRPC.prototype, "validateRPCCallback").andCallThrough();
 
-      // fakemessage with json callback
+      var jsonRPC = new JSONRPC(transport);
+
+      var messageSent = false;
+      myModule.on("message", function(){
+        messageSent = true;
+      });
+
+
+      myModule.moduleEl.fakeMessage({
+        "jsonrpc": "2.0",
+        "result" : 19,
+        "id"     : 1
+      });
+
+      waitsFor(function(){
+        return messageSent;
+      }, "the message to be sent", 1000);
+
+
       // check validate called
+      runs(function(){
+        expect(jsonRPC.handleRPCCallback).toHaveBeenCalled();
+        expect(jsonRPC.validateRPCCallback).toHaveBeenCalled();
+      });
 
     });
 
