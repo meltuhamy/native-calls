@@ -1,5 +1,6 @@
 define([],function(){
   // Use this to set up a fake module
+  var defaultEventTime = 10; //ms
   var createFakeEmbed = function(){
     var fakeEmbed = document.createElement("embed");
     fakeEmbed.loaded = false;
@@ -19,7 +20,7 @@ define([],function(){
 
         fakeEmbed.dispatchEvent(new CustomEvent('load'));
         fakeEmbed.dispatchEvent(new CustomEvent('loadend'));
-      }, ms || 50);
+      }, ms || defaultEventTime);
     };
 
     fakeEmbed.fakeCrash = function(exitStatus, ms){
@@ -29,7 +30,7 @@ define([],function(){
           fakeEmbed.exitStatus = exitStatus == undefined ? -1 : exitStatus;
           fakeEmbed.dispatchEvent(new CustomEvent("crash"));
           fakeEmbed.crashed = true;
-        } , ms || 50);
+        } , ms || defaultEventTime);
       } else {
         throw new Error("You're trying to fake crash a module that wasn't loaded.");
       }
@@ -43,7 +44,7 @@ define([],function(){
           e.data = data;
           fakeEmbed.dispatchEvent(e);
           fakeEmbed.messageSent = true;
-        } , ms || 50);
+        } , ms || defaultEventTime);
       } else {
         throw new Error("You're trying to fake message  from a module that wasn't loaded.");
       }
