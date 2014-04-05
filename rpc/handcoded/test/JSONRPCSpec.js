@@ -3,7 +3,8 @@ define(["JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], function(JSONRPC
     var testModuleId = "jsonrpc-layer";
     var fakeAttrs = {src:'rpc-module.nmf', name:'myRPC', id:testModuleId, type:'application/x-pnacl'};
 
-    var myModule, transport;
+    var myModule, transport, rpcRuntime;
+
 
     beforeEach(function() {
       // remove the naclmodule after each test.
@@ -23,6 +24,7 @@ define(["JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], function(JSONRPC
       waitsFor(function(){
         return loaded;
       }, "the module to load", 1000);
+      rpcRuntime = jasmine.createSpyObj("rpcRuntime", ["setJSONRPC", "handleRequest", "handleCallback", "handleError"])
     });
 
 
@@ -325,31 +327,168 @@ define(["JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], function(JSONRPC
     it("should handle json-rpc callbacks", function(){
       spyOn(JSONRPC.prototype, "handleRPCCallback").andCallThrough();
       spyOn(JSONRPC.prototype, "validateRPCCallback").andCallThrough();
+      spyOn(JSONRPC.prototype, "validateRPCError").andCallThrough();
+      spyOn(JSONRPC.prototype, "validateRPCRequest").andCallThrough();
 
-      var jsonRPC = new JSONRPC(transport);
+      var jsonRPC = new JSONRPC(transport, rpcRuntime);
 
-      var messageSent = false;
-      myModule.on("message", function(){
-        messageSent = true;
-      });
+      // 3 cases to check: call, callback, and error
+      var callJSON = {
+        "jsonrpc": "2.0",
+        "method" : "helloWorld",
+        "params" : ["hello!"],
+        "id"     : 1
+      };
 
-
-      myModule.moduleEl.fakeMessage({
+      var callbackJSON = {
         "jsonrpc": "2.0",
         "result" : 19,
         "id"     : 1
+      };
+
+      var errorJSON = {
+        "jsonrpc": "2.0",
+        "error" : {
+          "code" : -32700,
+          "message" : "failed to parse",
+          "data"    : "the server failed to parse the message: 123"
+        },
+        "id"     : 1
+      };
+
+
+      // send all the json-rpc messages from the module
+      var messageCount = 0;
+      myModule.on("message", function(){
+        messageCount++;
       });
+
+      myModule.moduleEl.fakeMessage(callJSON);
+      myModule.moduleEl.fakeMessage(callbackJSON);
+      myModule.moduleEl.fakeMessage(errorJSON);
 
       waitsFor(function(){
-        return messageSent;
-      }, "the message to be sent", 1000);
+        return messageCount >= 3;
+      }, "the messages to be sent", 1000);
 
 
-      // check validate called
+      // check validates called
       runs(function(){
-        expect(jsonRPC.handleRPCCallback).toHaveBeenCalled();
+        expect(jsonRPC.handleRPCCallback.calls.length).toEqual(3); //called 3 times
+        expect(jsonRPC.validateRPCRequest).toHaveBeenCalled();
         expect(jsonRPC.validateRPCCallback).toHaveBeenCalled();
+        expect(jsonRPC.validateRPCError).toHaveBeenCalled();
       });
+
+
+    });
+
+
+    it("should call runtime methods when handling a json-rpc message, if a runtime is provided", function(){
+      new JSONRPC(transport, rpcRuntime);
+
+      // 3 cases to check: call, callback, and error
+      var callJSON = {
+        "jsonrpc": "2.0",
+        "method" : "helloWorld",
+        "params" : ["hello!"],
+        "id"     : 1
+      };
+
+      var callbackJSON = {
+        "jsonrpc": "2.0",
+        "result" : 19,
+        "id"     : 1
+      };
+
+      var errorJSON = {
+        "jsonrpc": "2.0",
+        "error" : {
+          "code" : -32700,
+          "message" : "failed to parse",
+          "data"    : "the server failed to parse the message: 123"
+        },
+        "id"     : 1
+      };
+
+
+      // send all the json-rpc messages from the module
+      var messageCount = 0;
+      myModule.on("message", function(){
+        messageCount++;
+      });
+
+      myModule.moduleEl.fakeMessage(callJSON);
+      myModule.moduleEl.fakeMessage(callbackJSON);
+      myModule.moduleEl.fakeMessage(errorJSON);
+
+      waitsFor(function(){
+        return messageCount >= 3;
+      }, "the messages to be sent", 1000);
+
+
+      // check validates called
+      runs(function(){
+        expect(rpcRuntime.handleRequest).toHaveBeenCalled();
+        expect(rpcRuntime.handleCallback).toHaveBeenCalled();
+        expect(rpcRuntime.handleError).toHaveBeenCalled();
+      });
+
+
+    });
+
+    it("shouldn't call rpc runtime methods if a runtime is not set", function(){
+      spyOn(console, "error");
+      new JSONRPC(transport);
+
+      // 3 cases to check: call, callback, and error
+      var callJSON = {
+        "jsonrpc": "2.0",
+        "method" : "helloWorld",
+        "params" : ["hello!"],
+        "id"     : 1
+      };
+
+      var callbackJSON = {
+        "jsonrpc": "2.0",
+        "result" : 19,
+        "id"     : 1
+      };
+
+      var errorJSON = {
+        "jsonrpc": "2.0",
+        "error" : {
+          "code" : -32700,
+          "message" : "failed to parse",
+          "data"    : "the server failed to parse the message: 123"
+        },
+        "id"     : 1
+      };
+
+
+      // send all the json-rpc messages from the module
+      var messageCount = 0;
+      myModule.on("message", function(){
+        messageCount++;
+      });
+
+      myModule.moduleEl.fakeMessage(callJSON);
+      myModule.moduleEl.fakeMessage(callbackJSON);
+      myModule.moduleEl.fakeMessage(errorJSON);
+
+      waitsFor(function(){
+        return messageCount >= 3;
+      }, "the messages to be sent", 1000);
+
+
+      // check runtime methods not called
+      runs(function(){
+        expect(rpcRuntime.handleRequest).not.toHaveBeenCalled();
+        expect(rpcRuntime.handleCallback).not.toHaveBeenCalled();
+        expect(rpcRuntime.handleError).not.toHaveBeenCalled();
+        expect(console.error.calls.length).toEqual(3); //should print 3 error messages
+      });
+
 
     });
 

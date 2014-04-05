@@ -1,8 +1,13 @@
 define(['RPCTransport', 'lodash'], function(RPCTransport, _){
-	function JSONRPC(rpcTransport){
+	function JSONRPC(rpcTransport, runtime){
     if(!_.isUndefined(rpcTransport)){
       this.transport = rpcTransport;
       rpcTransport.setJSONRPC(this);
+    }
+
+    if(!_.isUndefined(runtime)){
+      this.runtime = runtime;
+      runtime.setJSONRPC(this);
     }
 	}
 
@@ -11,6 +16,14 @@ define(['RPCTransport', 'lodash'], function(RPCTransport, _){
            (rpcObject.jsonrpc === "2.0") &&
            (_.isString(rpcObject.method) || !_.isUndefined(rpcObject.result) || _.isObject(rpcObject.error));
   }
+
+  JSONRPC.prototype.setTransport = function(transport){
+    this.transport = transport;
+  };
+
+  JSONRPC.prototype.setRuntime = function(runtime){
+    this.runtime = runtime;
+  };
 
   /**
    * Checks that the given object is a valid JSON RPC request,
@@ -68,17 +81,35 @@ define(['RPCTransport', 'lodash'], function(RPCTransport, _){
    */
   JSONRPC.prototype.handleRPCCallback = function(eventObject){
     var rpcObject = eventObject.data;
+
     if(this.validateRPCCallback(rpcObject)){
       // it's a successful response that is a callback
-      // TODO goes to the RPC Runtime layer now.
-      return true;
+      if(!_.isUndefined(this.runtime)){
+        this.runtime.handleCallback(rpcObject);
+        return true;
+      } else {
+        console.error("JSONRPC received callback response but no runtime is set to handle it.");
+        return false;
+      }
+
     } else if(this.validateRPCError(rpcObject)){
       // it's a "successful" response that is an error
-      // TODO goes to the RPC Runtime layer now.
-      return true;
+      if(!_.isUndefined(this.runtime)){
+        this.runtime.handleError(rpcObject);
+        return true;
+      } else {
+        console.error("JSONRPC received error response but no runtime is set to handle it.");
+        return false;
+      }
     } else if (this.validateRPCRequest(rpcObject)){
       // it's a rpc call
-      // TODO goes to the RPC Runtime layer now.
+      if(!_.isUndefined(this.runtime)){
+        this.runtime.handleRequest(rpcObject);
+        return true;
+      } else {
+        console.error("JSONRPC received rpc request but no runtime is set to handle it.");
+        return false;
+      }
     } else{
       // it's not a rpc response.
       console.info("Received a message that is not a RPC response");
