@@ -137,5 +137,34 @@ define(['RPCTransport', 'lodash'], function(RPCTransport, _){
 
   };
 
+  JSONRPC.prototype.constructRPCRequest = function(method, id, params){
+    return {
+      "jsonrpc": "2.0",
+      "method": method,
+      "id": id,
+      "params": params
+    };
+  };
+
+  JSONRPC.prototype.constructRPCCallback = function(id, result){
+    return {
+      "jsonrpc": "2.0",
+      "id": id,
+      "result": result
+    };
+  };
+
+  JSONRPC.prototype.constructRPCError = function(id, code, message, data){
+    return {
+      "jsonrpc": "2.0",
+      "id": id,
+      "error": {
+        "code": code,
+        "message": message,
+        "data": data
+      }
+    };
+  };
+
 	return JSONRPC;
 });

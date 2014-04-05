@@ -493,6 +493,29 @@ define(["JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], function(JSONRPC
     });
 
 
+    it("should construct valid json rpc request objects", function(){
+      var jsonRPC = new JSONRPC(transport);
+      var constructed = jsonRPC.constructRPCRequest("myFunction", 12, ["hello", "world"]);
+      expect(jsonRPC.validateRPCRequest(constructed)).toBe(true);
+    });
+
+
+
+    it("should construct valid json rpc callback objects", function(){
+      var jsonRPC = new JSONRPC(transport);
+      var constructed = jsonRPC.constructRPCCallback(12, 123);
+      expect(jsonRPC.validateRPCCallback(constructed)).toBe(true);
+    });
+
+
+
+    it("should construct valid json rpc error objects", function(){
+      var jsonRPC = new JSONRPC(transport);
+      var constructed = jsonRPC.constructRPCError(12, -113, "Parsing failed", "Extra error data");
+      expect(jsonRPC.validateRPCError(constructed)).toBe(true);
+
+    });
+
 
   });
 });
