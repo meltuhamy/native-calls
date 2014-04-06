@@ -9,8 +9,8 @@
 #define LOGGERINSTANCE_H_
 
 #include <ppapi/cpp/instance.h>
-#include "../src/Logger.h"
-#include "../../NaClRPCInstance.h"
+#include "Logger.h"
+#include "NaClRPCInstance.h"
 class LoggerInstance: public NaClRPCInstance {
 public:
 	LoggerInstance(PP_Instance instance) : NaClRPCInstance(instance) {};

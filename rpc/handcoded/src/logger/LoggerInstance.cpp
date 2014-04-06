@@ -9,7 +9,7 @@
 #include "ppapi/cpp/var.h"
 #include "ppapi/cpp/var_array.h"
 #include "ppapi/cpp/var_dictionary.h"
-#include "../src/Logger.h"
+#include "Logger.h"
 /**
  * Handle RPC calls
  */
@@ -22,7 +22,7 @@ void LoggerInstance::HandleRPC(std::string name, pp::VarArray params, int id) {
 				std::string result = Echo(firstParam.AsString());
 				// Now do a callback
 				pp::Var responseData = pp::Var(result);
-				PostMessage(*ConstructResponseDictionary(id, &responseData, 1));
+				PostMessage(*ConstructResponseDictionary(id, responseData));
 			}
 		}
 	}

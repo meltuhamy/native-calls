@@ -3,7 +3,7 @@
 # found in the LICENSE file.
 
 #
-# GNU Make based build file.  For details on GNU Make see:
+# GNU Make based build file. ��For details on GNU Make see:
 # http://www.gnu.org/software/make/manual/make.html
 #
 
@@ -46,8 +46,8 @@ all: rpc-module.pexe
 clean:
 	$(RM) *.pexe *.bc
 
-rpc-module.bc: NaClRPCInstance.cpp logger/gen/*.cpp logger/src/*.cpp
-	$(PNACL_CXX) -o $@ NaClRPCInstance.cpp logger/gen/*.cpp logger/src/*.cpp -O2 $(CXXFLAGS) $(LDFLAGS)
+rpc-module.bc: logger/*.cpp
+	$(PNACL_CXX) -o $@ logger/*.cpp -O2 $(CXXFLAGS) $(LDFLAGS)
 
 rpc-module.pexe: rpc-module.bc
 	$(PNACL_FINALIZE) -o $@ $<

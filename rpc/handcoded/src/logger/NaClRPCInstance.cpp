@@ -28,26 +28,14 @@ pp::VarDictionary * NaClRPCInstance::ConstructRequestDictionary(std::string meth
 }
 
 pp::VarDictionary * NaClRPCInstance::ConstructResponseDictionary(int responseID,
-		pp::Var* responseParams, int length) {
+		pp::Var responseResult) {
 	pp::VarDictionary *rpcDict = ConstructBasicResponseDictionary(responseID);
 	pp::VarArray responseArray = pp::VarArray(rpcDict->Get("result"));
-	for (int i = 0; i < length; i++) {
-		responseArray.Set(i, responseParams[i]);
-	}
+	rpcDict->Set("result", responseResult);
 	return rpcDict;
 
 }
 
-pp::VarDictionary * NaClRPCInstance::ConstructResponseDictionary(int responseID,
-		std::vector<pp::Var> responseParams) {
-	pp::VarDictionary *rpcDict = ConstructBasicResponseDictionary(responseID);
-	pp::VarArray responseArray = pp::VarArray(rpcDict->Get("result"));
-	for (std::vector<pp::Var>::size_type i = 0; i != responseParams.size();
-			i++) {
-		responseArray.Set(i, responseParams[i]);
-	}
-	return rpcDict;
-}
 
 pp::VarDictionary * NaClRPCInstance::ConstructBasicRequestDictionary(
 		std::string method) {
@@ -84,9 +72,10 @@ bool NaClRPCInstance::VerifyRPC(pp::Var d, std::string& methodName,
 	bool success = false;
 	if (d.is_dictionary()) {
 		pp::VarDictionary rpcDict = pp::VarDictionary(d);
-		if (rpcDict.HasKey("json-rpc") && rpcDict.HasKey("method")
+		if (rpcDict.HasKey("jsonrpc") && rpcDict.HasKey("method")
 				&& rpcDict.HasKey("params") && rpcDict.HasKey("id")
-				&& rpcDict.Get("json-rpc").AsString() == "2.0") {
+				&& rpcDict.Get("jsonrpc").AsString() == "2.0") {
+
 			pp::Var methodVar = rpcDict.Get("method");
 			pp::Var paramsVar = rpcDict.Get("params");
 			pp::Var idVar = rpcDict.Get("id");
@@ -104,6 +93,7 @@ bool NaClRPCInstance::VerifyRPC(pp::Var d, std::string& methodName,
 }
 
 void NaClRPCInstance::HandleMessage(const pp::Var& var_message) {
+
     std::string methodName; pp::VarArray methodParams; int id;
     if(VerifyRPC(var_message, methodName, methodParams, id)){
     	HandleRPC(methodName, methodParams, id);

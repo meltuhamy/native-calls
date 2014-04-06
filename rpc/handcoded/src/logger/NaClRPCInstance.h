@@ -15,7 +15,7 @@ public:
 	virtual ~NaClRPCInstance() {
 	}
 	pp::VarDictionary * ConstructResponseDictionary(int responseID,
-			pp::Var* responseParams, int length);
+			pp::Var responseResult);
 	pp::VarDictionary * ConstructResponseDictionary(int responseID,
 			std::vector<pp::Var> responseParams);
 	pp::VarDictionary * ConstructRequestDictionary(std::string method,

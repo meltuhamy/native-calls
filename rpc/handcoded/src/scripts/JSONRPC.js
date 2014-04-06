@@ -13,7 +13,7 @@ define(['RPCTransport', 'lodash'], function(RPCTransport, _){
 
   function isBasicJSONRPC(rpcObject){
     return _.isObject(rpcObject) && _.isString(rpcObject.jsonrpc) &&
-           (rpcObject.jsonrpc === "2.0") &&
+           (rpcObject.jsonrpc == "2.0") &&
            (_.isString(rpcObject.method) || !_.isUndefined(rpcObject.result) || _.isObject(rpcObject.error));
   }
 

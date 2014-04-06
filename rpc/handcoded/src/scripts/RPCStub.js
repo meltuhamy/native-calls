@@ -117,7 +117,7 @@ define(['RPCRuntime', 'lodash'], function(RPCRuntime, _){
   RPCStub.prototype.isArray = _.isArray;
 
   RPCStub.prototype.checkType = function(x, type){
-    if(type === "Any"){
+    if(type == "Any"){
       return true;
     } else {
       return this["is"+type](x);
