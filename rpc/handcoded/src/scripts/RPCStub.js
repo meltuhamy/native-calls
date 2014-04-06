@@ -40,6 +40,11 @@ define(['RPCRuntime', 'lodash'], function(RPCRuntime, _){
         checkReturn = function(result){
           return stubThis.checkType(result, stubSpec.returnType);
         };
+      } else {
+        // if we weren't given a returnType, assume we don't want to check it (i.e. it is 'Any')
+        checkReturn = function(){
+          return true;
+        }
       }
 
       // finally, construct the actual function
