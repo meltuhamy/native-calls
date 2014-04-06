@@ -1,6 +1,7 @@
 define([],function(){
   // Use this to set up a fake module
-  var defaultEventTime = 10; //ms
+  var defaultEventTime = 5; //ms
+  var defaultLoadTime = 0; //ms
   var createFakeEmbed = function(){
     var fakeEmbed = document.createElement("embed");
     fakeEmbed.loaded = false;
@@ -20,7 +21,7 @@ define([],function(){
 
         fakeEmbed.dispatchEvent(new CustomEvent('load'));
         fakeEmbed.dispatchEvent(new CustomEvent('loadend'));
-      }, ms || defaultEventTime);
+      }, ms || defaultLoadTime);
     };
 
     fakeEmbed.fakeCrash = function(exitStatus, ms){

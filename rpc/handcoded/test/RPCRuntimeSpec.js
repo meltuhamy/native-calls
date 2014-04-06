@@ -155,7 +155,7 @@ define(["RPCRuntime", "JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], fu
 
     it("should handle many simultaneous RPC requests and do the correct callbacks", function(){
       var i;
-      var numTests = 30;
+      var numTests = 10;
       //create numCallbacks number of spies
       var spies = [];
       for(i=0; i<numTests; i++){
@@ -184,7 +184,7 @@ define(["RPCRuntime", "JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], fu
           // send an error!
           var errorObject = jsonRPC.constructRPCError(ids[i], "-1234", "I am an error message", i);
           resultsAndErrors.push(errorObject.error);
-          myModule.moduleEl.fakeMessage(errorObject,5); // send quickly (5ms)
+          myModule.moduleEl.fakeMessage(errorObject,1); // send quickly (1ms)
 
         }
       }
@@ -213,7 +213,7 @@ define(["RPCRuntime", "JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], fu
     it("shouldn't be affected by the order of the RPC responses compared to the order of the RPC requests", function(){
       // same as previous test, only this time the messages received are in random order.
       var i;
-      var numTests = 30;
+      var numTests = 10;
       //create numCallbacks number of spies
       var spies = [];
       for(i=0; i<numTests; i++){
@@ -242,8 +242,8 @@ define(["RPCRuntime", "JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], fu
           // send an error!
           var errorObject = jsonRPC.constructRPCError(ids[i], "-1234", "I am an error message", i);
           resultsAndErrors.push(errorObject.error);
-          // send randomly, in a range between 5 and 50 ms
-          myModule.moduleEl.fakeMessage(errorObject, Math.random() * (50 - 5) + 5);
+          // send randomly, in a range between 0 and 10 ms
+          myModule.moduleEl.fakeMessage(errorObject, Math.floor(Math.random() * 10));
 
         }
       }
