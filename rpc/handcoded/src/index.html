@@ -1,31 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="-1">
   <title>RPC Example</title>
   <script src="scripts/paths.require.js"></script>
   <script data-main="scripts/main" src="scripts/lib/requirejs/require.js"></script>
 </head>
 <body>
   <h1>RPCModule Example</h1>
-  <p>Make sure you have built the rpc module, by typing <code>make</code> in this folder. <br /> Open the console and type in: <br />
-<pre>EchoRPCModule.Echo("Mohamed", function(result){
+  <p>Make sure you have built the rpc module, by typing <code>make</code> in the <code>Logger</code> folder. <br />
+      Open the console and type in: <br /> </p>
+<pre>Logger.helloName("Mohamed", function(result){
     console.log(JSON.stringify(result))
 });</pre>
-  </p>
+
+  <p>This will first load the C++ module, then call the helloName C++ function. The result will come to the callback function.</p>
 
 <h2>How it works</h2>
-  EchoRPCModule is constructed using the RPCModule function. This requires a NaClModule and function definitions. The result is a name-spaced set of functions that you can call directly, as in the example above.
-<pre>
-new RPCModule({
-    "module": new NaClModule({src:'../rpc-module.nmf', name:'myRPC', id:"naclRPC", type:'application/x-pnacl'}),
-    "functions": [
-      {"name": "Echo", "params": ["String"], "returnType": "String"}
-    ]
-  });
-</pre>
+  <p>LoggerRPCModule is constructed using the RPCModule function. This requires a NaClModule and function definitions.
+      The result is a name-spaced set of functions that you can call directly, as in the example above.</p>
 
-<p>For more information, check structure.txt</p>
+  <p>The LoggerRPCModule is generated using the IDL file (Logger.idl).
+      This is done when <code>Make</code> is called in the <code>Logger</code> folder.
+      This means all we need to do is change this IDL file whenever the C++ API you want to expose changes. </p>
+
+<p>For more information about how the RPC works, check ../structure.txt</p>
 </body>
 </html>

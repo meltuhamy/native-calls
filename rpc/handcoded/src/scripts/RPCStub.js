@@ -1,4 +1,4 @@
-define(['RPCRuntime', 'lodash'], function(RPCRuntime, _){
+define(['RPCRuntime', 'IDLTypeMap', 'lodash'], function(RPCRuntime, IDLTypeMap, _){
 	function RPCStub(rpcRuntime){
     // a stub requires a runtime
     if(_.isUndefined(rpcRuntime)){
@@ -23,9 +23,12 @@ define(['RPCRuntime', 'lodash'], function(RPCRuntime, _){
             throw new Error("Number of arguments ("+argumentsArray.length+") doesn't match spec ("+stubSpec.params.length+").")
           }
           for(var i = 0; i < argumentsArray.length; i++){
-            var expectedType = stubSpec.params[i];
+            var expectedTypeRaw = stubSpec.params[i];
+            // check if that's an array
+            var expectedTypeIsArray = /Array/.test(expectedTypeRaw);
+            var expectedType = IDLTypeMap[stubSpec.params[i]].replace("Array", "");
             var argumentIn = argumentsArray[i];
-            if(!stubThis.checkType(argumentIn, expectedType)){
+            if(!stubThis.checkType(argumentIn, expectedType, expectedTypeIsArray)){
               throw new Error("Param "+argumentIn+" is not of expected type "+expectedType);
             }
           }
@@ -38,7 +41,9 @@ define(['RPCRuntime', 'lodash'], function(RPCRuntime, _){
       if(_.isString(stubSpec.returnType)){
         // sort out return type
         checkReturn = function(result){
-          return stubThis.checkType(result, stubSpec.returnType);
+          var expectedTypeIsArray = /Array/.test(stubSpec.returnType);
+          var expectedType = IDLTypeMap[stubSpec.returnType].replace("Array", "");
+          return stubThis.checkType(result, expectedType, expectedTypeIsArray);
         };
       } else {
         // if we weren't given a returnType, assume we don't want to check it (i.e. it is 'Any')
@@ -116,11 +121,32 @@ define(['RPCRuntime', 'lodash'], function(RPCRuntime, _){
 
   RPCStub.prototype.isArray = _.isArray;
 
-  RPCStub.prototype.checkType = function(x, type){
+  RPCStub.prototype.isDate = _.isDate;
+
+  RPCStub.prototype.isObject = _.isObject;
+
+  RPCStub.prototype.isUndefined = _.isUndefined;
+
+  RPCStub.prototype.checkType = function(x, type, isArray){
     if(type == "Any"){
       return true;
     } else {
-      return this["is"+type](x);
+      var checker = this["is"+type];
+
+      if(isArray){
+        if(!this.isArray(x)){
+          return false;
+        }
+
+        for(var i = 0; i< x.length; i++){
+          if(!checker(x[i])){
+            return false;
+          }
+        }
+        return true;
+      } else {
+        return checker(x);
+      }
     }
   };
 

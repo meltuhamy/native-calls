@@ -2,7 +2,7 @@
   "program": {
     "portable": {
       "pnacl-translate": {
-        "url": "rpc-module.pexe"
+        "url": "Logger.pexe"
       }
     }
   }

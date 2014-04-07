@@ -2,8 +2,8 @@ requirejs.config({
   paths: REQUIRE_PATHS
 });
 
-require(["EchoRPCModule"], function(EchoRPCModule) {
+require(["../Logger/LoggerRPCModule"], function(LoggerRPCModule) {
 
-  window.EchoRPCModule = EchoRPCModule;
+  window.Logger = LoggerRPCModule;
 
 });

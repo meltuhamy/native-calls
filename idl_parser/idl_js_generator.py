@@ -14,9 +14,17 @@ class JSGenerator(Generator):
                 out += self.CompileNode(child)
             return out
         elif node.IsA('Interface'):
-            out = '/* Interface: {0} */\n\n'.format(str(node.GetName()))
-            for child in node.GetChildren():
-                out += self.CompileNode(child)
+            out = (
+                "define(['RPCModule', 'NaClModule'], function(RPCModule, NaClModule){{\n"
+                "  return new RPCModule({{\n"
+                "    'module': new NaClModule({{src:'{mname}/{mname}.nmf', name:'{mname}', id:'{mname}', type:'application/x-pnacl'}}),\n"
+                "    'functions': [\n").format(mname=str(node.GetName()))
+            for (i, child) in enumerate(node.GetChildren()):
+                out += (',\n' if i > 0 else '') + self.CompileNode(child)
+            out+= (
+                "\n    ]\n"
+                "  });\n"
+                "});\n")
             return out
         elif node.IsA('Operation'):
             return self.CompileOperation(node)
@@ -37,21 +45,18 @@ class JSGenerator(Generator):
         paramsTypesString = ''
         if arguments is not None:
             for (i, arg) in enumerate(arguments):
-                paramsString += (', ' if i > 0 else '') + arg.GetName()
-                paramsTypesString += (', ' if i > 0 else '') + arg.GetName() + ':' + self.getArgumentType(arg)
+                paramsString += (', ' if i > 0 else '') + "'" + arg.GetName() + "'"
+                paramsTypesString += (', ' if i > 0 else '') + "'" + self.getArgumentType(arg) + "'"
 
-        out += ("/* Returns: {returntype} */\n"
-                "function {fname}({params}) {{\n"
-                "  /* TODO Check these argument types:\n"
-                "   * {paramtypes}\n"
-                "   */\n"
-                "}}\n\n").format(returntype=self.CompileType(type),fname=str(node.GetName()), params=paramsString, paramtypes=paramsTypesString)
+        out+= (
+            "      {{'name': '{fname}', 'params': [{paramtypes}], 'returnType': '{returntype}'}}"
+        ).format(returntype=self.CompileType(type),fname=str(node.GetName()), params=paramsString, paramtypes=paramsTypesString)
 
         return out
 
     def CompileType(self, type):
         if type is None:
-            return 'void '
+            return 'void'
         else:
 
             primitiveType = 'void'
@@ -65,7 +70,7 @@ class JSGenerator(Generator):
                     while len(temp.GetChildren()) > 0:
                         isArray += '[]'
                         temp = temp.GetChildren()[0]
-            return str(primitiveType) + str(isArray) + ' '
+            return str(primitiveType) + str(isArray)
 
     def getArgumentType(self, arg):
         if arg is None:
