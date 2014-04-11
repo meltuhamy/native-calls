@@ -9,3 +9,9 @@ This is still work in progress. Check the [milestones](https://github.com/meltuh
 ## WebIDL
 
 The project uses WebIDL to define interfaces. The WebIDL is compiled into C++ and JavaScript stubs. Implementation details are in the [idl_parser directory](https://github.com/meltuhamy/native-calls/tree/master/idl_parser).
+
+## Docs
+
+You can read some design docs in the [docs folder](https://github.com/meltuhamy/native-calls/tree/master/docs).
+
+The full project report (in progress) is written in TeX and is found in the [report folder](https://github.com/meltuhamy/native-calls/tree/master/report).
