@@ -14,6 +14,7 @@ public:
 	}
 	virtual ~NaClRPCInstance() {
 	}
+	virtual void l(pp::Var x);
 	pp::VarDictionary * ConstructResponseDictionary(int responseID,
 			pp::Var responseResult);
 	pp::VarDictionary * ConstructResponseDictionary(int responseID,

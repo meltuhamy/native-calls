@@ -34,19 +34,19 @@ export CYGWIN
 
 
 # Declare the ALL target first, to make the 'all' target the default build
-all: FibModule
+all: ObjectsExampleModule
 
 clean:
 	$(RM) *.pexe *.bc *.js
 
-Fib.bc: $(RPCINSTANCE)/*.cpp *.cpp
+ObjectsExample.bc: $(RPCINSTANCE)/*.cpp *.cpp
 	$(PNACL_CXX) -o $@ $(RPCINSTANCE)/*.cpp *.cpp -O2 $(CXXFLAGS) $(LDFLAGS)
 
-Fib.pexe: Fib.bc
+ObjectsExample.pexe: ObjectsExample.bc
 	$(PNACL_FINALIZE) -o $@ $<
 
-FibModule: Fib.idl Fib.pexe
-	../../../../idl_parser/idl_js_generator.py Fib.idl > FibRPCModule.js
+ObjectsExampleModule: ObjectsExample.idl ObjectsExample.pexe
+	../../../../idl_parser/idl_js_generator.py ObjectsExample.idl > ObjectsExampleRPCModule.js
 #
 # Makefile target to run the SDK's simple HTTP server and serve this example.
 #

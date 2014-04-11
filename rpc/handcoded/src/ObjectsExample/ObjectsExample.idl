@@ -1,0 +1,4 @@
+interface ObjectsExample {
+  long acceptsObject(object x);
+  long acceptsTypedArray(object x);
+};

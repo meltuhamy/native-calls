@@ -7,6 +7,9 @@
 #include "ppapi/cpp/var_array.h"
 #include "NaClRPCInstance.h"
 
+void NaClRPCInstance::l(pp::Var x){
+	LogToConsole(PP_LOGLEVEL_WARNING, x);
+}
 pp::VarDictionary * NaClRPCInstance::ConstructRequestDictionary(std::string method,
 		pp::Var* params, int length) {
 	pp::VarDictionary *rpcDict = ConstructBasicRequestDictionary(method);
@@ -93,11 +96,20 @@ bool NaClRPCInstance::VerifyRPC(pp::Var d, std::string& methodName,
 }
 
 void NaClRPCInstance::HandleMessage(const pp::Var& var_message) {
-
+	l("instance received message");
     std::string methodName; pp::VarArray methodParams; int id;
     if(VerifyRPC(var_message, methodName, methodParams, id)){
     	HandleRPC(methodName, methodParams, id);
     } else {
       // It's not a RPC call!
+    	l("Instance received message that isn't jsonrpc.");
+    	l("is_string, is_int, is_array, is_dictionary, is_array_buffer:");
+    	l(var_message.is_string());
+    	l(var_message.is_int());
+    	l(var_message.is_array());
+    	l(var_message.is_dictionary());
+    	l(var_message.is_array_buffer());
+    	l("debug string");
+    	l(var_message.DebugString());
     }
 }

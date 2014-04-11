@@ -1,4 +1,4 @@
-RPCINSTANCE = "../NaClRPCInstance"
+RPCINSTANCE = ../NaClRPCInstance
 
 # Get pepper directory for toolchain and includes.
 #
@@ -39,7 +39,7 @@ all: LoggerModule
 clean:
 	$(RM) *.pexe *.bc *.js
 
-Logger.bc: *.cpp
+Logger.bc: $(RPCINSTANCE)/*.cpp *.cpp
 	$(PNACL_CXX) -o $@ $(RPCINSTANCE)/*.cpp *.cpp -O2 $(CXXFLAGS) $(LDFLAGS)
 
 Logger.pexe: Logger.bc
