@@ -62,9 +62,6 @@ define(["RPCStub", "RPCRuntime", "JSONRPC", "RPCTransport", "fakemodule", "NaClM
       expect(p.isString("hello")).toBe(true);
       expect(p.isString(12)).toBe(false);
 
-      expect(p.isChar("c")).toBe(true);
-      expect(p.isChar("hi")).toBe(false);
-
       expect(p.isBoolean(true)).toBe(true);
       expect(p.isBoolean(false)).toBe(true);
       expect(p.isBoolean(1)).toBe(false);
@@ -81,9 +78,13 @@ define(["RPCStub", "RPCRuntime", "JSONRPC", "RPCTransport", "fakemodule", "NaClM
 
     it("should construct functions using a json notation", function(){
       var p = RPCStub.prototype;
+      var dictionaries = [];
+      dictionaries.push({"Dictionary": "DictName", "properties": [{"myPropName": "Boolean"}] });
+
       var fn = p.constructStub({
         "name"  : "foo",
-        "params": ["String"],
+        "dictionaries" : dictionaries,
+        "params": ["String", {"Dictionary": "DictName"}],
         "returnType": "Boolean"
       });
       expect(fn instanceof Function).toBe(true);
@@ -95,8 +96,8 @@ define(["RPCStub", "RPCRuntime", "JSONRPC", "RPCTransport", "fakemodule", "NaClM
       var p = RPCStub.prototype;
       var fn = p.constructStub({
         "name" : "foo",
-        "params": ["String", "Integer", "Char", "Float", "Boolean", "Array", "Any", "ArrayBuffer", "Object",
-          "IntegerArray", "StringArray", "CharArray", "FloatArray", "BooleanArray", "AnyArray"],
+        "params": ["String", "Long", "DOMString", "Float", "Boolean", "Any", "Object",
+          ["Long"], ["String"], ["DOMString"], ["Float"], ["Boolean"], ["Any"]],
         "returnType": "Boolean"
       });
       expect(fn instanceof Function).toBe(true);
@@ -129,7 +130,7 @@ define(["RPCStub", "RPCRuntime", "JSONRPC", "RPCTransport", "fakemodule", "NaClM
       // construct a function
       var myRPCFunction = stub.constructStub({
         "name" : "myRPCFunction",
-        "params" : ["Boolean", "Integer"],
+        "params" : ["Boolean", "Long"],
         "returnType" : "Boolean"
       });
 

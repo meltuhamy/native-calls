@@ -1,4 +1,5 @@
-define(['RPCTransport', 'lodash'], function(RPCTransport, _){
+define(['RPCTransport', 'lodash', "TagLogger"], function(RPCTransport, _, TagLogger){
+  var logger = new TagLogger("JSONRPC");
 	function JSONRPC(rpcTransport, runtime){
     if(!_.isUndefined(rpcTransport)){
       this.transport = rpcTransport;
@@ -84,6 +85,7 @@ define(['RPCTransport', 'lodash'], function(RPCTransport, _){
 
     if(this.validateRPCCallback(rpcObject)){
       // it's a successful response that is a callback
+      logger.debug("Received response", rpcObject.result);
       if(!_.isUndefined(this.runtime)){
         this.runtime.handleCallback(rpcObject);
         return true;
@@ -94,6 +96,7 @@ define(['RPCTransport', 'lodash'], function(RPCTransport, _){
 
     } else if(this.validateRPCError(rpcObject)){
       // it's a "successful" response that is an error
+      logger.debug("Received error response", rpcObject.error);
       if(!_.isUndefined(this.runtime)){
         this.runtime.handleError(rpcObject);
         return true;
@@ -103,6 +106,7 @@ define(['RPCTransport', 'lodash'], function(RPCTransport, _){
       }
     } else if (this.validateRPCRequest(rpcObject)){
       // it's a rpc call
+      logger.debug("Received request", rpcObject);
       if(!_.isUndefined(this.runtime)){
         this.runtime.handleRequest(rpcObject);
         return true;
@@ -112,7 +116,7 @@ define(['RPCTransport', 'lodash'], function(RPCTransport, _){
       }
     } else{
       // it's not a rpc response.
-      console.info("Received a message that is not a RPC response");
+      logger.warn("Received non-rpc message", rpcObject);
       return false;
     }
   };
@@ -125,9 +129,10 @@ define(['RPCTransport', 'lodash'], function(RPCTransport, _){
   JSONRPC.prototype.sendRPCRequest = function(rpcObject){
     if(!_.isUndefined(this.transport)){
       if(this.validateRPCRequest(rpcObject)){
+        logger.debug("Sending request");
         return this.transport.send(rpcObject);
       } else {
-        console.error("Failed to send rpc object because it is invalid");
+        logger.debug("Failed to send rpc object because it is invalid");
         // might be better doing an error callback.
         return false;
       }

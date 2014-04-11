@@ -7,14 +7,14 @@ define([], function(){
 
   IDLTypeMap["any"]                 = "Any";
   IDLTypeMap["boolean"]             = "Boolean";
-  IDLTypeMap["byte"]                = "Integer";
-  IDLTypeMap["octet"]               = "Integer";
-  IDLTypeMap["short"]               = "Integer";
-  IDLTypeMap["unsigned short"]      = "Integer";
-  IDLTypeMap["long"]                = "Integer";
-  IDLTypeMap["unsigned long"]       = "Integer";
-  IDLTypeMap["long long"]           = "Integer";
-  IDLTypeMap["unsigned long long"]  = "Integer";
+  IDLTypeMap["byte"]                = "Byte";
+  IDLTypeMap["octet"]               = "Octet";
+  IDLTypeMap["short"]               = "Short";
+  IDLTypeMap["unsigned short"]      = "UnsignedShort";
+  IDLTypeMap["long"]                = "Long";
+  IDLTypeMap["unsigned long"]       = "UnsignedLong";
+  IDLTypeMap["long long"]           = "LongLong";
+  IDLTypeMap["unsigned long long"]  = "UnsignedLongLong";
   IDLTypeMap["float"]               = "Float";
   IDLTypeMap["unrestricted float"]  = "Float";
   IDLTypeMap["double"]              = "Float";
@@ -23,16 +23,15 @@ define([], function(){
   IDLTypeMap["string"]              = "String";
   IDLTypeMap["DOMString"]           = "String";
   IDLTypeMap["void"]                = "Undefined";
+  IDLTypeMap["undefined"]           = "Undefined";
+  IDLTypeMap["object"]              = "Object";
 
 
   // reflexive
-  IDLTypeMap["Any"]         = "Any";
-  IDLTypeMap["Boolean"]     = "Boolean";
-  IDLTypeMap["ArrayBuffer"] = "ArrayBuffer";
-  IDLTypeMap["Integer"]     = "Integer";
-  IDLTypeMap["Float"]       = "Float";
-  IDLTypeMap["String"]      = "String";
-  IDLTypeMap["Date"]        = "Date";
+  var keys = Object.keys(IDLTypeMap);
+  for(var i = 0; i< keys.length; i++){
+    IDLTypeMap[IDLTypeMap[keys[i]]] = IDLTypeMap[keys[i]];
+  }
 
   return IDLTypeMap;
 });

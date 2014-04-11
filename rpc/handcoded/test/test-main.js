@@ -23,3 +23,8 @@ requirejs.config({
   // start test run, once Require.js is done
   callback: window.__karma__.start
 });
+
+require(['loglevel'], function(loglevel){
+  // disable logging while testing
+  loglevel.disableAll();
+});

@@ -1,5 +1,6 @@
-define(['NaClModule', 'lodash'], function(NaClModule, _){
+define(['NaClModule', 'lodash', "TagLogger"], function(NaClModule, _, TagLogger){
 	function RPCTransport(rpcModule, jsonRPC){
+    this.logger = new TagLogger;
     if(_.isUndefined(rpcModule)) {
       throw new Error("NaClModule must be provided");
     }
@@ -11,6 +12,7 @@ define(['NaClModule', 'lodash'], function(NaClModule, _){
 
     this.module = rpcModule;
     this.module.on("message", this.handleMessage, this);
+    this.logger.setTag("Transport:"+this.module.name);
 	}
 
   RPCTransport.prototype.load = function(successCallback){
@@ -23,6 +25,7 @@ define(['NaClModule', 'lodash'], function(NaClModule, _){
     var module = this.module;
 
     if(module.status === 0){ //0 means no-status
+      this.logger.info("Sending message while module not loaded.");
       module.load(function(){
         module.postMessage(data);
       });

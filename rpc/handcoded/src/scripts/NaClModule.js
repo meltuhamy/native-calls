@@ -1,11 +1,11 @@
-define(['lodash'], function(_){
-  var LOG_VERBOSE = false;
+define(['lodash', 'TagLogger'], function(_, TagLogger){
   /**
    * Creates a NaCl module wrapper that encapsulates the embed element.
    * @param attrs - The attributes to add to the embed element
    * @constructor
    */
   function NaClModule(attrs){
+    this.logger = new TagLogger(); //used for logging
     // Used in closures
     var thisModule = this;
     // Make sure that attrs includes name, src, and id.
@@ -18,9 +18,6 @@ define(['lodash'], function(_){
     }
 
     this.name = attrs.name;
-    if(attrs.verbose != undefined){
-      LOG_VERBOSE = attrs.verbose;
-    }
 
     // Make sure a module with that id doesn't already exist.
     if(!_.isNull(document.getElementById(attrs.id))){
@@ -74,8 +71,8 @@ define(['lodash'], function(_){
       }
     });
     this.moduleEl = moduleEl; //expose to object
-
-
+    this.logger.setTag("NaClModule:"+this.name);
+    this.logger.trace("Constructed");
 
   }
 
@@ -102,7 +99,7 @@ define(['lodash'], function(_){
       }
       this.listenerDiv.removeEventListener('load', arguments.callee, true);
     });
-
+    this.logger.info("Loading module...");
     this.listenerDiv.appendChild(this.moduleEl);
 
   };
@@ -115,7 +112,7 @@ define(['lodash'], function(_){
    * @param {DocumentEvent} e
    */
   var onLoad = function(e) {
-    if(LOG_VERBOSE) console.info("["+ this.name + "]" + " module loaded");
+    this.logger.info("Module loaded");
   };
 
   /**
@@ -123,7 +120,7 @@ define(['lodash'], function(_){
    * @param {DocumentEvent} e
    */
   var onMessage = function(e) {
-    if(LOG_VERBOSE) console.info("["+ this.name + "]" + " message received");
+    this.logger.debug("Message received");
   };
 
   /**
@@ -131,7 +128,7 @@ define(['lodash'], function(_){
    * @param {DocumentEvent} e
    */
   var onCrash = function(e) {
-    if(LOG_VERBOSE) console.error("["+ this.name + "]" + " module crashed");
+    this.logger.warn("Module crashed/exited");
   };
 
   /**
@@ -160,9 +157,9 @@ define(['lodash'], function(_){
   NaClModule.prototype.postMessage = function(data) {
     if(this.status === STATUSES.LOADED){
       this.moduleEl.postMessage(data);
-      if(LOG_VERBOSE) console.info("["+ this.name + "] " + "message sent to module.");
+      this.logger.debug("Message sent to module.");
     } else {
-      if(LOG_VERBOSE) console.error("["+ this.name + "]" + " postMessage failed. Module not running.");
+      this.logger.error("postMessage failed. Module not running.");
     }
   };
 

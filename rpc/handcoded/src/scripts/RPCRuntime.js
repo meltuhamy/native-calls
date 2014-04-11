@@ -1,4 +1,5 @@
-define(['JSONRPC'], function(JSONRPC){
+define(['JSONRPC', 'TagLogger'], function(JSONRPC, TagLogger){
+  var logger = new TagLogger("Runtime");
 	function RPCRuntime(jsonRPC){
 		if(!_.isUndefined(jsonRPC)){
       this.setJSONRPC(jsonRPC);
@@ -54,7 +55,7 @@ define(['JSONRPC'], function(JSONRPC){
   RPCRuntime.prototype.handleCallback = function(rpcObject){
     // see if that id is even registered with us
     if(_.isUndefined(this.idCallbackMap[rpcObject.id])){
-      console.error("Received a callback response for a call that hasn't been made");
+      logger.error("Received a callback response for a call that hasn't been made");
       return false;
     }
 
@@ -78,7 +79,7 @@ define(['JSONRPC'], function(JSONRPC){
     // see if that id is even registered with us
     var id = rpcObject.id;
     if(_.isUndefined(this.idCallbackMap[id])){
-      console.error("Received a error response for a call that hasn't been made");
+      logger.error("Received a error response for a call that hasn't been made");
       return false;
     }
 

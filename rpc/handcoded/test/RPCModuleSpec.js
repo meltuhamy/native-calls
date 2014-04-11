@@ -38,7 +38,7 @@ define(["RPCModule", "NaClModule", "fakemodule"], function(RPCModule, NaClModule
           },
           {
             "name" : "myFun",
-            "params" : ["Integer"]
+            "params" : ["Long"]
           }
         ]
       });
@@ -63,7 +63,7 @@ define(["RPCModule", "NaClModule", "fakemodule"], function(RPCModule, NaClModule
 
       RPCModule.addStubToModule(rpcModule, {
         "name" : "myFun",
-        "params" : ["Integer"]
+        "params" : ["Long"]
       });
 
       expect(rpcModule.myFoo).toBeDefined();
@@ -84,7 +84,7 @@ define(["RPCModule", "NaClModule", "fakemodule"], function(RPCModule, NaClModule
         functions: [
           {
             "name": "myFoo",
-            "params" : ["String"]
+            "params" : ["DOMString"]
           }
         ]
       });
@@ -120,7 +120,7 @@ define(["RPCModule", "NaClModule", "fakemodule"], function(RPCModule, NaClModule
           {
             "name": "myFoo",
             "params" : ["String"],
-            "returnType" : "Integer"
+            "returnType" : "Long"
           }
         ]
       });
@@ -171,7 +171,7 @@ define(["RPCModule", "NaClModule", "fakemodule"], function(RPCModule, NaClModule
           {
             "name": "myFoo",
             "params" : ["String"],
-            "returnType" : "Integer"
+            "returnType" : "Long"
           }
         ]
       });
