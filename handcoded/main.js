@@ -1,8 +1,10 @@
 requirejs.config({
+  baseUrl: '../scripts',
   paths: REQUIRE_PATHS
 });
+var DEMOPREFIX = '../handcoded/'; //relative to requirejs baseurl
 
-require(["loglevel", "../Logger/LoggerRPCModule", "../Fib/FibRPCModule", "../ObjectsExample/ObjectsExampleRPCModule", "JSFib",], function(loglevel, LoggerRPCModule, FibRPCModule, ObjectsExampleModule, JSFib) {
+require(["loglevel", DEMOPREFIX+"Logger/LoggerRPC", DEMOPREFIX+"Fib/FibRPC", DEMOPREFIX+"ObjectsExample/ObjectsExampleRPC", "../scripts/JSFib"], function(loglevel, LoggerRPCModule, FibRPCModule, ObjectsExampleModule, JSFib) {
   window.loglevel = loglevel;
   loglevel.setLevel(loglevel.levels.DEBUG); //log everything when debugging!
   window.Logger = LoggerRPCModule;

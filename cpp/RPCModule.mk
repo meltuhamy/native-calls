@@ -20,6 +20,7 @@ RM := $(OSHELPERS) rm
 
 PNACL_TC_PATH := $(abspath $(NACL_SDK_ROOT)/toolchain/$(OSNAME)_pnacl)
 PNACL_CXX := $(PNACL_TC_PATH)/bin/pnacl-clang++
+PNACL_FINALIZE := $(PNACL_TC_PATH)/bin/pnacl-finalize
 
 CXXFLAGS := -I$(RPCINSTANCE)include -I$(NACL_SDK_ROOT)/include
 
@@ -31,10 +32,13 @@ export CYGWIN
 all: $(THIS_FOLDERNAME)RPC.js
 
 clean:
-	$(RM) -f *.pexe *.js *.nmf
+	$(RM) -f *.bc *.pexe *.nmf
 
-$(THIS_FOLDERNAME).pexe: *.cpp
+$(THIS_FOLDERNAME).bc: *.cpp
 	$(PNACL_CXX) -o $@ $^ -O0 $(CXXFLAGS) $(LDFLAGS)
+
+$(THIS_FOLDERNAME).pexe: $(THIS_FOLDERNAME).bc
+	$(PNACL_FINALIZE) -o $@ $<
 
 $(THIS_FOLDERNAME).nmf: $(THIS_FOLDERNAME).pexe
 	$(CREATE_NMF) -o $@ $<
