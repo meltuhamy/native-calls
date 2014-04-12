@@ -6,14 +6,31 @@
   <script data-main="main" src="../scripts/lib/requirejs/require.js"></script>
 </head>
 <body>
-  <h1>RPCModule Example</h1>
-  <p>Make sure you have built the rpc module, by typing <code>make</code> in the <code>Logger</code> folder. <br />
-      Open the console and type in: <br /> </p>
-<pre>Logger.helloName("Mohamed", function(result){
-    console.log(JSON.stringify(result))
-});</pre>
+  <h1>Building</h1>
+  <p>Make sure you have built the rpc modules by typing <code>make</code> in each module folder. Alternatively, run <code>make</code> in the handcoded folder to build all demos.</p>
 
+  <h1>Playing with the demos</h1>
+  <p>Take a look at each IDL file to see the API each module supports.</p>
+  <p>For example, the <code>Logger/Logger.idl</code> file contains the following interface: </p>
+
+  <pre>
+interface Logger {
+  DOMString helloName(DOMString name1);
+  DOMString greetName(DOMString greeting, DOMString name);
+};
+  </pre>
+
+  <p>This allows the JavaScript developer to run the helloName and greetName methods on the Logger module. To do this, simply call the function with its parameters, then give an optional success callback and an optional error callback</p>
+  <p>For example, here is the <code>Logger.helloName</code> RPC call.</p>
+  <pre>
+Logger.helloName("Mohamed", function(result){
+    console.log(JSON.stringify(result))
+});
+  </pre>
   <p>This will first load the C++ module, then call the helloName C++ function. The result will come to the callback function.</p>
+
+  <p>You can make your own calls by opening the <a href="https://developers.google.com/chrome-developer-tools/docs/console" target="_blank">console</a> and typing in code like the above.</p>
+
 
 <h2>How it works</h2>
   <p>LoggerRPCModule is constructed using the RPCModule function. This requires a NaClModule and function definitions.

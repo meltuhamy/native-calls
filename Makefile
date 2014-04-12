@@ -1,6 +1,7 @@
 mkfile_path = $(abspath $(lastword $(MAKEFILE_LIST)))
 current_dir = $(patsubst %/,%,$(dir $(mkfile_path)))
 
+CPPDIR = cpp
 HANDCODED_DIR = handcoded
 TEST_CODE_DIR = test/cpp
 NACL_EXE_STDOUT ?= ${current_dir}/nacl_std_out.log
@@ -10,6 +11,8 @@ all: .PHONY
 .PHONY: project_code
 
 project_code:
+	npm install
+	$(MAKE) -C $(CPPDIR)
 	$(MAKE) -C $(HANDCODED_DIR)
 
 test_code:
@@ -17,8 +20,10 @@ test_code:
 
 clean:
 	$(MAKE) -C $(HANDCODED_DIR) clean
+	$(MAKE) -C $(CPPDIR) clean
 
 serve:
+	npm install
 	npm run serve
 
 test: project_code test_code

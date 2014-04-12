@@ -6,12 +6,18 @@ Part of my final year project at Imperial College London.
 
 This is still work in progress. Check the [milestones](https://github.com/meltuhamy/native-calls/issues/milestones) for details.
 
-## WebIDL
+## Build
+To build the project, you'll need the following requirements:
 
-The project uses WebIDL to define interfaces. The WebIDL is compiled into C++ and JavaScript stubs. Implementation details are in the [idl_parser directory](https://github.com/meltuhamy/native-calls/tree/master/idl_parser).
+To build, simply run ```make``` in this folder. This will get JavaScript dependencies, build the C++ RPC library and build each individual demo.
+
+## Run
+To see it in action, make sure you have built the project (see above). Then, type ```make serve```. This will start a server in the project directory.
+
+Visit the index page, by typing http://localhost:3000/ into your browser.
 
 ## Docs
 
 You can read some design docs in the [docs folder](https://github.com/meltuhamy/native-calls/tree/master/docs).
 
-The full project report (in progress) is written in TeX and is found in the [report folder](https://github.com/meltuhamy/native-calls/tree/master/report).
+The full project report (in progress) is written in TeX and is found in the [report folder](https://github.com/meltuhamy/native-calls/tree/master/docs/report).
