@@ -1,6 +1,0 @@
-.cproject
-.settings
-node_modules
-*.bc
-*.o
-*.pexe

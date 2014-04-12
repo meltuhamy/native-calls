@@ -1,0 +1,6 @@
+.cproject
+.settings
+*.bc
+*.o
+*.pexe
+*.nmf

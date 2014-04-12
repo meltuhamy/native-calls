@@ -1,0 +1,27 @@
+{
+  "name": "native-calls",
+  "version": "0.0.0",
+  "description": "A C++/JavaScript RPC client",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "./node_modules/.bin/karma start --single-run",
+    "install" : "./node_modules/.bin/bower install",
+    "serve": "./node_modules/.bin/serve"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/meltuhamy/native-calls"
+  },
+  "author": "Mohamed Eltuhamy",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "bower": "~1.2.8",
+    "serve": "~1.4.0"
+  },
+  "devDependencies": {
+    "karma": "~0.10.9"
+  }
+}

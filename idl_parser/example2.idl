@@ -1,3 +1,0 @@
-interface AnotherInterface {
-  long anotherFunction(Structure anotherStructure);
-};
