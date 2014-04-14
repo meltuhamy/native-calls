@@ -59,11 +59,12 @@ ASTNode.prototype.addChildren = function(nodes){
 /**
  * Returns a string representation of the tree whose root is this node.
  * Level is passed to indent line nodes.
- * @param level
+ * @param [level]
  * @returns {string}
  */
 ASTNode.prototype.compile = function(level){
   "use strict";
+  level = level > 0 ? level : 0;
   // print all my children.
   // if we come across a block, push it to the stack
   var str = '';
@@ -138,7 +139,7 @@ TerminatingNode.prototype.setTerminator = function(terminator){
 
 /**
  * Compiling a terminating node is the same as compiling its children and following it with the terminating character.
- * @param level
+ * @param [level]
  * @returns {string}
  */
 TerminatingNode.prototype.compile = function(level){
@@ -190,7 +191,7 @@ LineNode.prototype.compile = function(level){
 /**
  * A syntactic type of node used for indenting stuff later on.
  * @constructor
- * @param child
+ * @param [child]
  */
 function BlockNode(child){
   "use strict";
@@ -207,6 +208,8 @@ util.inherits(BlockNode, ASTNode);
 BlockNode.prototype.compile = function(level){
   "use strict";
   // print all my children at a higher level
+  // if level not given, then it's supposed to be a 0.
+  level = level > 0 ? level : 0;
   return ASTNode.prototype.compile.call(this, level+1);
 };
 
@@ -277,10 +280,12 @@ function JSPrimitiveNode(prim){
 function CommaListNode(array){
   "use strict";
   var node = new ASTNode();
-  for(var i = 0; i < array.length-1; i++){
+  var i = 0;
+  for(i = 0; i < array.length-1; i++){
     node.addChild(array[i]);
     node.addChild(', ');
   }
+  node.addChild(array[i]);
   return node;
 }
 
