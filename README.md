@@ -16,6 +16,12 @@ To see it in action, make sure you have built the project (see above). Then, typ
 
 Visit the index page, by typing http://localhost:3000/ into your browser.
 
+## Test
+To run all tests, type ```make test```. This will test JavaScript front end, back end (generators), and C++ tests.
+
+To test only the generator tests, type ```make nodetest```.
+
+
 ## Docs
 
 You can read some design docs in the [docs folder](https://github.com/meltuhamy/native-calls/tree/master/docs).

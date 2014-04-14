@@ -30,3 +30,7 @@ test: project_code test_code
 	npm install
 	touch $(NACL_EXE_STDOUT)
 	export NACL_EXE_STDOUT="$(NACL_EXE_STDOUT)" ; tail -n 0 -f $(NACL_EXE_STDOUT) & TAILPID=$$! && npm test ; kill $$TAILPID
+
+nodetest:
+	npm install
+	npm run nodetest
