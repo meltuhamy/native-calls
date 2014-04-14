@@ -1,0 +1,3 @@
+dictionary Structure{
+    Structure myValue;
+};

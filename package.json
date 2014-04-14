@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "./node_modules/.bin/karma start --single-run",
-    "install" : "./node_modules/.bin/bower install",
+    "install": "./node_modules/.bin/bower install",
     "serve": "./node_modules/.bin/serve"
   },
   "repository": {
@@ -19,7 +19,9 @@
   "license": "BSD-2-Clause",
   "dependencies": {
     "bower": "~1.2.8",
-    "serve": "~1.4.0"
+    "serve": "~1.4.0",
+    "webidl2": "~2.0.4",
+    "minimist": "0.0.8"
   },
   "devDependencies": {
     "karma": "~0.10.9"
