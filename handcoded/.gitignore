@@ -3,4 +3,5 @@
 *.bc
 *.o
 *.pexe
+*.nexe
 *.nmf

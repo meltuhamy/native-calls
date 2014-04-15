@@ -18,13 +18,64 @@ CREATE_NMF = python $(NACL_SDK_ROOT)/tools/create_nmf.py
 OSNAME := $(shell $(GETOS))
 RM := $(OSHELPERS) rm
 
-PNACL_TC_PATH := $(abspath $(NACL_SDK_ROOT)/toolchain/$(OSNAME)_pnacl)
-PNACL_CXX := $(PNACL_TC_PATH)/bin/pnacl-clang++
-PNACL_FINALIZE := $(PNACL_TC_PATH)/bin/pnacl-finalize
+
+#
+# Compute tool paths
+#
+TOOLCHAIN ?= pnacl
+ARCH ?= 64
+COMPILER ?= g++
+
+# LIBPATH is one of 5: glibc_x86_32,  glibc_x86_64, newlib_x86_32,  newlib_x86_64,  pnacl
+RELASEDEBUG = Release
+LIBPATH := -L$(NACL_SDK_ROOT)/lib/$(TOOLCHAIN)
+RPCLIBNAME := nativecalls_
+PNEXE := pexe
+
+# pnacl is architecture independent. Others are.
+TOOLPREFIX = $(TOOLCHAIN)
+TOOLFOLDER = $(TOOLCHAIN)
+ifeq ($(TOOLCHAIN),pnacl)
+COMPILER = clang++
+LIBPATH := $(LIBPATH)/$(RELASEDEBUG)
+RPCLIBNAME := $(RPCLIBNAME)pnacl
+PNEXE := pexe
+else
+LIBPATH := $(LIBPATH)_x86_$(ARCH)/$(RELASEDEBUG)
+RPCLIBNAME := $(RPCLIBNAME)$(TOOLCHAIN)_$(ARCH)
+TOOLFOLDER = x86_$(TOOLCHAIN)
+PNEXE := nexe
+ifeq ($(ARCH),32)
+#32 bit
+TOOLPREFIX = i686-nacl
+else
+#64 bit
+TOOLPREFIX = x86_64-nacl
+endif
+endif
+
+# at this point the following variables are set:
+# TOOLCHAIN: either pnacl, newlib, or glibc
+# ARCH: either 64 or 32
+# TOOLPREFIX: either pnacl, i686-nacl, or x86_64-nacl
+# COMPILER: either clang++ or g++
+# TOOLFOLDER: either pnacl, x86_newlib, or x86_glibc
+
+GETOS := python $(NACL_SDK_ROOT)/tools/getos.py
+OSHELPERS = python $(NACL_SDK_ROOT)/tools/oshelpers.py
+OSNAME := $(shell $(GETOS))
+RM := $(OSHELPERS) rm
+CREATE_NMF = python $(NACL_SDK_ROOT)/tools/create_nmf.py
+
+
+TC_PATH := $(abspath $(NACL_SDK_ROOT)/toolchain/$(OSNAME)_$(TOOLFOLDER))
+ARCH_CXX := $(TC_PATH)/bin/$(TOOLPREFIX)-$(COMPILER)
+PNACL_FINALIZE := $(TC_PATH)/bin/$(TOOLPREFIX)-finalize
+
 
 CXXFLAGS := -I$(RPCINSTANCE)include -I$(NACL_SDK_ROOT)/include
 
-LDFLAGS := -L$(RPCINSTANCE) -L$(NACL_SDK_ROOT)/lib/pnacl/Release -lnativecalls -lppapi_cpp -lppapi
+LDFLAGS := -L$(RPCINSTANCE) $(LIBPATH) -l$(RPCLIBNAME) -lppapi_cpp -lppapi
 
 CYGWIN ?= nodosfilewarning
 export CYGWIN
@@ -32,15 +83,15 @@ export CYGWIN
 all: $(THIS_FOLDERNAME)RPC.js
 
 clean:
-	$(RM) -f *.bc *.pexe *.nmf
+	$(RM) -f *.bc *.pexe *.nexe *.nmf
 
 $(THIS_FOLDERNAME).bc: *.cpp
-	$(PNACL_CXX) -o $@ $^ -O0 $(CXXFLAGS) $(LDFLAGS)
+	$(ARCH_CXX) -o $@ $^ -O0 $(CXXFLAGS) $(LDFLAGS)
 
-$(THIS_FOLDERNAME).pexe: $(THIS_FOLDERNAME).bc
-	$(PNACL_FINALIZE) -o $@ $<
+$(THIS_FOLDERNAME).$(PNEXE): $(THIS_FOLDERNAME).bc
+	if [ "$(TOOLCHAIN)" == "pnacl" ] ; then $(PNACL_FINALIZE) -o $@ $< ; else cp $< $@ ; fi
 
-$(THIS_FOLDERNAME).nmf: $(THIS_FOLDERNAME).pexe
+$(THIS_FOLDERNAME).nmf: $(THIS_FOLDERNAME).$(PNEXE)
 	$(CREATE_NMF) -o $@ $<
 
 $(THIS_FOLDERNAME)RPC.js: $(THIS_FOLDERNAME).nmf $(THIS_FOLDERNAME).idl 
