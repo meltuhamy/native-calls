@@ -1,6 +1,6 @@
 var ast = require('../../generator/ast');
 
-describe('Augmented AST', function(){
+describe('Abstract Syntax Tree', function(){
   beforeEach(function() {
     this.addMatchers({
       toBeInstanceOf: function(expectedInstance) {

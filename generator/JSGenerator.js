@@ -39,6 +39,7 @@ function Types(){
 
 function JSGenerator(augmentedAST){
   "use strict";
+  console.log(augmentedAST);
   var js = new ast.Node();
 
   // use the ast to generate a js tree.
