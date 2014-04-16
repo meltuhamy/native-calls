@@ -1,3 +1,13 @@
-dictionary Structure{
-    Structure myValue;
+interface Logger {
+  DOMString helloName(DOMString name1);
+  DOMString greetName(DOMString greeting, DOMString name);
+};
+
+interface Fib {
+  unsigned long fib(Range r);
+};
+
+dictionary Range{
+  unsigned long from;
+  unsigned long to;
 };
