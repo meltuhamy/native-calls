@@ -6,7 +6,7 @@ define(["NaClModule"], function(NaClModule){
         name: "testingModule",
         src: "/base/test/cpp/testing.nmf",
         id: "testingModule",
-        type: "application/x-pnacl"
+        type: "application/x-nacl"
       });
 
       var testingFramework = {

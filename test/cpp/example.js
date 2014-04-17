@@ -2,7 +2,7 @@
 // first load the module.
 isRelease = true;
 common.attachDefaultListeners();
-common.createNaClModule("testing",'pnacl','.',1,1);
+common.createNaClModule("testing",'nacl','.',1,1);
 
 
 // Copyright (c) 2013 The Chromium Authors. All rights reserved.

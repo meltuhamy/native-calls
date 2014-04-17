@@ -1,9 +1,5 @@
 {
   "program": {
-    "portable": {
-      "pnacl-translate": {
-        "url": "testing.pexe"
-      }
-    }
+    "x86-32": { "url": "testing.nexe" }
   }
 }

@@ -27,11 +27,11 @@ OSHELPERS = python $(NACL_SDK_ROOT)/tools/oshelpers.py
 OSNAME := $(shell $(GETOS))
 RM := $(OSHELPERS) rm
 
-PNACL_TC_PATH := $(abspath $(NACL_SDK_ROOT)/toolchain/$(OSNAME)_pnacl)
-PNACL_CXX := $(PNACL_TC_PATH)/bin/pnacl-clang++
-PNACL_FINALIZE := $(PNACL_TC_PATH)/bin/pnacl-finalize
+TC_PATH := $(abspath $(NACL_SDK_ROOT)/toolchain/$(OSNAME)_x86_newlib)
+TC_CXX := $(TC_PATH)/bin/i686-nacl-g++
+# TC_FIN := $(TC_PATH)/bin/pnacl-finalize # don't need this when not pnacl
 CXXFLAGS := -I$(NACL_SDK_ROOT)/include
-LDFLAGS := -L$(NACL_SDK_ROOT)/lib/pnacl/Release -lppapi_simple -lnacl_io -lppapi_cpp -lppapi -lgtest -lpthread
+LDFLAGS := -L$(NACL_SDK_ROOT)/lib/newlib_x86_32/Release -lppapi_simple -lnacl_io -lppapi_cpp -lppapi -lgtest
 
 #
 # Disable DOS PATH warning when using Cygwin based tools Windows
@@ -41,16 +41,13 @@ export CYGWIN
 
 
 # Declare the ALL target first, to make the 'all' target the default build
-all: testing.pexe
+all: testing.nexe
 
 clean:
-	$(RM) *.pexe *.bc
+	$(RM) -f *.pexe *.bc *.nexe
 
-testing.bc: **/*.cpp
-	$(PNACL_CXX) -o $@ testing.cpp -O2 $(CXXFLAGS) $(LDFLAGS)
-
-testing.pexe: testing.bc
-	$(PNACL_FINALIZE) -o $@ $<
+testing.nexe: **/*.cpp
+	$(TC_CXX) -o $@ testing.cpp -O0 $(CXXFLAGS) $(LDFLAGS)
 
 
 #
