@@ -1,30 +1,30 @@
 #include "gtest/gtest.h"
 #include "ppapi/cpp/instance.h"
-class ExternalInstance : public pp::Instance
-{
+#include "NaClRPCInstance.h"
+#include "ppapi/cpp/var.h"
+#include "ppapi/cpp/var_array.h"
+#include <string>
+
+
+class TestInstance: public NaClRPCInstance {
 public:
-  ExternalInstance(PP_Instance instance) : Instance(instance){}
-  virtual ~ExternalInstance(){}
-  virtual bool myTest(bool in){
-    return !in;
+  TestInstance(PP_Instance instance) : NaClRPCInstance(instance) {}
+  virtual ~TestInstance(){}
+
+  virtual void HandleRPC(std::string name, pp::VarArray params, int id){
+    // do nothing
   }
+
 };
 
+TEST(RPCInstanceCase, ConstructorTest) {
+  NaClRPCInstance* i = new TestInstance(123);
 
-TEST(TestCase, SimpleTest) {
-  EXPECT_EQ(4, 4);
+  // should return false
+  std::string s;
+  int id;
+  pp::VarArray p;
+  bool actual = i->VerifyRPC(pp::Var("hello"), s, p, id);
+  ASSERT_EQ(false, actual);
 }
 
-TEST(TestCase, AnotherTest) {
-  EXPECT_EQ(4, sizeof(void*));
-}
-
-TEST(TestCase, ExternalInstanceTest) {
-  ExternalInstance *i = new ExternalInstance(1234);
-  EXPECT_EQ(i->myTest(true), false);
-  EXPECT_EQ(i->myTest(false), true);
-}
-
-TEST(TestCase, SittingAcrossThereTest){
-  EXPECT_EQ(1,1);
-}

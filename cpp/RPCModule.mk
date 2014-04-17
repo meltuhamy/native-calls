@@ -80,7 +80,7 @@ LDFLAGS := -L$(RPCINSTANCE) $(LIBPATH) -l$(RPCLIBNAME) -lppapi_cpp -lppapi
 CYGWIN ?= nodosfilewarning
 export CYGWIN
 
-all: $(THIS_FOLDERNAME)RPC.js
+all: $(THIS_FOLDERNAME).nmf
 
 clean:
 	$(RM) -f *.bc *.pexe *.nexe *.nmf
@@ -94,5 +94,3 @@ $(THIS_FOLDERNAME).$(PNEXE): $(THIS_FOLDERNAME).bc
 $(THIS_FOLDERNAME).nmf: $(THIS_FOLDERNAME).$(PNEXE)
 	$(CREATE_NMF) -o $@ $<
 
-$(THIS_FOLDERNAME)RPC.js: $(THIS_FOLDERNAME).nmf $(THIS_FOLDERNAME).idl 
-	# todo: generate js
