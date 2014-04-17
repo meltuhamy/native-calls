@@ -1,0 +1,3 @@
+[submodule "docs/report"]
+	path = docs/report
+	url = git@github.com:meltuhamy/native-calls-report.git
