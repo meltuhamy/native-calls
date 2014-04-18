@@ -3,7 +3,7 @@
 # found in the LICENSE file.
 
 #
-# GNU Make based build file. ��For details on GNU Make see:
+# GNU Make based build file. ������For details on GNU Make see:
 # http://www.gnu.org/software/make/manual/make.html
 #
 
@@ -50,7 +50,7 @@ all: testing.nexe
 clean:
 	$(RM) -f *.pexe *.bc *.nexe
 
-testing.nexe: **/*.cpp
+testing.nexe: *.cpp cases/*.cpp
 	$(TC_CXX) -o $@ testing.cpp -O0 $(CXXFLAGS) $(LDFLAGS)
 
 

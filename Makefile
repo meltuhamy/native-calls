@@ -10,7 +10,7 @@ NM_BIN_PATH := ${current_dir}/node_modules/.bin
 
 all: .PHONY
 
-.PHONY: project_code
+.PHONY: project_code test_code
 
 $(NM_BIN_PATH):
 	npm install
