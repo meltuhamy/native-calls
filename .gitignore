@@ -6,3 +6,5 @@
 *.idea
 *.log
 node_modules
+.cproject
+.settings

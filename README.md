@@ -9,6 +9,10 @@ This is still work in progress. Check the [milestones](https://github.com/meltuh
 ## Build
 To build the project, you'll need the following requirements:
 
+1. The [Native Client SDK](https://developers.google.com/native-client/dev/).
+2. The [NACL_SDK_ROOT](https://developers.google.com/native-client/dev/devguide/devcycle/building) variable set.
+
+
 To build, simply run ```make``` in this folder. This will get JavaScript dependencies, build the C++ RPC library and build each individual demo.
 
 ## Run
@@ -21,9 +25,32 @@ To run all tests, type ```make test```. This will test JavaScript front end, bac
 
 To test only the generator tests, type ```make nodetest```.
 
+### TDD with karma
+The project uses karma to enable a fast and easy test-driven-development approach. Karma is used to test both the C++ and client-side JavaScript code. To run it, simply run ```karma start``` in the project root. Or if ```karma``` isn't installed, you can run it from the ```node_modules``` directory, by running ```./node_modules/.bin/karma start``` instead. Karma will run the C++ tests using a modified version of the gtest module provided in the SDK. This means you will need to make sure that the module is built by typing ```make```.
+
+Every time a client-side JavaScript file is modified, the tests are automatically re-run. This also happens when the C++ tests are built.
 
 ## Docs
 
 You can read some design docs in the [docs folder](https://github.com/meltuhamy/native-calls/tree/master/docs).
 
-The full project report (in progress) is written in TeX and is found in the [report folder](https://github.com/meltuhamy/native-calls/tree/master/docs/report).
+The full project report (in progress) is written in TeX and is found in the [report repo](https://github.com/meltuhamy/native-calls-report).
+
+## Eclipse
+How to set up the Native Calls project in Eclipse.
+
+A project has already been created and is in the repository. All you need to do is to configure it with your ```NACL_SDK_ROOT```.
+
+
+1. Download [eclipse CDT](http://goo.gl/Rymz93)
+2. Clone the [Native Calls project](http://goo.gl/qarpeD).
+3. Copy the ```.cproject.sample``` file and save it as ```.cproject```.
+4. Open eclipse
+5. Import the project. ```File``` -> ```Import...``` -> ```Existing Project into Workspace```
+6. Right click on the project and click properties.
+7. Under ```C/C++ Build``` -> ```Enivronment```, set the ```NACL_SDK_ROOT``` variable to be the NaCl SDK location. Save for all configurations.
+8. Under ```C/C++ Build``` -> ```Build Variables```, set the ```NACL_SDK_ROOT``` variable to be a directory pointing to your NaCl SDK location. Save for all configurations.
+9. Right click on the project and choose ```Index``` -> ```Rebuild``` to rebuild the index.
+10. Done! Clicking the build button runs ```make```.
+
+You can also set up eclipse to debug the C/C++ application. This is shown in the [chromium how-to](http://www.chromium.org/nativeclient/how-tos/debugging-documentation/debugging-with-debug-stub-recommended/debugging-nacl-apps-in-eclipse-cdt).
