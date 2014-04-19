@@ -1,5 +1,4 @@
 #include "gtest/gtest.h"
-
-TEST(TestCase, SimpleTestFromTesterTest) {
-  EXPECT_EQ(0, 0);
+TEST(TesterTest, TestCase){
+	ASSERT_EQ(1,1);
 }

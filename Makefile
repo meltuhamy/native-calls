@@ -1,5 +1,5 @@
 VALID_TOOLCHAINS ?= newlib glibc pnacl
-TOOLCHAIN = newlib
+TOOLCHAIN ?= newlib
 mkfile_path = $(abspath $(lastword $(MAKEFILE_LIST)))
 current_dir = $(patsubst %/,%,$(dir $(mkfile_path)))
 

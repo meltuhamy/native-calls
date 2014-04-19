@@ -1,10 +1,5 @@
 #include "gtest/gtest.h"
 
-//#include "included_tests.cpp"
-
-TEST(TesterTest, TestCase){
-	ASSERT_EQ(1,1);
-}
 
 #if defined(SEL_LDR)
 
