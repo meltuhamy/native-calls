@@ -16,7 +16,7 @@ ifeq ($(TOOLCHAIN),glibc)
 $(eval $(call SO_RULE,$(TARGET),$(SOURCES)))
 endif
 
-
+# RPCTransport
 $(foreach src,RPCTransport.cpp,$(eval $(call COMPILE_RULE,$(src),$(CFLAGS))))
 $(eval $(call LIB_RULE,RPCTransport,RPCTransport.cpp))
 
@@ -24,3 +24,10 @@ ifeq ($(TOOLCHAIN),glibc)
 $(eval $(call SO_RULE,RPCTransport,RPCTransport.cpp))
 endif
 
+# JSONRPC
+$(foreach src,JSONRPC.cpp,$(eval $(call COMPILE_RULE,$(src),$(CFLAGS))))
+$(eval $(call LIB_RULE,JSONRPC,JSONRPC.cpp))
+
+ifeq ($(TOOLCHAIN),glibc)
+$(eval $(call SO_RULE,JSONRPC,JSONRPC.cpp))
+endif
