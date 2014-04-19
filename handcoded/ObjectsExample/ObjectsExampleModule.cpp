@@ -49,7 +49,7 @@ public:
 					pp::VarDictionary dict = pp::VarDictionary(firstParam);
 					l("Printing keys / values");
 					pp::VarArray keysArray = dict.GetKeys();
-					for(int i = 0; i < keysArray.GetLength(); i++){
+					for(unsigned int i = 0; i < keysArray.GetLength(); i++){
 						l("key");
 						l(keysArray.Get(i));
 						l("value");

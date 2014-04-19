@@ -4,9 +4,9 @@ all: .PHONY
 .PHONY: project_code
 
 project_code:
-	$(MAKE) -C Logger
-	$(MAKE) -C Fib
-	$(MAKE) -C ObjectsExample
+	$(MAKE) -C Logger TOOLCHAIN=$(TOOLCHAIN)
+	$(MAKE) -C Fib TOOLCHAIN=$(TOOLCHAIN)
+	$(MAKE) -C ObjectsExample TOOLCHAIN=$(TOOLCHAIN)
 
 
 clean:

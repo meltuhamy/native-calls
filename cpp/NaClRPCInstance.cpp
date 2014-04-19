@@ -5,7 +5,7 @@
 #include "ppapi/cpp/var.h"
 #include "ppapi/cpp/var_dictionary.h"
 #include "ppapi/cpp/var_array.h"
-#include "../include/NaClRPCInstance.h"
+#include "NaClRPCInstance.h"
 
 void NaClRPCInstance::l(pp::Var x){
 	LogToConsole(PP_LOGLEVEL_WARNING, x);

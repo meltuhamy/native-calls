@@ -5,3 +5,6 @@
 *.pexe
 *.nexe
 *.nmf
+*/glibc
+*/newlib
+*/pnacl

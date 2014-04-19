@@ -1,3 +1,6 @@
 *.bc
 *.pexe
 *.nexe
+glibc
+newlib
+pnacl

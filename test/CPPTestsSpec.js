@@ -4,7 +4,7 @@ define(["NaClModule"], function(NaClModule){
     it("shouldn't fail any C++ tests", function(){
       var testingModule = new NaClModule({
         name: "testingModule",
-        src: "/base/test/cpp/testing.nmf",
+        src: "/base/test/cpp/newlib/Release/testing.nmf",
         id: "testingModule",
         type: "application/x-nacl"
       });

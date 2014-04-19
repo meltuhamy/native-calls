@@ -1,4 +1,4 @@
-define(['lodash', 'TagLogger'], function(_, TagLogger){
+define(['lodash', 'TagLogger', 'NaClConfig'], function(_, TagLogger, NaClConfig){
   /**
    * Creates a NaCl module wrapper that encapsulates the embed element.
    * @param attrs - The attributes to add to the embed element
@@ -10,12 +10,43 @@ define(['lodash', 'TagLogger'], function(_, TagLogger){
     var thisModule = this;
     // Make sure that attrs includes name, src, and id.
     if( _.isUndefined(attrs) || 
-        _.isUndefined(attrs.name) || 
-        _.isUndefined(attrs.src) || 
-        _.isUndefined(attrs.id) || 
-        _.isUndefined(attrs.type)){
-      throw new Error("Could not create NaCl Module. name, src, type, and id must be defined");
+        _.isUndefined(attrs.name)){
+      throw new Error("Could not create NaCl Module. name must be defined");
     }
+
+    // config or src/type must be defined
+    if( (_.isUndefined(NaClConfig.CONFIG) || _.isUndefined(NaClConfig.TOOLCHAIN)) && (_.isUndefined(attrs.src) || _.isUndefined(attrs.type))){
+      throw new Error("Could not infer type from config. TOOLCHAIN and CONFIG must be defined; otherwise, use src and type");
+    }
+
+    // attrs overrides config
+    var moduleName = attrs.name, moduleType = attrs.type, moduleSrc = attrs.src, moduleId = attrs.id;
+
+    // ... otherwise, infer attrs using config
+    // infer type
+    if(!moduleType){
+      if(NaClConfig.TOOLCHAIN === 'pnacl'){
+        moduleType = 'application/x-pnacl';
+      } else {
+        moduleType = 'application/x-nacl';
+      }
+    }
+
+    // infer src
+    if(!moduleSrc){
+      // e.g. Logger/pnacl/Release/Logger.nmf
+      moduleSrc = moduleName+'/'+NaClConfig.TOOLCHAIN+'/'+NaClConfig.CONFIG+'/'+moduleName+'.nmf';
+    }
+
+    // infer id
+    if(!moduleId){
+      moduleId = moduleName;
+    }
+
+    // set the inferred types back to attrs.
+    attrs.type = moduleType;
+    attrs.src = moduleSrc;
+    attrs.id = moduleId;
 
     this.name = attrs.name;
 
@@ -33,6 +64,7 @@ define(['lodash', 'TagLogger'], function(_, TagLogger){
     }
 
     // Default width and height is 0. Default parent container is body.
+
     _.defaults(attrs, {width:"0", height:"0", parent: document.body});
 
     // wrap the module in a div so we can listen to events before it loads.

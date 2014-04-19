@@ -19,7 +19,6 @@ module.exports = function(config) {
       {pattern: 'test/**/*Spec.js', included: false},
       {pattern: 'test/**/*.nmf', included: false},
       {pattern: 'test/**/*.*exe', included: false},
-      {pattern: 'src/**/*.*exe', included: false},
       {pattern: 'test/lib/**/*.js', included: false},
       'test/test-main.js'
     ],
