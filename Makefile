@@ -26,7 +26,7 @@ demos: libs
 	$(MAKE) -C $(DEMOS_DIR) TOOLCHAIN=$(TOOLCHAIN)
 
 tests: libs
-	$(MAKE) -C $(TEST_CODE_DIR) TOOLCHAIN=$(TOOLCHAIN)
+	$(MAKE) -C $(TEST_CODE_DIR) TOOLCHAIN=$(TOOLCHAIN) ARCH=$(ARCH)
 
 rebuildtests: libs cleantest tests
 
