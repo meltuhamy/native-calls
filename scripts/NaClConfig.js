@@ -1,7 +1,7 @@
 define([], function(){
   // allow global setting
   return window.NaClConfig ? window.NaClConfig : {
-    CONFIG: 'Release',
+    CONFIG: 'Debug',
     TOOLCHAIN: 'newlib'
   }
 });
