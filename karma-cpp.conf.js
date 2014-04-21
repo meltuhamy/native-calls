@@ -16,7 +16,9 @@ module.exports = function(config) {
     files: [
       'scripts/paths.require.js',
       {pattern: 'scripts/**/*.js', included: false},
-      {pattern: 'test/*Spec.js', included: false},
+      {pattern: 'test/CPPTestsSpec.js', included: false},
+      {pattern: 'test/cpp/**/*.nmf', included: false},
+      {pattern: 'test/cpp/**/*.*exe', included: false, watched: false},
       {pattern: 'test/lib/**/*.js', included: false},
       'test/test-main.js'
     ],
@@ -25,7 +27,6 @@ module.exports = function(config) {
     // list of files to exclude
     exclude: [
       'scripts/main.js',
-      'test/CPPTestsSpec.js',
       'test/node/**/*.js'
     ],
 

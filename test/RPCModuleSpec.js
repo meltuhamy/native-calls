@@ -71,13 +71,17 @@ define(["RPCModule", "NaClModule", "fakemodule"], function(RPCModule, NaClModule
     });
 
 
-    it("should generate functions that make RPC calls", function(){
-      var loaded = false;
-      myModule.on("load", function(){
-        loaded = true;
+    it("should generate functions that make RPC calls", function(done){
+      var id;
+      spyOn(myModule.moduleEl, "postMessage").and.callFake(function(dataToSend){
+        expect(dataToSend).toEqual({
+          "jsonrpc": "2.0",
+          "id": id,
+          "method": "myFoo",
+          "params": ["hello world"]
+        });
+        done();
       });
-
-      spyOn(myModule.moduleEl, "postMessage");
 
       var rpcModule = new RPCModule({
         module: myModule,
@@ -89,31 +93,12 @@ define(["RPCModule", "NaClModule", "fakemodule"], function(RPCModule, NaClModule
         ]
       });
 
-      var id = rpcModule.myFoo("hello world");
-
-      // the module wasn't loaded. We expect the rpc call to make the module load. Wait for it to load.
-      waitsFor(function(){
-        return loaded;
-      }, "the module to load");
-
-      runs(function(){
-        expect(myModule.moduleEl.postMessage).toHaveBeenCalledWith({
-          "jsonrpc": "2.0",
-          "id": id,
-          "method": "myFoo",
-          "params": ["hello world"]
-        });
-      });
+      id = rpcModule.myFoo("hello world");
     });
 
 
 
-    it("should handle successful result callbacks", function(){
-      var loaded = false;
-      myModule.on("load", function(){
-        loaded = true;
-      });
-
+    it("should handle successful result callbacks", function(done){
       var rpcModule = new RPCModule({
         module: myModule,
         functions: [
@@ -124,47 +109,35 @@ define(["RPCModule", "NaClModule", "fakemodule"], function(RPCModule, NaClModule
           }
         ]
       });
+
       var successSpy = jasmine.createSpy("successSpy");
       var errorSpy = jasmine.createSpy("errorSpy");
-      var id = rpcModule.myFoo("hello world", successSpy, errorSpy);
 
-      // the module wasn't loaded. We expect the rpc call to make the module load. Wait for it to load.
-      waitsFor(function(){
-        return loaded;
-      }, "the module to load");
-
-      var messageSent = false;
-      myModule.on("message", function(){
-        messageSent = true;
-      });
-
-      runs(function(){
-        // now, make the fake callback
+      spyOn(myModule.moduleEl, "postMessage").and.callFake(function(){
+        // when we post message, reply back.
         myModule.moduleEl.fakeMessage({
           "jsonrpc": "2.0",
           "result": 23,
           "id": id
         });
+
       });
 
-      waitsFor(function(){
-        return messageSent;
-      }, "the message to be sent");
-
-      runs(function(){
+      // the module will then receive the message.
+      // check that the rpc call's callback was called.
+      myModule.on("message", function(){
         expect(successSpy).toHaveBeenCalledWith(23);
         expect(errorSpy).not.toHaveBeenCalled();
+        done();
       });
+
+      var id = rpcModule.myFoo("hello world", successSpy, errorSpy);
+
     });
 
 
 
-    it("should handle error callbacks", function(){
-      var loaded = false;
-      myModule.on("load", function(){
-        loaded = true;
-      });
-
+    it("should handle error callbacks", function(done){
       var rpcModule = new RPCModule({
         module: myModule,
         functions: [
@@ -175,22 +148,12 @@ define(["RPCModule", "NaClModule", "fakemodule"], function(RPCModule, NaClModule
           }
         ]
       });
+
       var successSpy = jasmine.createSpy("successSpy");
       var errorSpy = jasmine.createSpy("errorSpy");
-      var id = rpcModule.myFoo("hello world", successSpy, errorSpy);
 
-      // the module wasn't loaded. We expect the rpc call to make the module load. Wait for it to load.
-      waitsFor(function(){
-        return loaded;
-      }, "the module to load");
-
-      var messageSent = false;
-      runs(function(){
-        // now, make the fake callback
-        myModule.on("message", function(){
-          messageSent = true;
-        });
-
+      spyOn(myModule.moduleEl, "postMessage").and.callFake(function(){
+        // when we post message, reply back with error.
         myModule.moduleEl.fakeMessage({
           "jsonrpc": "2.0",
           "error": {
@@ -199,19 +162,23 @@ define(["RPCModule", "NaClModule", "fakemodule"], function(RPCModule, NaClModule
           },
           "id": id
         });
+
       });
 
-      waitsFor(function(){
-        return messageSent;
-      }, "the message to be sent");
-
-      runs(function(){
+      // the module will then receive the message.
+      // check that the rpc call's callback was called.
+      myModule.on("message", function(){
         expect(successSpy).not.toHaveBeenCalled();
         expect(errorSpy).toHaveBeenCalledWith({
           "code": -23,
           "message" : "the function on the server failed! :("
         });
+        done();
       });
+
+      var id = rpcModule.myFoo("hello world", successSpy, errorSpy);
+
+
     });
 
   });

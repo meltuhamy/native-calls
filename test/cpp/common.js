@@ -416,7 +416,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
 
-    if (loadFunction && body.dataset && body.dataset.tools && body.dataset.configs) {
+    if (loadFunction) {
       var toolchains = body.dataset.tools.split(' ');
       var configs = body.dataset.configs.split(' ');
 

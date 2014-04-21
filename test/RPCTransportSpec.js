@@ -26,59 +26,42 @@ define(["RPCTransport", "NaClModule", "fakemodule"], function(RPCTransport, NaCl
 
 
 
-    it("should load the naclmodule", function(){
-      var myModule = fakemodule.createModuleWithFakeEmbed(new NaClModule(fakeAttrs));
-      var transport = new RPCTransport(myModule);
-      transport.load();
-
-      waitsFor(function(){
-        return myModule.status === 1; // 1 means module loaded.
-      }, "module to load", 10000);
-
-      // ... if the module loads, the test passes.
-
-    });
-
-
-
-    it("should send messages to the (loaded) module using postMessage", function(){
+    it("should load the naclmodule", function(done){
       var myModule = fakemodule.createModuleWithFakeEmbed(new NaClModule(fakeAttrs));
       var transport = new RPCTransport(myModule);
 
-      transport.load();
-
-      waitsFor(function(){
-        return myModule.status === 1; // 1 means module loaded.
-      }, "module to load", 10000);
-
-      runs(function(){
-        spyOn(myModule,"postMessage");
-        transport.send("hello world");
-        expect(myModule.postMessage).toHaveBeenCalled();
-
+      transport.load(function(){
+        expect(myModule.status).toBe(1);
+        done();
       });
     });
 
 
 
-    it("should load the module if postMessage was called and it isn't loaded", function(){
+    it("should send messages to the (loaded) module using postMessage", function(done){
+      var myModule = fakemodule.createModuleWithFakeEmbed(new NaClModule(fakeAttrs));
+      var transport = new RPCTransport(myModule);
+
+      transport.load(function(){
+        spyOn(myModule,"postMessage");
+        transport.send("hello world");
+        expect(myModule.postMessage).toHaveBeenCalled();
+        done();
+      });
+    });
+
+
+
+    it("should load the module if postMessage was called and it isn't loaded", function(done){
       var myModule = fakemodule.createModuleWithFakeEmbed(new NaClModule(fakeAttrs));
       var transport = new RPCTransport(myModule);
 
       expect(myModule.status).not.toBe(1); //1 means loaded
-      spyOn(myModule, "load").andCallThrough();
-      spyOn(myModule, "postMessage");
+      spyOn(myModule, "load").and.callThrough();
+      spyOn(myModule, "postMessage").and.callFake(done);
+
       transport.send("hello world");
       expect(myModule.load).toHaveBeenCalled();
-
-      waitsFor(function(){
-        return myModule.status === 1; // 1 means module loaded.
-      }, "module to load", 10000);
-
-      runs(function(){
-        expect(myModule.postMessage).toHaveBeenCalled();
-      });
-
     });
 
 
@@ -99,62 +82,37 @@ define(["RPCTransport", "NaClModule", "fakemodule"], function(RPCTransport, NaCl
 
 
 
-    it("should handle messages coming from the module", function(){
+    it("should handle messages coming from the module", function(done){
       var myModule = fakemodule.createModuleWithFakeEmbed(new NaClModule(fakeAttrs));
 
       spyOn(RPCTransport.prototype, "handleMessage");
       var transport = new RPCTransport(myModule);
 
       // load and fake a message
-      var loaded = false;
-      var messageReceived = false;
-      myModule.on("message", function(){
-        messageReceived = true;
-      });
       myModule.load(function(){
-        loaded = true;
-        myModule.moduleEl.fakeMessage("Hello World");
-      });
-
-
-      waitsFor(function(){
-        return loaded && messageReceived;
-      }, "module to load and receive a message", 10000);
-
-      runs(function(){
-        expect(transport.handleMessage).toHaveBeenCalled();
+        myModule.moduleEl.fakeMessage("Hello World", function(){
+          expect(transport.handleMessage).toHaveBeenCalled();
+          done();
+        });
       });
 
     });
 
 
 
-    it("should pass messages on to the json-rpc layer if constructed with one", function(){
+    it("should pass messages on to the json-rpc layer if constructed with one", function(done){
       var myModule = fakemodule.createModuleWithFakeEmbed(new NaClModule(fakeAttrs));
 
       // We mock the JSON RPC
       var jsonRPC = jasmine.createSpyObj("jsonRPC", ["handleRPCCallback"]);
-      transport = new RPCTransport(myModule, jsonRPC);
+      var transport = new RPCTransport(myModule, jsonRPC);
 
       // load and fake a message
-      var loaded = false;
-      var messageReceived = false;
-
-      myModule.on("message", function(){
-        messageReceived = true;
-      });
-
       myModule.load(function(){
-        loaded = true;
-        myModule.moduleEl.fakeMessage("Hello World");
-      });
-
-      waitsFor(function(){
-        return loaded && messageReceived
-      }, "module to load and receive a message", 10000);
-
-      runs(function(){
-        expect(jsonRPC.handleRPCCallback).toHaveBeenCalled();
+        myModule.moduleEl.fakeMessage("Hello World", function(){
+          expect(jsonRPC.handleRPCCallback).toHaveBeenCalled();
+          done();
+        });
       });
     });
 

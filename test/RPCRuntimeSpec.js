@@ -6,7 +6,7 @@ define(["RPCRuntime", "JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], fu
     var myModule, transport, jsonRPC, runtime;
 
 
-    beforeEach(function() {
+    beforeEach(function(done) {
       // remove the naclmodule after each test.
       var listenerElement = document.getElementById(testModuleId+'-listener');
       if(listenerElement){
@@ -19,14 +19,7 @@ define(["RPCRuntime", "JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], fu
 
 
       // load the transport before each test.
-      var loaded = false;
-      transport.load(function(){
-        loaded = true;
-      });
-
-      waitsFor(function(){
-        return loaded;
-      }, "the module to load", 1000);
+      transport.load(done);
     });
 
 
@@ -41,16 +34,16 @@ define(["RPCRuntime", "JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], fu
     it("should make a valid request", function(){
       spyOn(myModule.moduleEl, "postMessage");
       runtime.sendRequest("myFunction", ["hello"]);
-      expect(jsonRPC.validateRPCRequest(myModule.moduleEl.postMessage.calls[0].args[0])).toBe(true);
+      expect(jsonRPC.validateRPCRequest(myModule.moduleEl.postMessage.calls.argsFor(0)[0])).toBe(true);
     });
 
 
 
-    it("should handle rpc messages (requests, callbacks, errrors)", function(){
+    it("should handle rpc messages (requests, callbacks, errrors)", function(done){
       spyOn(RPCRuntime.prototype, "handleRequest");
       spyOn(RPCRuntime.prototype, "handleCallback");
       spyOn(RPCRuntime.prototype, "handleError");
-      spyOn(RPCTransport.prototype, "handleMessage").andCallThrough();
+      spyOn(RPCTransport.prototype, "handleMessage").and.callThrough();
 
       // 3 messages
       var callJSON = {
@@ -79,33 +72,28 @@ define(["RPCRuntime", "JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], fu
       var messageCount = 0;
       myModule.on("message", function(){
         messageCount++;
+        if(messageCount >= 3){
+          expect(messageCount).toEqual(3);
+          expect(runtime.handleRequest).toHaveBeenCalled();
+          expect(runtime.handleCallback).toHaveBeenCalled();
+          expect(runtime.handleError).toHaveBeenCalled();
+          done();
+        }
       });
 
       myModule.moduleEl.fakeMessage(callJSON);
       myModule.moduleEl.fakeMessage(callbackJSON);
       myModule.moduleEl.fakeMessage(errorJSON);
-
-      waitsFor(function(){
-        return messageCount >= 3;
-      }, "3 messages to be sent");
-
-      runs(function(){
-        expect(messageCount).toEqual(3);
-        expect(runtime.handleRequest).toHaveBeenCalled();
-        expect(runtime.handleCallback).toHaveBeenCalled();
-        expect(runtime.handleError).toHaveBeenCalled();
-
-      });
-
     });
 
 
 
-    it("should match callbacks with requests", function(){
+    it("should match callbacks with requests", function(done){
       var successSpy = jasmine.createSpy("successSpy");
-      var messageSent = false;
+
       myModule.on("message", function(){
-        messageSent = true;
+        expect(successSpy).toHaveBeenCalledWith(result);
+        done();
       });
 
       // sendRequest returns the id
@@ -115,23 +103,16 @@ define(["RPCRuntime", "JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], fu
       var result = (new Date()).getTime();
       myModule.moduleEl.fakeMessage(jsonRPC.constructRPCCallback(id, result));
 
-      waitsFor(function(){
-        return messageSent;
-      }, "the message to be sent");
-
-      runs(function(){
-        expect(successSpy).toHaveBeenCalledWith(result);
-      });
 
     });
 
 
 
-    it("should match errors with requests", function(){
+    it("should match errors with requests", function(done){
       var errorSpy = jasmine.createSpy("errorSpy");
-      var messageSent = false;
       myModule.on("message", function(){
-        messageSent = true;
+        done();
+        expect(errorSpy).toHaveBeenCalledWith(errorObject.error);
       });
 
       // sendRequest returns the id
@@ -140,20 +121,11 @@ define(["RPCRuntime", "JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], fu
       // the module sends a message back
       var errorObject = jsonRPC.constructRPCError(id, "-1234", "I am an error message", "And here's some data");
       myModule.moduleEl.fakeMessage(errorObject);
-
-      waitsFor(function(){
-        return messageSent;
-      }, "the message to be sent");
-
-      runs(function(){
-        expect(errorSpy).toHaveBeenCalledWith(errorObject.error);
-      });
-
     });
 
 
 
-    it("should handle many simultaneous RPC requests and do the correct callbacks", function(){
+    it("should handle many simultaneous RPC requests and do the correct callbacks", function(done){
       var i;
       var numTests = 10;
       //create numCallbacks number of spies
@@ -165,6 +137,20 @@ define(["RPCRuntime", "JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], fu
       var messageCount = 0;
       myModule.on("message", function(){
         messageCount++;
+        if(messageCount === numTests){
+          for(i=0; i<numTests; i++){
+            if(i%2 === 0){
+              // check that it was a callback
+              expect(spies[i].success).toHaveBeenCalledWith(resultsAndErrors[i]);
+              expect(spies[i].error).not.toHaveBeenCalled();
+            } else {
+              // check that it was an error
+              expect(spies[i].error).toHaveBeenCalledWith(resultsAndErrors[i]);
+              expect(spies[i].success).not.toHaveBeenCalled();
+            }
+          }
+          done();
+        }
       });
 
       var ids = [];
@@ -188,29 +174,11 @@ define(["RPCRuntime", "JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], fu
 
         }
       }
-
-      waitsFor(function(){
-        return messageCount === numTests;
-      }, numTests+" messages to be sent");
-
-      runs(function(){
-        for(i=0; i<numTests; i++){
-          if(i%2 === 0){
-            // check that it was a callback
-            expect(spies[i].success).toHaveBeenCalledWith(resultsAndErrors[i]);
-            expect(spies[i].error).not.toHaveBeenCalled();
-          } else {
-            // check that it was an error
-            expect(spies[i].error).toHaveBeenCalledWith(resultsAndErrors[i]);
-            expect(spies[i].success).not.toHaveBeenCalled();
-          }
-        }
-      });
     });
 
 
 
-    it("shouldn't be affected by the order of the RPC responses compared to the order of the RPC requests", function(){
+    it("shouldn't be affected by the order of the RPC responses compared to the order of the RPC requests", function(done){
       // same as previous test, only this time the messages received are in random order.
       var i;
       var numTests = 10;
@@ -223,6 +191,20 @@ define(["RPCRuntime", "JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], fu
       var messageCount = 0;
       myModule.on("message", function(){
         messageCount++;
+        if(messageCount === numTests){
+          for(i=0; i<numTests; i++){
+            if(i%2 === 0){
+              // check that it was a callback
+              expect(spies[i].success).toHaveBeenCalledWith(resultsAndErrors[i]);
+              expect(spies[i].error).not.toHaveBeenCalled();
+            } else {
+              // check that it was an error
+              expect(spies[i].error).toHaveBeenCalledWith(resultsAndErrors[i]);
+              expect(spies[i].success).not.toHaveBeenCalled();
+            }
+          }
+          done();
+        }
       });
 
       var ids = [];
@@ -248,23 +230,6 @@ define(["RPCRuntime", "JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], fu
         }
       }
 
-      waitsFor(function(){
-        return messageCount === numTests;
-      }, numTests+" messages to be sent");
-
-      runs(function(){
-        for(i=0; i<numTests; i++){
-          if(i%2 === 0){
-            // check that it was a callback
-            expect(spies[i].success).toHaveBeenCalledWith(resultsAndErrors[i]);
-            expect(spies[i].error).not.toHaveBeenCalled();
-          } else {
-            // check that it was an error
-            expect(spies[i].error).toHaveBeenCalledWith(resultsAndErrors[i]);
-            expect(spies[i].success).not.toHaveBeenCalled();
-          }
-        }
-      });
     });
 
 

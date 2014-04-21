@@ -24,20 +24,23 @@ define([],function(){
       }, ms || defaultLoadTime);
     };
 
-    fakeEmbed.fakeCrash = function(exitStatus, ms){
+    fakeEmbed.fakeCrash = function(exitStatus, callback, ms){
       //PRE: The module should have already been loaded.
       if(fakeEmbed.loaded){
         setTimeout( function(){
           fakeEmbed.exitStatus = exitStatus == undefined ? -1 : exitStatus;
           fakeEmbed.dispatchEvent(new CustomEvent("crash"));
           fakeEmbed.crashed = true;
+          if(callback){
+            setTimeout(callback, 0); //push callback to the end of our stack.
+          }
         } , ms || defaultEventTime);
       } else {
         throw new Error("You're trying to fake crash a module that wasn't loaded.");
       }
     };
 
-    fakeEmbed.fakeMessage = function(data, ms){
+    fakeEmbed.fakeMessage = function(data, callback, ms){
       //PRE: The module should have already been loaded.
       if(fakeEmbed.loaded){
         setTimeout( function(){
@@ -45,6 +48,9 @@ define([],function(){
           e.data = data;
           fakeEmbed.dispatchEvent(e);
           fakeEmbed.messageSent = true;
+          if(callback){
+            setTimeout(callback, 0);
+          }
         } , ms || defaultEventTime);
       } else {
         throw new Error("You're trying to fake message  from a module that wasn't loaded.");

@@ -62,6 +62,11 @@ $(TOOLCHAIN)/$(CONFIG)/$(2).nmf:
 
 endef
 
+ifdef KEEPNMF
+clean:
+	rm -f $(TOOLCHAIN)/$(CONFIG)/*.o $(TOOLCHAIN)/$(CONFIG)/*.nexe $(TOOLCHAIN)/$(CONFIG)/*.pexe
+endif
+
 # foreach source
 # warning: setting ARCH will speed things up but it'll spew a tonne of Makefile Warnings
 ifdef ARCH

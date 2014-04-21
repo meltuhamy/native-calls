@@ -45,7 +45,7 @@ tests: libs
 	$(MAKE) -C $(TEST_CODE_DIR) $(MAKE_ARGS) ARCH=$(ARCH)
 
 # Use this to re-link tests with the libraries
-rebuildtests: libs cleantest tests
+rebuildtests: libs cleantestkeepnmf tests
 
 
 # cleaning
@@ -59,6 +59,9 @@ cleanlib:
 cleantest:
 	$(MAKE) -C $(TEST_CODE_DIR) clean $(MAKE_ARGS)
 
+cleantestkeepnmf:
+	$(MAKE) -C $(TEST_CODE_DIR) clean $(MAKE_ARGS) KEEPNMF=Y
+
 
 clean: cleantest cleanlib cleandemo
 cleanbuild: clean all
@@ -69,13 +72,25 @@ hardclean:
 	$(MAKE) clean TOOLCHAIN=all CONFIG=Debug
 
 # testing
-test: libs tests $(NM_BIN_PATH)
-	touch $(NACL_EXE_STDOUT)
-	export NACL_EXE_STDOUT="$(NACL_EXE_STDOUT)" ; tail -n 0 -f $(NACL_EXE_STDOUT) & TAILPID=$$! && npm test ; kill $$TAILPID
+test: nodetest jstest cpptest
 
 nodetest: $(NM_BIN_PATH)
 	npm run nodetest
 
+cpptest: libs tests $(NM_BIN_PATH)
+	touch $(NACL_EXE_STDOUT)
+	export NACL_EXE_STDOUT="$(NACL_EXE_STDOUT)" ; tail -n 0 -f $(NACL_EXE_STDOUT) & TAILPID=$$! && npm run cpptest ; kill $$TAILPID
+
+cppwatch: libs tests $(NM_BIN_PATH)
+	touch $(NACL_EXE_STDOUT)
+	export NACL_EXE_STDOUT="$(NACL_EXE_STDOUT)" ; tail -n 0 -f $(NACL_EXE_STDOUT) & TAILPID=$$! && npm run cppwatch ; kill $$TAILPID
+
+
+jstest: $(NM_BIN_PATH)
+	npm run jstest
+
+jswatch: $(NM_BIN_PATH)
+	npm run jswatch
 
 # running
 serve: $(NM_BIN_PATH)

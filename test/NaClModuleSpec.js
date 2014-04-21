@@ -1,42 +1,44 @@
-define(["NaClModule", "fakemodule"], function(NaClModule, fakemodule){
+define(["NaClModule", "fakemodule"], function (NaClModule, fakemodule) {
 
-  describe("NaCl Module", function() {
+  describe("NaCl Module", function () {
     var testModuleId = "rpc-module";
-    var myModuleAttrs = {src:'rpc-module.nmf', name:'rpc', id:testModuleId,type:'application/x-pnacl'};
+    var myModuleAttrs = {src: 'rpc-module.nmf', name: 'rpc', id: testModuleId, type: 'application/x-pnacl'};
 
 
-    beforeEach(function() {
+    beforeEach(function () {
       // remove the naclmodule after each test.
-      var listenerElement = document.getElementById(testModuleId+'-listener');
-      if(listenerElement){
+      var listenerElement = document.getElementById(testModuleId + '-listener');
+      if (listenerElement) {
         listenerElement.parentNode.removeChild(listenerElement);
       }
     });
 
 
-    it("should construct",function(){
-      var myModule = new NaClModule({src:'rpc-module.nmf', name:'rpc', id:testModuleId, type:'application/x-pnacl'});
+
+    it("should construct", function () {
+      var myModule = new NaClModule({src: 'rpc-module.nmf', name: 'rpc', id: testModuleId, type: 'application/x-pnacl'});
       expect(myModule).toBeDefined();
     });
 
 
-    it("should construct if we only give it a name", function(){
-      expect(function(){
+
+    it("should construct if we only give it a name", function () {
+      expect(function () {
         new NaClModule({'name': testModuleId});
       }).not.toThrow();
     });
 
 
 
-    it("should fail to construct if we don't give it a name", function(){
-      expect(function(){
+    it("should fail to construct if we don't give it a name", function () {
+      expect(function () {
         new NaClModule(testModuleId);
       }).toThrow;
     });
 
 
 
-    it("should infer type, src, and id using the name", function(){
+    it("should infer type, src, and id using the name", function () {
       var myModule = new NaClModule({"name": testModuleId});
       expect(myModule.moduleEl.name).toBeDefined();
       expect(myModule.moduleEl.src).toBeDefined();
@@ -46,24 +48,31 @@ define(["NaClModule", "fakemodule"], function(NaClModule, fakemodule){
 
 
 
-    it("should fail to construct if the application type isn't valid", function(){
-      var notCorrectType = function(){ new NaClModule({src:'rpc-module.nmf', name:'rpc', id:testModuleId,type:'application/x-helloworld'}); };
+    it("should fail to construct if the application type isn't valid", function () {
+      var notCorrectType = function () {
+        new NaClModule({src: 'rpc-module.nmf', name: 'rpc', id: testModuleId, type: 'application/x-helloworld'});
+      };
       expect(notCorrectType).toThrow();
     });
 
 
-    it("should construct with x-nacl types", function(){
-      new NaClModule({src:'rpc-module.nmf', name:'rpc', id:testModuleId,type:'application/x-nacl'});
+
+    it("should construct with x-nacl types", function () {
+      new NaClModule({src: 'rpc-module.nmf', name: 'rpc', id: testModuleId, type: 'application/x-nacl'});
     });
 
 
-    it("should construct with x-pnacl types", function(){
-      new NaClModule({src:'rpc-module.nmf', name:'rpc', id:testModuleId,type:'application/x-pnacl'});
+
+    it("should construct with x-pnacl types", function () {
+      new NaClModule({src: 'rpc-module.nmf', name: 'rpc', id: testModuleId, type: 'application/x-pnacl'});
     });
 
 
-    it("should fail when a module with the same name already exists", function(){
-      var rpcmoduleNameAndIdType = function(){ new NaClModule({src:'rpc-module.nmf', name:'rpc', id:testModuleId,type:'application/x-pnacl'}); };
+
+    it("should fail when a module with the same name already exists", function () {
+      var rpcmoduleNameAndIdType = function () {
+        new NaClModule({src: 'rpc-module.nmf', name: 'rpc', id: testModuleId, type: 'application/x-pnacl'});
+      };
       // first time should pass
       expect(rpcmoduleNameAndIdType).not.toThrow();
 
@@ -72,35 +81,27 @@ define(["NaClModule", "fakemodule"], function(NaClModule, fakemodule){
     });
 
 
-    it("should load a module and call a callback we specify", function(){
+
+    it("should load a module and call a callback we specify", function (done) {
       var myModule = fakemodule.createModuleWithFakeEmbed(new NaClModule(myModuleAttrs));
 
       // we haven't called .load() yet, so the status should be 0.
       expect(myModule.status).toBe(0); // 0 means NO-STATUS
 
-      // we create a callback spy to ensure the callback is called
-      var loadCallbackSpy = jasmine.createSpy("loadCallback");
-
       // idea: load the module and the fakeEmbed will fire the load event.
-      myModule.load(loadCallbackSpy);
-
-      // wait for the module to load
-      waitsFor(function(){
-        return myModule.moduleEl.loaded; // loaded property only exists in test.
-      }, "the embed to load", 1000);
-
-      // check callback was called and status changed
-      runs(function(){
-        expect(loadCallbackSpy).toHaveBeenCalled();
+      myModule.load(function () {
         expect(myModule.status).toBe(1); // 1 means loaded
+        done();
       });
     });
 
-    it("should allow multiple load callbacks", function(){
+
+
+    it("should allow multiple load callbacks", function (done) {
       var myModule = fakemodule.createModuleWithFakeEmbed(new NaClModule(myModuleAttrs)),
-          onload1  = jasmine.createSpy("load1"),
-          onload2  = jasmine.createSpy("load2"),
-          onload3  = jasmine.createSpy("load3");
+          onload1 = jasmine.createSpy("load1"),
+          onload2 = jasmine.createSpy("load2"),
+          onload3 = jasmine.createSpy("load3");
 
       // register onload listeners
       myModule.on("load", onload1);
@@ -108,133 +109,109 @@ define(["NaClModule", "fakemodule"], function(NaClModule, fakemodule){
       myModule.on("load", onload3);
 
       // load the module
-      myModule.load();
-
-      waitsFor(function(){
-        return myModule.moduleEl.loaded; // loaded property only exists in test.
-      }, "the embed to load", 1000);
-
-      // check callbacks were called.
-      runs(function(){
+      myModule.load(function () {
         expect(onload1).toHaveBeenCalled();
         expect(onload2).toHaveBeenCalled();
         expect(onload3).toHaveBeenCalled();
+        done();
       });
+
     });
 
-    it("should handle messages", function(){
+
+
+    it("should handle messages", function (done) {
       var myModule = fakemodule.createModuleWithFakeEmbed(new NaClModule(myModuleAttrs)),
           onMessageSpy = jasmine.createSpy("onMessage"),
           onMessageSpy2 = jasmine.createSpy("onMessage2"),
-          testData = "hello, world! I'm test number "+ (new Date()).getTime();
+          testData = "hello, world! I'm test number " + (new Date()).getTime();
 
-      myModule.load();
       myModule.on("message", onMessageSpy);
       myModule.on("message", onMessageSpy2);
 
-      waitsFor(function(){
-        return myModule.moduleEl.loaded; // loaded property only exists in test.
-      }, "the embed to load", 1000);
+      myModule.load(function () {
+        // send the message
+        myModule.moduleEl.fakeMessage(testData, function () {
+          // expectations
+          expect(onMessageSpy).toHaveBeenCalledWith(jasmine.objectContaining({data: testData}));
+          expect(onMessageSpy2).toHaveBeenCalledWith(jasmine.objectContaining({data: testData}));
 
-      runs(function(){
-        myModule.moduleEl.fakeMessage(testData);
-      });
+          done();
 
-      waitsFor(function(){
-        return myModule.moduleEl.messageSent;
-      }, "a message to be sent", 1000);
+        });
 
-      runs(function(){
-        // Important: set the messageSent param back to false so we could send/receive more messages later.
-        myModule.moduleEl.messageSent = false;
-        expect(onMessageSpy).toHaveBeenCalledWith(jasmine.objectContaining({data: testData}));
-        expect(onMessageSpy2).toHaveBeenCalledWith(jasmine.objectContaining({data: testData}));
       });
 
     });
 
-    it("should handle a module crash", function(){
+
+
+    it("should handle a module crash", function (done) {
       var myModule = fakemodule.createModuleWithFakeEmbed(new NaClModule(myModuleAttrs)),
           crashSpy = jasmine.createSpy("crashSpy");
 
-      myModule.load();
       myModule.on("crash", crashSpy);
 
-      waitsFor(function(){
-        return myModule.moduleEl.loaded; // loaded property only exists in test.
-      }, "the embed to load", 1000);
-
-      runs(function(){
-        myModule.moduleEl.fakeCrash();
-      });
-
-      waitsFor(function(){
-        return myModule.moduleEl.crashed;
-      }, "the embed to crash", 1000);
-
-      runs(function(){
-        expect(crashSpy).toHaveBeenCalled();
-        expect(myModule.status).toBe(2); // 2 means CRASHED
-        expect(myModule.exitCode).toBe(-1);
+      myModule.load(function () {
+        myModule.moduleEl.fakeCrash(-1, function () {
+          expect(crashSpy).toHaveBeenCalled();
+          expect(myModule.status).toBe(2); // 2 means CRASHED
+          expect(myModule.exitCode).toBe(-1);
+          done();
+        });
       });
     });
 
-    it("should handle events with thisReference", function(){
+
+
+    it("should handle events with thisReference", function (done) {
       // two ways to do events: .load(fn) and .on(e, fn). We test adding a this reference to each of these.
       var myModule = fakemodule.createModuleWithFakeEmbed(new NaClModule(myModuleAttrs));
       var myObject = {};
-      var crazyFunctionName = "aMadeUpFunctionName"+(new Date()).getTime();
-      myObject[crazyFunctionName] = jasmine.createSpy("helloWorld");
-      myObject[crazyFunctionName+"2"] = jasmine.createSpy("helloWorld2");
+      var crazyFunctionName = "aMadeUpFunctionName" + (new Date()).getTime();
+      myObject[crazyFunctionName] = jasmine.createSpy("crazySpy1");
+      myObject[crazyFunctionName + "2"] = jasmine.createSpy("crazySpy2");
 
-      var loaded1, loaded2 = false;
-
-      myModule.on("load", function(){
-        this[crazyFunctionName+"2"]();
-        loaded2 = true;
+      myModule.on("load", function () {
+        this[crazyFunctionName + "2"]();
       }, myObject);
 
-      myModule.load(function(){
+      myModule.on("load", function () {
         this[crazyFunctionName]();
-        loaded1 = true;
       }, myObject);
 
-      waitsFor(function(){
-        return loaded1 && loaded2;
-      }, "the module to load", 10000);
-
-      runs(function(){
+      myModule.load(function () {
         expect(myObject[crazyFunctionName]).toHaveBeenCalled();
-        expect(myObject[crazyFunctionName+"2"]).toHaveBeenCalled();
-      });
-
-      // no test on method
+        expect(myObject[crazyFunctionName + "2"]).toHaveBeenCalled();
+        done();
+      }, myObject);
 
     });
 
 
-    it("should postMessage to the embed", function(){
+
+    it("should postMessage to the embed", function (done) {
       var myModule = fakemodule.createModuleWithFakeEmbed(new NaClModule(myModuleAttrs)),
-          testData = "Hello! I'm test number "+(new Date()).getTime();
+          testData = "Hello! I'm test number " + (new Date()).getTime();
 
       spyOn(myModule.moduleEl, "postMessage");
-      myModule.load();
-      waitsFor(function(){
-        return myModule.moduleEl.loaded; // loaded property only exists in test.
-      }, "the embed to load", 1000);
-
-      runs(function(){
+      myModule.load(function () {
         myModule.postMessage(testData);
         expect(myModule.moduleEl.postMessage).toHaveBeenCalledWith(testData);
+        done();
       });
     });
 
-    it("shouldn't post the message if the module wasn't loaded", function(){
+
+
+    it("shouldn't post the message if the module wasn't loaded", function () {
       var myModule = fakemodule.createModuleWithFakeEmbed(new NaClModule(myModuleAttrs));
       spyOn(myModule.moduleEl, "postMessage");
       myModule.postMessage();
       expect(myModule.moduleEl.postMessage).not.toHaveBeenCalled();
     });
+
+
 
   });
 });

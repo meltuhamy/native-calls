@@ -7,9 +7,13 @@
     "test": "test"
   },
   "scripts": {
-    "test": "npm run nodetest && ./node_modules/.bin/karma start --single-run",
+    "test": "npm run nodetest && npm run jstest && npm run cpptest",
     "nodetest": "./node_modules/.bin/jasmine-node test/node/",
-    "install": "./node_modules/.bin/bower install",
+    "cpptest": "./node_modules/karma/bin/karma start karma-cpp.conf.js --single-run",
+    "cppwatch": "./node_modules/karma/bin/karma start karma-cpp.conf.js",
+    "jstest": "./node_modules/karma/bin/karma start karma.conf.js --single-run",
+    "jswatch": "./node_modules/karma/bin/karma start karma.conf.js",
+    "install": "./node_modules/.bin/bower install && patch ./node_modules/karma/lib/preprocessor.js < preprocessor.patch",
     "serve": "./node_modules/.bin/serve"
   },
   "repository": {
@@ -19,13 +23,17 @@
   "author": "Mohamed Eltuhamy",
   "license": "BSD-2-Clause",
   "dependencies": {
-    "bower": "~1.2.8",
+    "bower": "~1.3.2",
     "serve": "~1.4.0",
     "webidl2": "~2.0.4",
     "minimist": "0.0.8"
   },
   "devDependencies": {
-    "karma": "~0.10.9",
-    "jasmine-node": "~1.14.3"
+    "jasmine-node": "~1.14.3",
+    "karma-jasmine": "~0.2.0",
+    "requirejs": "~2.1.11",
+    "karma-requirejs": "~0.2.1",
+    "karma-chrome-launcher": "~0.1.3",
+    "karma" : "*"
   }
 }

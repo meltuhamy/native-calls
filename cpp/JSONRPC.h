@@ -4,11 +4,12 @@
 namespace pp{
 class Var;
 }
-
+class RPCRuntime;
+class RPCTransport;
 class JSONRPC {
 public:
 	JSONRPC();
-//	JSONRPC(RPCTransport transport, RPCRuntime runtime);
+	JSONRPC(RPCTransport transport, RPCRuntime runtime);
 	virtual ~JSONRPC();
 
 	virtual bool is_basic_json_rpc(pp::Var obj);
@@ -43,8 +44,8 @@ public:
 //	}
 
 private:
-//	RPCTransport *transport;
-//	RPCRuntime *runtime;
+	RPCTransport *transport;
+	RPCRuntime *runtime;
 };
 
 #endif /* JSONRPC_H_ */

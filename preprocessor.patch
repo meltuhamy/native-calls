@@ -1,0 +1,11 @@
+--- node_modules/karma/lib/preprocessor.js	2014-04-14 04:16:25.000000000 +0100
++++ ./preprocessor.js	2014-04-21 11:29:05.000000000 +0100
+@@ -22,7 +22,7 @@
+   'sgi', 'tiff', 'psd', 'uvi', 'sub', 'djvu', 'dwg', 'dxf', 'fbs', 'fpx', 'fst', 'mmr',
+   'rlc', 'mdi', 'wdp', 'npx', 'wbmp', 'xif', 'webp', '3ds', 'ras', 'cmx', 'fh', 'ico', 'pcx', 'pic',
+   'pnm', 'pbm', 'pgm', 'ppm', 'rgb', 'tga', 'xbm', 'xpm', 'xwd', 'zip', 'rar', 'tar', 'bz2', 'eot',
+-  'ttf', 'woff', 'dat'
++  'ttf', 'woff', 'dat', 'nexe', 'pexe'
+ ].forEach(function(extension) {
+   isBinary['.' + extension] = true;
+ });

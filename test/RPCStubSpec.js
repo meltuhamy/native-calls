@@ -6,7 +6,7 @@ define(["RPCStub", "RPCRuntime", "JSONRPC", "RPCTransport", "fakemodule", "NaClM
 
     var myModule, transport, jsonRPC, runtime;
 
-    beforeEach(function(){
+    beforeEach(function(done){
       // make a new runtime mock
       runtimeMock = jasmine.createSpyObj("runtimeMock", [
         "handleCallback",
@@ -28,14 +28,9 @@ define(["RPCStub", "RPCRuntime", "JSONRPC", "RPCTransport", "fakemodule", "NaClM
 
 
       // load the transport before each test.
-      var loaded = false;
       transport.load(function(){
-        loaded = true;
+        done();
       });
-
-      waitsFor(function(){
-        return loaded;
-      }, "the module to load", 1000);
     });
 
     it("should only construct with a runtime", function(){
@@ -123,7 +118,7 @@ define(["RPCStub", "RPCRuntime", "JSONRPC", "RPCTransport", "fakemodule", "NaClM
       }).not.toThrow();
     });
 
-    it("should check the return value from a callback response", function(){
+    it("should check the return value from a callback response", function(done){
       // we will need an actual runtime.
       var stub = new RPCStub(runtime);
 
@@ -141,46 +136,38 @@ define(["RPCStub", "RPCRuntime", "JSONRPC", "RPCTransport", "fakemodule", "NaClM
           id = myRPCFunction(true, 124, mySuccess, myError);
 
       // fake the callback, with a correct return value. check no throw
-      var messageSent = false;
+      var messageCount = 0;
       myModule.on("message", function(){
-        messageSent = true;
+        messageCount++;
+        if(messageCount == 1){
+          // first message.
+          expect(mySuccess).toHaveBeenCalledWith(true);
+          expect(myError).not.toHaveBeenCalled();
+
+          mySuccess = jasmine.createSpy("mySuccess");
+          myError = jasmine.createSpy("myError");
+          id = myRPCFunction(true, 124, mySuccess, myError);
+
+          // send second message: an error
+          myModule.moduleEl.fakeMessage({
+            "jsonrpc": "2.0",
+            "id" : id,
+            "result" : 124
+          });
+
+        } else if(messageCount == 2){
+          // second message.
+          expect(myError).toHaveBeenCalled();
+          done();
+
+        }
       });
 
+      // send first message
       myModule.moduleEl.fakeMessage({
         "jsonrpc": "2.0",
         "id" : id,
         "result" : true
-      });
-
-      waitsFor(function(){
-        return messageSent;
-      }, "message to be sent");
-
-      runs(function(){
-        expect(mySuccess).toHaveBeenCalledWith(true);
-        expect(myError).not.toHaveBeenCalled();
-
-        // do a new request
-        messageSent=false;
-        mySuccess = jasmine.createSpy("mySuccess");
-        myError = jasmine.createSpy("myError");
-        id = myRPCFunction(true, 124, mySuccess, myError);
-
-        myModule.moduleEl.fakeMessage({
-          "jsonrpc": "2.0",
-          "id" : id,
-          "result" : 124
-        });
-
-      });
-
-      waitsFor(function(){
-        return messageSent;
-      }, "message to be sent");
-
-      runs(function(){
-        expect(mySuccess).not.toHaveBeenCalled();
-        expect(myError).toHaveBeenCalled();
       });
 
     });
