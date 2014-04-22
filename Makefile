@@ -45,8 +45,8 @@ tests: libs
 	$(MAKE) -C $(TEST_CODE_DIR) $(MAKE_ARGS) ARCH=$(ARCH)
 
 # Use this to re-link tests with the libraries
-rebuildtests: libs cleantestkeepnmf tests
-
+rebuildtests: libs
+	$(MAKE) -C $(TEST_CODE_DIR) $(MAKE_ARGS) FORCE=y
 
 # cleaning
 

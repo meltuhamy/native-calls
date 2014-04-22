@@ -3,11 +3,22 @@ VALID_TOOLCHAINS := newlib glibc pnacl
 # force newlib for faster builds
 TOOLCHAIN = newlib
 
+LINKER_LIBS := JSONRPC RPCTransport NaClRPCInstance
+
+ifeq ($(FORCE),y)
+$(info Forcing make)
+forceall:
+	$(MAKE) -B TOOLCHAIN=$(TOOLCHAIN) CONFIG=$(CONFIG) FORCE=n
+endif
+
+before_all: $(LINKER_LIBS_LIB_32) $(LINKER_LIBS_LIB_64) $(LINKER_LIBS_LIB_arm) all
+
+
 include $(NACL_SDK_ROOT)/tools/common.mk
 
 
 TARGET = testing
-LIBS = $(DEPS) JSONRPC RPCTransport NaClRPCInstance ppapi_simple nacl_io ppapi_cpp ppapi gmock gtest pthread
+LIBS = $(DEPS) $(LINKER_LIBS) ppapi_simple nacl_io ppapi_cpp ppapi gmock gtest pthread
 
 CFLAGS = -I../../cpp -Wall -Wno-sign-compare
 ifneq ($(TOOLCHAIN),pnacl)
@@ -20,7 +31,9 @@ SOURCES = $(addsuffix .cpp,$(SOURCE_NAMES))
 
 # depend on the actual libraries
 
-	
+
+
+
 $(foreach src,$(SOURCES),$(eval $(call COMPILE_RULE,$(src),$(CFLAGS))))
 
 ifeq ($(CONFIG),Release)
