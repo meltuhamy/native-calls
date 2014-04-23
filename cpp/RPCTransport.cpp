@@ -14,12 +14,17 @@ RPCTransport::RPCTransport(PP_Instance instance, JSONRPC* jsonRPC) : pp::Instanc
 }
 
 
-void RPCTransport::HandleMesasge(const pp::Var& message) {
+void RPCTransport::HandleMessage(const pp::Var& message) {
 	if(this->jsonRPC){
 		// send it to the json rpc if it's there
 		this->jsonRPC->HandleRPC(message);
 	}
 }
+
+void RPCTransport::PostMessage(const pp::Var& message) {
+	pp::Instance::PostMessage(message);
+}
+
 
 RPCTransport::~RPCTransport() {
 
@@ -27,6 +32,7 @@ RPCTransport::~RPCTransport() {
 
 void RPCTransport::init() {
 }
+
 
 void RPCTransport::init(JSONRPC* jsonRPC) {
 	this->setJSONRPC(jsonRPC);

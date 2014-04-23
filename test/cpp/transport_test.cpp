@@ -42,6 +42,6 @@ TEST(RPCTransport, HandleMessageToJSONRPCTest){
 	EXPECT_CALL(mockJSONRPC, HandleRPC(message)).Times(AtLeast(1));
 
 	RPCTransport *myTransport = new RPCTransport(instanceId++, &mockJSONRPC);
-	myTransport->HandleMesasge(message);
+	myTransport->HandleMessage(message);
 
 }

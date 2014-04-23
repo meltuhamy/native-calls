@@ -1,15 +1,22 @@
 #include "gmock/gmock.h"
 #include "JSONRPC.h"
 #include "ppapi/cpp/var.h"
+#include "ppapi/cpp/var_array.h"
+#include "ppapi/cpp/var_dictionary.h"
 
 class MockJSONRPC: public JSONRPC {
 public:
+	MOCK_METHOD1(is_basic_json_rpc, bool(const pp::Var& obj));
+	MOCK_METHOD1(ValidateRPCRequest, bool(const pp::Var& obj));
+	MOCK_METHOD1(ValidateRPCCallback, bool(const pp::Var& obj));
+	MOCK_METHOD1(ValidateRPCError, bool(const pp::Var& obj));
+	MOCK_METHOD1(HandleRPC, void(const pp::Var& obj));
+	MOCK_METHOD1(SendRPCRequest, bool(const pp::Var& obj));
+	MOCK_METHOD3(ConstructRPCRequest, pp::VarDictionary(std::string& method, unsigned int id, const pp::VarArray& params));
+	MOCK_METHOD2(ConstructRPCCallback, pp::VarDictionary(unsigned int id, pp::Var& result));
+	MOCK_METHOD4(ConstructRPCError, pp::VarDictionary(unsigned int id, int code, std::string& message, const pp::Var& data));
 
-	MOCK_METHOD1(is_basic_json_rpc, bool(pp::Var obj));
-	MOCK_METHOD1(ValidateRPCRequest, bool(pp::Var obj));
-	MOCK_METHOD1(ValidateRPCCallback, bool(pp::Var obj));
-	MOCK_METHOD1(ValidateRPCError, bool(pp::Var obj));
-	MOCK_METHOD1(HandleRPC, void(pp::Var obj));
-	MOCK_METHOD1(SendRPCRequst, void(pp::Var obj));
-
+	void HandleRPC_concrete(const pp::Var& obj){
+		JSONRPC::HandleRPC(obj);
+	}
 };

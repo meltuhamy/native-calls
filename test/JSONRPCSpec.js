@@ -141,7 +141,7 @@ define(["JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], function (JSONRP
       expect(JSONRPC.prototype.validateRPCError(json)).toBe(false);
       expect(JSONRPC.prototype.validateRPCRequest(json)).toBe(false);
 
-      expect(JSONRPC.prototype.validateRPCCallback({
+      expect(JSONRPC.prototype.validateRPCCallback(json = {
         "jsonrpc": "2.0",
         "result": 19,
         "id": "myID1"

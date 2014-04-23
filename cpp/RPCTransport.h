@@ -13,15 +13,17 @@ public:
 
 	RPCTransport(PP_Instance instance, JSONRPC *jsonRPC);
 
-	virtual void HandleMesasge(const pp::Var& message);
+	virtual void HandleMessage(const pp::Var& message);
+
+	virtual void PostMessage(const pp::Var& message);
 
 	virtual ~RPCTransport();
 
-	JSONRPC* getJSONRPC() {
+	virtual JSONRPC* getJSONRPC() {
 		return jsonRPC;
 	}
 
-	void setJSONRPC(JSONRPC* jsonRpc) {
+	virtual void setJSONRPC(JSONRPC* jsonRpc) {
 		jsonRPC = jsonRpc;
 	}
 
