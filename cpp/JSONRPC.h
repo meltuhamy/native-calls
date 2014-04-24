@@ -45,9 +45,8 @@ public:
 		return transport;
 	}
 
-	virtual void setTransport(RPCTransport* transport) {
-		this->transport = transport;
-	}
+	virtual void setTransport(RPCTransport* transport);
+
 //
 //	virtual const RPCRuntime* getRuntime() const {
 //		return runtime;

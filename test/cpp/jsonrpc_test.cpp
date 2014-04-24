@@ -178,7 +178,7 @@ TEST(JSONRPCLayer, ValidateJSONRPCRequestTest){
 
 
 // it should validate json-rpc callbacks and errors according to spec
-TEST(JSONRPCLayer, ValidateJSONRPCErrorsTest){
+TEST(JSONRPCLayer, ValidateJSONRPCCallbacksAndErrorsTest){
 	JSONRPC jsonRPC;
 	{
 		pp::VarDictionary obj;
@@ -363,6 +363,8 @@ TEST(JSONRPCLayer, ValidateJSONRPCBatchCallsTest){
 TEST(JSONRPCLayer, SendJSONRPCRequestTest){
 	// SendRPCRequest with a valid object, check PostMessage called.
 	MockRPCTransport transport;
+	EXPECT_CALL(transport, PostMessage(_)).Times(1);
+
 	JSONRPC* jsonRPC = new JSONRPC(&transport);
 
 	pp::VarDictionary obj;
@@ -375,17 +377,17 @@ TEST(JSONRPCLayer, SendJSONRPCRequestTest){
 
 	ASSERT_TRUE(jsonRPC->ValidateRPCRequest(obj) == true);
 
-	EXPECT_CALL(transport, PostMessage(obj)).Times(AtLeast(1));
+	bool sent = jsonRPC->SendRPCRequest(obj);
 
-	ASSERT_TRUE(jsonRPC->SendRPCRequest(obj) == true);
+	ASSERT_TRUE(sent);
 
 }
 
 // it should fail to send request if transport wasn't provided
 TEST(JSONRPCLayer, SendRequestWithoutTransportTest){
-	// SendRPCRequest with an invalid object, check PostMessage NOT called.
+	// Construct jsonrpc without transport. check PostMessage NOT called.
 	MockRPCTransport transport;
-	JSONRPC* jsonRPC = new JSONRPC(&transport);
+	JSONRPC* jsonRPC = new JSONRPC();
 
 	pp::VarDictionary obj;
 	obj.Set("jsonrpc","2.0");
@@ -395,7 +397,7 @@ TEST(JSONRPCLayer, SendRequestWithoutTransportTest){
 	obj.Set("params",obj_params);
 	obj.Set("id",1);
 
-	ASSERT_FALSE(jsonRPC->ValidateRPCRequest(obj) == true);
+	ASSERT_TRUE(jsonRPC->ValidateRPCRequest(obj) == true);
 
 	EXPECT_CALL(transport, PostMessage(_)).Times(0);
 
@@ -505,7 +507,7 @@ TEST(JSONRPCLayer, JSONRPCErrorObjectTest){
 
 	pp::VarDictionary errorWithData = jsonRPC.ConstructRPCError(id, -213, message, data);
 	pp::VarDictionary errorWithoutData = jsonRPC.ConstructRPCError(id, -213, message);
-	ASSERT_TRUE(jsonRPC.ValidateRPCError(errorWithData) == true);
 	ASSERT_TRUE(jsonRPC.ValidateRPCError(errorWithoutData) == true);
+	ASSERT_TRUE(jsonRPC.ValidateRPCError(errorWithData) == true);
 
 }

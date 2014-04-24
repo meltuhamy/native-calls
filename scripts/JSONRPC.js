@@ -80,7 +80,7 @@ define(['RPCTransport', 'lodash', "TagLogger"], function(RPCTransport, _, TagLog
    * @returns {boolean}
    * @param eventObject
    */
-  JSONRPC.prototype.handleRPCCallback = function(eventObject){
+  JSONRPC.prototype.handleRtPCCallback = function(eventObject){
     var rpcObject = eventObject.data;
 
     if(this.validateRPCCallback(rpcObject)){
