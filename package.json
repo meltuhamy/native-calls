@@ -13,7 +13,7 @@
     "cppwatch": "./node_modules/karma/bin/karma start karma-cpp.conf.js",
     "jstest": "./node_modules/karma/bin/karma start karma.conf.js --single-run",
     "jswatch": "./node_modules/karma/bin/karma start karma.conf.js",
-    "install": "./node_modules/.bin/bower install && patch scripts/lib/tv4/tv4.js < tv4.patch && patch ./node_modules/karma/lib/preprocessor.js < preprocessor.patch",
+    "install": "./node_modules/.bin/bower install && patch ./node_modules/karma/lib/preprocessor.js < preprocessor.patch",
     "serve": "./node_modules/.bin/serve"
   },
   "repository": {
