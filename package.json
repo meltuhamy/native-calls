@@ -13,7 +13,7 @@
     "cppwatch": "./node_modules/karma/bin/karma start karma-cpp.conf.js",
     "jstest": "./node_modules/karma/bin/karma start karma.conf.js --single-run",
     "jswatch": "./node_modules/karma/bin/karma start karma.conf.js",
-    "install": "./node_modules/.bin/bower install && patch ./node_modules/karma/lib/preprocessor.js < preprocessor.patch",
+    "install": "./node_modules/.bin/bower install",
     "serve": "./node_modules/.bin/serve"
   },
   "repository": {
@@ -34,6 +34,6 @@
     "requirejs": "~2.1.11",
     "karma-requirejs": "~0.2.1",
     "karma-chrome-launcher": "~0.1.3",
-    "karma" : "*"
+    "karma" : "~0.12.14"
   }
 }
