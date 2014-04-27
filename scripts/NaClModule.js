@@ -44,9 +44,9 @@ define(['lodash', 'TagLogger', 'NaClConfig'], function(_, TagLogger, NaClConfig)
     }
 
     // set the inferred types back to attrs.
-    attrs.type = moduleType;
-    attrs.src = moduleSrc;
-    attrs.id = moduleId;
+    this.type = attrs.type = moduleType;
+    this.src = attrs.src = moduleSrc;
+    this.id = attrs.id = moduleId;
 
     this.name = attrs.name;
 
@@ -152,7 +152,7 @@ define(['lodash', 'TagLogger', 'NaClConfig'], function(_, TagLogger, NaClConfig)
    * @param {DocumentEvent} e
    */
   var onMessage = function(e) {
-    this.logger.debug("Message received");
+    this.logger.debug("← "+ JSON.stringify(e.data));
   };
 
   /**
@@ -189,7 +189,7 @@ define(['lodash', 'TagLogger', 'NaClConfig'], function(_, TagLogger, NaClConfig)
   NaClModule.prototype.postMessage = function(data) {
     if(this.status === STATUSES.LOADED){
       this.moduleEl.postMessage(data);
-      this.logger.debug("Message sent to module.");
+      this.logger.debug("→ "+JSON.stringify(data));
     } else {
       this.logger.error("postMessage failed. Module not running.");
     }

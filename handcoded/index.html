@@ -11,33 +11,32 @@
 
   <h1>Playing with the demos</h1>
   <p>Take a look at each IDL file to see the API each module supports.</p>
-  <p>For example, the <code>Logger/Logger.idl</code> file contains the following interface: </p>
+  <p>For example, the <code>Fib/Fib.idl</code> file contains the following interface: </p>
 
   <pre>
-interface Logger {
-  DOMString helloName(DOMString name1);
-  DOMString greetName(DOMString greeting, DOMString name);
+interface Fib {
+  long fib(unsigned long x);
 };
   </pre>
 
-  <p>This allows the JavaScript developer to run the helloName and greetName methods on the Logger module. To do this, simply call the function with its parameters, then give an optional success callback and an optional error callback</p>
-  <p>For example, here is the <code>Logger.helloName</code> RPC call.</p>
+  <p>This allows the JavaScript developer to run the fib method on the Fib module. To do this, simply call the function with its parameters, then give an optional success callback and an optional error callback</p>
+  <p>For example, here is the <code>Fib.fib()</code> RPC call.</p>
   <pre>
-Logger.helloName("Mohamed", function(result){
-    console.log(JSON.stringify(result))
+Fib.fib(23, function(result){
+    console.log("The 23rd Fibonacci number is "+result);
 });
   </pre>
-  <p>This will first load the C++ module, then call the helloName C++ function. The result will come to the callback function.</p>
+  <p>This will first load the C++ module, then call the fib C++ function. The result will come to the callback function.</p>
 
   <p>You can make your own calls by opening the <a href="https://developers.google.com/chrome-developer-tools/docs/console" target="_blank">console</a> and typing in code like the above.</p>
 
 
 <h2>How it works</h2>
-  <p>LoggerRPCModule is constructed using the RPCModule function. This requires a NaClModule and function definitions.
+  <p>FibModule is constructed using the RPCModule function. This requires a NaClModule and function definitions.
       The result is a name-spaced set of functions that you can call directly, as in the example above.</p>
 
-  <p>The LoggerRPCModule is generated using the IDL file (Logger.idl).
-      This is done when <code>Make</code> is called in the <code>Logger</code> folder.
+  <p>The FibRPCModule is (/will be) generated using the IDL file (Fib.idl).
+      This is (/will be) done when <code>Make</code> is called in the <code>Fib</code> folder.
       This means all we need to do is change this IDL file whenever the C++ API you want to expose changes. </p>
 
 <p>For more information about how the RPC works, check ../structure.txt</p>

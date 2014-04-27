@@ -251,6 +251,12 @@ define(["RPCRuntime", "JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], fu
     });
 
 
+    it("should export the NaCl Module", function(){
+      var naclmodule = runtime.getModule();
+      expect(naclmodule instanceof NaClModule).toBe(true);
+    });
+
+
 
     // maybe it should make batch calls for rpc calls that are made in the same interval
     // e.g. sending 10,000 requests in 5 milliseconds is stupid. Instead, send 1 batch request with 10,000 calls.

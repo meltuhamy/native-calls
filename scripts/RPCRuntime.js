@@ -12,6 +12,11 @@ define(['JSONRPC', 'TagLogger'], function(JSONRPC, TagLogger){
 	}
 
 
+  RPCRuntime.prototype.getModule = function(){
+    return this.jsonRPC.getModule();
+  };
+
+
   RPCRuntime.prototype.setJSONRPC = function(jsonRPC){
     this.jsonRPC = jsonRPC;
     this.jsonRPC.setRuntime(this);

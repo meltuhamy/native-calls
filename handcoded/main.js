@@ -4,14 +4,12 @@ requirejs.config({
 });
 var DEMOPREFIX = '../handcoded/'; //relative to requirejs baseurl
 
-require(["loglevel", DEMOPREFIX+"Logger/LoggerRPC", DEMOPREFIX+"Fib/FibRPC", DEMOPREFIX+"ObjectsExample/ObjectsExampleRPC", "../scripts/JSFib"], function(loglevel, LoggerRPCModule, FibRPCModule, ObjectsExampleModule, JSFib) {
+require(["tv4", "loglevel", DEMOPREFIX+"Fib/FibRPC", "../scripts/JSFib"], function(tv4, loglevel, FibRPCModule, JSFib) {
   window.loglevel = loglevel;
+  window.tv4 = tv4;
   loglevel.setLevel(loglevel.levels.DEBUG); //log everything when debugging!
-  window.Logger = LoggerRPCModule;
-  window.Fib = FibRPCModule;
+  window.Fib = FibRPCModule.Fib;
   window.JSFib = JSFib;
-  window.ObjectsExample = ObjectsExampleModule;
-
 
   window.timeJSFib = function(x){
     var jsStart = new Date();

@@ -18,6 +18,10 @@ define(['RPCTransport', 'lodash', "TagLogger"], function(RPCTransport, _, TagLog
            (_.isString(rpcObject.method) || !_.isUndefined(rpcObject.result) || _.isObject(rpcObject.error));
   }
 
+  JSONRPC.prototype.getModule = function(){
+    return this.transport.getModule();
+  };
+
   JSONRPC.prototype.setTransport = function(transport){
     this.transport = transport;
   };
@@ -80,7 +84,7 @@ define(['RPCTransport', 'lodash', "TagLogger"], function(RPCTransport, _, TagLog
    * @returns {boolean}
    * @param eventObject
    */
-  JSONRPC.prototype.handleRtPCCallback = function(eventObject){
+  JSONRPC.prototype.handleRPC = function(eventObject){
     var rpcObject = eventObject.data;
 
     if(this.validateRPCCallback(rpcObject)){

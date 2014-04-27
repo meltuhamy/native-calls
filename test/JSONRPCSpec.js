@@ -335,7 +335,7 @@ define(["JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], function (JSONRP
 
 
     it("should handle json-rpc requests", function (done) {
-      spyOn(JSONRPC.prototype, "handleRPCCallback").and.callThrough();
+      spyOn(JSONRPC.prototype, "handleRPC").and.callThrough();
       spyOn(JSONRPC.prototype, "validateRPCRequest").and.callThrough();
       var jsonRPC = new JSONRPC(transport, rpcRuntime);
 
@@ -347,7 +347,7 @@ define(["JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], function (JSONRP
       };
 
       myModule.on("message", function () {
-        expect(jsonRPC.handleRPCCallback).toHaveBeenCalled();
+        expect(jsonRPC.handleRPC).toHaveBeenCalled();
         expect(jsonRPC.validateRPCRequest).toHaveBeenCalled();
         done();
       });
@@ -357,7 +357,7 @@ define(["JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], function (JSONRP
 
 
     it("should handle json-rpc callbacks", function (done) {
-      spyOn(JSONRPC.prototype, "handleRPCCallback").and.callThrough();
+      spyOn(JSONRPC.prototype, "handleRPC").and.callThrough();
       spyOn(JSONRPC.prototype, "validateRPCCallback").and.callThrough();
       var jsonRPC = new JSONRPC(transport, rpcRuntime);
 
@@ -367,7 +367,7 @@ define(["JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], function (JSONRP
         "id": 1
       };
       myModule.on("message", function () {
-        expect(jsonRPC.handleRPCCallback).toHaveBeenCalled();
+        expect(jsonRPC.handleRPC).toHaveBeenCalled();
         expect(jsonRPC.validateRPCCallback).toHaveBeenCalled();
         done();
       });
@@ -378,7 +378,7 @@ define(["JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], function (JSONRP
 
 
     it("should handle json-rpc errors", function (done) {
-      spyOn(JSONRPC.prototype, "handleRPCCallback").and.callThrough();
+      spyOn(JSONRPC.prototype, "handleRPC").and.callThrough();
       spyOn(JSONRPC.prototype, "validateRPCError").and.callThrough();
       var jsonRPC = new JSONRPC(transport, rpcRuntime);
 
@@ -392,7 +392,7 @@ define(["JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], function (JSONRP
         "id": 1
       };
       myModule.on("message", function () {
-        expect(jsonRPC.handleRPCCallback).toHaveBeenCalled();
+        expect(jsonRPC.handleRPC).toHaveBeenCalled();
         expect(jsonRPC.validateRPCError).toHaveBeenCalled();
         done();
       });
@@ -495,6 +495,13 @@ define(["JSONRPC", "RPCTransport", "NaClModule", "fakemodule"], function (JSONRP
       myModule.moduleEl.fakeMessage(errorJSON);
     });
 
+
+
+    it("should export the NaCl Module", function(){
+      var jsonRPC = new JSONRPC(transport);
+      var naclmodule = jsonRPC.getModule();
+      expect(naclmodule instanceof NaClModule).toBe(true);
+    });
 
   });
 });

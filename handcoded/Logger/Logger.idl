@@ -1,4 +1,0 @@
-interface Logger {
-  DOMString helloName(DOMString name1);
-  DOMString greetName(DOMString greeting, DOMString name);
-};

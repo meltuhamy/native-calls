@@ -1,6 +1,6 @@
 #include "Fib.h"
 
-int fib(int x) {
+int Fib::fib(int x) {
 	if (x == 0)
 		return 0;
 

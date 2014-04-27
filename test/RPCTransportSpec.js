@@ -104,16 +104,29 @@ define(["RPCTransport", "NaClModule", "fakemodule"], function(RPCTransport, NaCl
       var myModule = fakemodule.createModuleWithFakeEmbed(new NaClModule(fakeAttrs));
 
       // We mock the JSON RPC
-      var jsonRPC = jasmine.createSpyObj("jsonRPC", ["handleRPCCallback"]);
+      var jsonRPC = jasmine.createSpyObj("jsonRPC", ["handleRPC"]);
       var transport = new RPCTransport(myModule, jsonRPC);
 
       // load and fake a message
       myModule.load(function(){
         myModule.moduleEl.fakeMessage("Hello World", function(){
-          expect(jsonRPC.handleRPCCallback).toHaveBeenCalled();
+          expect(jsonRPC.handleRPC).toHaveBeenCalled();
           done();
         });
       });
+    });
+
+
+    it("should export the NaCl Module", function(){
+      var myModule = fakemodule.createModuleWithFakeEmbed(new NaClModule(fakeAttrs));
+
+      // We mock the JSON RPC
+      var jsonRPC = jasmine.createSpyObj("jsonRPC", ["handleRPC"]);
+      var transport = new RPCTransport(myModule, jsonRPC);
+
+      var exportedModule = transport.getModule();
+      expect(exportedModule instanceof NaClModule).toBe(true);
+
     });
 
 

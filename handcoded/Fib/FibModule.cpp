@@ -13,12 +13,12 @@ public:
 
 	// Handle RPC method calls
 	virtual void HandleRPC(std::string name, pp::VarArray params, int id){
-		if(name == "fib"){
+		if(name == "Fib::fib"){
 			// expecting 1 param with type int
 			if(params.GetLength() == 1){
 				pp::Var firstParam = params.Get(0);
 				if(firstParam.is_int()){
-					int result = fib(firstParam.AsInt());
+					int result = Fib::fib(firstParam.AsInt());
 					// Now do a callback
 					pp::Var responseData = pp::Var(result);
 					PostMessage(*ConstructResponseDictionary(id, responseData));

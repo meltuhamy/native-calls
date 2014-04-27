@@ -1,5 +1,5 @@
 define(["RPCModule", "NaClModule", "fakemodule"], function(RPCModule, NaClModule, fakemodule){
-  describe("RPC Stub", function() {
+  describe("RPC Module", function() {
     var testModuleId = "rpcmodule-layer";
     var fakeAttrs = {src:'rpc-module.nmf', name:'myRPC', id:testModuleId, type:'application/x-pnacl'};
 
@@ -27,158 +27,145 @@ define(["RPCModule", "NaClModule", "fakemodule"], function(RPCModule, NaClModule
     });
 
 
-
-    it("should accept function specs", function(){
-      var rpcModule = new RPCModule({
+    it("should export interfaces", function(){
+      var MyRPCModule = new RPCModule({
         module: myModule,
-        functions: [
+        interfaces: [
+          {"name": "MyInterface", "functions": []},
+          {"name": "SecondInterface", "functions": []}
+        ],
+        dictionaries: []
+      });
+
+      expect(MyRPCModule.MyInterface).toBeDefined();
+      expect(MyRPCModule.SecondInterface).toBeDefined();
+
+      // not allowed to have any other enumerable properties
+      var allowed = ["MyInterface", "SecondInterface"];
+      for(var key in MyRPCModule){
+        expect(allowed.indexOf(key)).toBeGreaterThan(-1);
+      }
+    });
+
+
+    it("should export functions in the interfaces", function(){
+      var MyRPCModule = new RPCModule({
+        module: myModule,
+        interfaces: [
           {
-            "name": "myFoo",
-            "params" : ["String"]
+            "name": "MyInterface",
+            "functions": [
+              {"name": "firstFn", "params": []},
+              {"name": "secondFn", "params": []}
+            ]
+          },
+          {"name": "SecondInterface"}
+        ],
+        dictionaries: []
+      });
+
+      expect(MyRPCModule.MyInterface.firstFn instanceof Function).toBe(true);
+      expect(MyRPCModule.MyInterface.secondFn instanceof Function).toBe(true);
+
+      //MyInterface should have ONLY these enumerable properties:
+      var myInterfaceAllowed = ["firstFn", "secondFn"];
+      for(var key in MyRPCModule.MyInterface){
+        expect(myInterfaceAllowed.indexOf(key)).toBeGreaterThan(-1);
+      }
+
+      for(key in MyRPCModule.SecondInterface){
+        // should never get here
+        expect(key).toBeUndefined();
+      }
+
+
+    });
+
+
+    it("should export functions that make real rpc calls", function(done){
+      var validPersonDatabase = [
+        {"id": 1, "person": {"name": "Mohamed", "age": 12}},
+        {"id": 2, "person": {"name": "James", "age": 12}}
+      ];
+
+
+      var MyRPCModule = new RPCModule({
+        module: myModule,
+        interfaces: [
+          {
+            "name": "MyInterface",
+            "functions": [
+              {
+                "name": "printPeople",
+                "params": [
+                  {"type": "array", "items": {"$ref": "PersonID"}},
+                  {"$ref": "DOMString"}
+                ],
+                "returnType": {"$ref": "unsigned long"}
+              }
+            ]
+          },
+          {"name": "SecondInterface"}
+        ],
+        dictionaries: [
+          {
+            name: 'Person',
+            required:["name", "age"],
+            properties: {
+              "name": {"$ref": 'DOMString'},
+              "age": {"$ref": 'unsigned short'}
+            }
           },
           {
-            "name" : "myFun",
-            "params" : ["Long"]
+            'name': 'PersonID',
+            required: ["person", "id"],
+            properties: {
+              "person": {"$ref": "Person"},
+              "id": {"$ref": "unsigned long"}
+            }
           }
         ]
       });
 
-      expect(rpcModule.myFoo).toBeDefined();
-      expect(rpcModule.myFun).toBeDefined();
 
-    });
-
-
-
-    it("should allow adding function specs at runtime", function(){
-      var rpcModule = new RPCModule({
-        module: myModule,
-        functions: [
-          {
-            "name": "myFoo",
-            "params" : ["String"]
-          }
-        ]
-      });
-
-      RPCModule.addStubToModule(rpcModule, {
-        "name" : "myFun",
-        "params" : ["Long"]
-      });
-
-      expect(rpcModule.myFoo).toBeDefined();
-      expect(rpcModule.myFun).toBeDefined();
-    });
-
-
-    it("should generate functions that make RPC calls", function(done){
-      var id;
-      spyOn(myModule.moduleEl, "postMessage").and.callFake(function(dataToSend){
-        expect(dataToSend).toEqual({
-          "jsonrpc": "2.0",
-          "id": id,
-          "method": "myFoo",
-          "params": ["hello world"]
-        });
-        done();
-      });
-
-      var rpcModule = new RPCModule({
-        module: myModule,
-        functions: [
-          {
-            "name": "myFoo",
-            "params" : ["DOMString"]
-          }
-        ]
-      });
-
-      id = rpcModule.myFoo("hello world");
-    });
-
-
-
-    it("should handle successful result callbacks", function(done){
-      var rpcModule = new RPCModule({
-        module: myModule,
-        functions: [
-          {
-            "name": "myFoo",
-            "params" : ["String"],
-            "returnType" : "Long"
-          }
-        ]
-      });
-
-      var successSpy = jasmine.createSpy("successSpy");
-      var errorSpy = jasmine.createSpy("errorSpy");
-
+      // when a request is made, send back a response.
+      var requestID;
       spyOn(myModule.moduleEl, "postMessage").and.callFake(function(){
-        // when we post message, reply back.
         myModule.moduleEl.fakeMessage({
           "jsonrpc": "2.0",
-          "result": 23,
-          "id": id
+          "id": requestID,
+          "result": 234 // 234 is just an unsigned long..
         });
-
       });
 
-      // the module will then receive the message.
-      // check that the rpc call's callback was called.
-      myModule.on("message", function(){
-        expect(successSpy).toHaveBeenCalledWith(23);
-        expect(errorSpy).not.toHaveBeenCalled();
+      requestID = MyRPCModule.MyInterface.printPeople(validPersonDatabase, "Hello", function(data){
+        expect(data).toBe(234);
         done();
       });
-
-      var id = rpcModule.myFoo("hello world", successSpy, errorSpy);
 
     });
 
 
-
-    it("should handle error callbacks", function(done){
-      var rpcModule = new RPCModule({
+    it("should export the stub layer object", function(){
+      var MyRPCModule = new RPCModule({
         module: myModule,
-        functions: [
-          {
-            "name": "myFoo",
-            "params" : ["String"],
-            "returnType" : "Long"
-          }
-        ]
+        interfaces: [],
+        dictionaries: []
       });
 
-      var successSpy = jasmine.createSpy("successSpy");
-      var errorSpy = jasmine.createSpy("errorSpy");
+      var stub = RPCModule.getStub(MyRPCModule);
+      expect(stub).toBeDefined();
+    });
 
-      spyOn(myModule.moduleEl, "postMessage").and.callFake(function(){
-        // when we post message, reply back with error.
-        myModule.moduleEl.fakeMessage({
-          "jsonrpc": "2.0",
-          "error": {
-            "code": -23,
-            "message" : "the function on the server failed! :("
-          },
-          "id": id
-        });
-
+    it("should export the nacl module", function(){
+      var MyRPCModule = new RPCModule({
+        module: myModule,
+        interfaces: [],
+        dictionaries: []
       });
 
-      // the module will then receive the message.
-      // check that the rpc call's callback was called.
-      myModule.on("message", function(){
-        expect(successSpy).not.toHaveBeenCalled();
-        expect(errorSpy).toHaveBeenCalledWith({
-          "code": -23,
-          "message" : "the function on the server failed! :("
-        });
-        done();
-      });
-
-      var id = rpcModule.myFoo("hello world", successSpy, errorSpy);
-
-
+      var naclModule = RPCModule.getModule(MyRPCModule);
+      expect(naclModule instanceof NaClModule).toBe(true);
     });
 
   });

@@ -16,6 +16,10 @@ define(["RPCStub", "RPCRuntime", "JSONRPC", "RPCTransport", "fakemodule", "NaClM
         "sendCallback",
         "sendError"]);
 
+      runtimeMock.getModule = jasmine.createSpy("getModule").and.callFake(function(){
+        return myModule;
+      });
+
       // remove the naclmodule after each test.
       var listenerElement = document.getElementById(testModuleId+'-listener');
       if(listenerElement){
@@ -44,132 +48,286 @@ define(["RPCStub", "RPCRuntime", "JSONRPC", "RPCTransport", "fakemodule", "NaClM
     });
 
 
-
-    it("should have methods to easily check types", function(){
-      // because there are way too many cases to check, we only test a few working cases here.
-      var p = RPCStub.prototype;
-      expect(p.isInteger(12)).toBe(true);
-      expect(p.isInteger(12.2)).toBe(false);
-
-      expect(p.isFloat(12.2)).toBe(true); //we take approach float is superset of int
-      expect(p.isFloat(12)).toBe(true);
-
-      expect(p.isString("hello")).toBe(true);
-      expect(p.isString(12)).toBe(false);
-
-      expect(p.isBoolean(true)).toBe(true);
-      expect(p.isBoolean(false)).toBe(true);
-      expect(p.isBoolean(1)).toBe(false);
-
-      expect(p.isArrayBuffer(new ArrayBuffer(123))).toBe(true);
-      expect(p.isArrayBuffer(12)).toBe(false);
-
-      expect(p.isArray(['1'])).toBe(true);
-      expect(p.isArray(12)).toBe(false);
-
-    });
-
-
-
-    it("should construct functions using a json notation", function(){
-      var p = RPCStub.prototype;
-      var dictionaries = [];
-      dictionaries.push({"Dictionary": "DictName", "properties": [{"myPropName": "Boolean"}] });
-
-      var fn = p.constructStub({
-        "name"  : "foo",
-        "dictionaries" : dictionaries,
-        "params": ["String", {"Dictionary": "DictName"}],
-        "returnType": "Boolean"
-      });
-      expect(fn instanceof Function).toBe(true);
-    });
-
-
-
-    it("should allow parameters of many types", function(){
-      var p = RPCStub.prototype;
-      var fn = p.constructStub({
-        "name" : "foo",
-        "params": ["String", "Long", "DOMString", "Float", "Boolean", "Any", "Object",
-          ["Long"], ["String"], ["DOMString"], ["Float"], ["Boolean"], ["Any"]],
-        "returnType": "Boolean"
-      });
-      expect(fn instanceof Function).toBe(true);
-    });
-
-
-
-    it("should construct functions that adhere to their 'stub spec'", function(){
-      // when a function expects a boolean param and we give it a string, it should throw.
+    it("should allow creating and getting interfaces by name", function(){
       var stub = new RPCStub(runtimeMock);
-      var fn = stub.constructStub({
-        "name"  : "myFunction",
-        "params": ["Boolean"],
-        "returnType": "Boolean"
-      });
+      stub.addInterface('MyInterface');
 
-      expect(function(){
-        fn("hello");
-      }).toThrow();
+      var myInterface = stub.getInterface('MyInterface');
 
-      expect(function(){
-        fn(true);
-      }).not.toThrow();
+      // an interface is simply a map of functions
+      expect(myInterface).toBeDefined();
     });
 
-    it("should check the return value from a callback response", function(done){
-      // we will need an actual runtime.
-      var stub = new RPCStub(runtime);
 
-      // construct a function
-      var myRPCFunction = stub.constructStub({
-        "name" : "myRPCFunction",
-        "params" : ["Boolean", "Long"],
-        "returnType" : "Boolean"
+    it("should allow adding and getting functions to interfaces by name", function(){
+      var p = new RPCStub(runtimeMock);
+      var myInterface = p.addInterface('MyInterface'); //chainable
+
+      myInterface.addFunction({
+        "name": "foo",
+        "params": [{"$ref": "unsigned long"}],
+        "returnType": {"$ref": "boolean"}
       });
 
+      // get the function back
+      var fooFunction = myInterface.getFunction('foo');
+      expect(fooFunction instanceof Function).toBe(true);
+    });
 
-      // do a request (call the function)
-      var mySuccess = jasmine.createSpy("mySuccess"),
-          myError = jasmine.createSpy("myError"),
-          id = myRPCFunction(true, 124, mySuccess, myError);
 
-      // fake the callback, with a correct return value. check no throw
-      var messageCount = 0;
-      myModule.on("message", function(){
-        messageCount++;
-        if(messageCount == 1){
-          // first message.
-          expect(mySuccess).toHaveBeenCalledWith(true);
-          expect(myError).not.toHaveBeenCalled();
+    it("should allow adding interfaces with their functions by object", function(){
+      var stub = new RPCStub(runtimeMock);
+      var myInterface = stub.addInterface({
+        "name": "MyInterface",
+        "functions": [
+          {
+            "name": "foo",
+            "params": [{"$ref": "unsigned long"}],
+            "returnType": {"$ref": "boolean"}
+          }
+        ]
+      });
 
-          mySuccess = jasmine.createSpy("mySuccess");
-          myError = jasmine.createSpy("myError");
-          id = myRPCFunction(true, 124, mySuccess, myError);
+      var fooFunction = myInterface.getFunction('foo');
+      expect(fooFunction instanceof Function).toBe(true);
 
-          // send second message: an error
-          myModule.moduleEl.fakeMessage({
-            "jsonrpc": "2.0",
-            "id" : id,
-            "result" : 124
-          });
+    });
 
-        } else if(messageCount == 2){
-          // second message.
-          expect(myError).toHaveBeenCalled();
-          done();
 
+    it("should not add an interface that already exists", function(){
+      var stub = new RPCStub(runtimeMock);
+      stub.addInterface("SameInterface"); //shouldn't throw.
+      expect(function(){
+        stub.addInterface("SameInterface"); // should throw.
+      }).toThrow();
+    });
+
+
+    it("should not add a function to an interface that already has that function name", function(){
+      var stub = new RPCStub(runtimeMock);
+      var myInterface = stub.addInterface("MyInterface").addFunction({
+        "name": "foo",
+        "params": [],
+        "returnType": "void"
+      });
+
+      expect(function(){
+        myInterface.addFunction({
+          "name": "foo",
+          "params": [],
+          "returnType": "void"
+        });
+      }).toThrow();
+    });
+
+
+
+    it("should construct functions using string types", function(){
+      var stub = new RPCStub(runtimeMock);
+      var MyInterface = stub.addInterface("MyInterface").addFunction({
+        "name": "foo",
+        "params": ["unsigned long"],
+        "returnType": "boolean"
+      });
+      expect(MyInterface.getFunction("foo") instanceof Function).toBe(true);
+    });
+
+
+
+    it("should allow specifying array types", function(){
+      var stub = new RPCStub(runtimeMock);
+      var MyInterface = stub.addInterface("MyInterface").addFunction({
+        "name": "foo",
+        "params": [{"type": "array", "items": {"$ref": "unsigned long"}}],
+        "returnType": "boolean"
+      });
+      expect(MyInterface.getFunction("foo") instanceof Function).toBe(true);
+    });
+
+
+    it("should allow adding dictionary definitions using json schema notation", function(){
+      var stub = new RPCStub(runtimeMock);
+      stub.addDictionary({
+        "name": "Person",
+        "required": ["name", "age"],
+        "properties": {
+          "name": {"$ref": "DOMString"},
+          "age": {"$ref": "unsigned long"}
         }
       });
 
-      // send first message
-      myModule.moduleEl.fakeMessage({
-        "jsonrpc": "2.0",
-        "id" : id,
-        "result" : true
+      expect(stub.getDictionary("Person")).toBeDefined();
+    });
+
+    it("should allow adding dictionaries that reference other dictionaries.", function(){
+      var stub = new RPCStub(runtimeMock);
+      stub.addDictionary({
+        "name": "Person",
+        "required": ["name", "age"],
+        "properties": {
+          "name": {"$ref": "DOMString"},
+          "age": {"$ref": "unsigned short"}
+        }
+
       });
 
+      stub.addDictionary({
+        "name": "PersonID",
+        "required": ["person", "id"],
+        "properties": {
+          "person": {"$ref": "Person"},
+          "id": {"$ref": "unsigned long"}
+        }
+      });
+
+      expect(stub.getDictionary("PersonID")).toBeDefined();
+    });
+
+
+    it("should construct functions that adhere to their definitions", function(){
+      var stub = new RPCStub(runtimeMock);
+
+      // the most complex thing: an array of dictionaries
+      stub.addDictionary({
+        "name": "Person",
+        "required": ["name", "age"],
+        "properties": {
+          "name": {"$ref": "DOMString"},
+          "age": {"$ref": "unsigned short"}
+        }
+
+      });
+
+      stub.addDictionary({
+        "name": "PersonID",
+        "required": ["person", "id"],
+        "properties": {
+          "person": {"$ref": "Person"},
+          "id": {"$ref": "unsigned long"}
+        }
+      });
+
+      stub.addInterface({
+        "name": "MyInterface",
+        "functions": [
+          {
+            "name": "printPeople",
+            "params": [
+              { /* Param 1: an array of PersonID dicts */
+                "type": "array",
+                "items": {"$ref": "PersonID"}
+              }, {
+                /* Param 2: an IDL type */
+                "$ref": "unsigned long"
+              }
+            ],
+            "returnType": "void"
+          }
+        ]
+      });
+
+
+      var printPeople = stub.getInterface("MyInterface").getFunction("printPeople");
+
+      // working cases
+      printPeople([{"id": 12, "person": {"name": "Mohamed", "age": 2}}], 23);
+      printPeople([{"id": 12, "person": {"name": "Mohamed", "age": 2}}], 23, function(){});
+      printPeople([{"id": 12, "person": {"name": "Mohamed", "age": 2}}], 23, function(){}, function(){});
+
+
+      // failing cases
+      expect(function(){
+        printPeople([{"id": 12, "person": {"name": "Mohamed", "age": 2}}], "not a number");
+      }).toThrow();
+
+      expect(function(){
+        printPeople([{"id": 12, "person": {"name": "Mohamed", "age": "not a number"}}], 23);
+      }).toThrow();
+
+
+      expect(runtimeMock.sendRequest.calls.count()).toEqual(3);
+    });
+
+    it("should check the return value from a callback response", function(){
+      var stub = new RPCStub(runtimeMock);
+
+      // the most complex thing: an array of dictionaries
+      stub.addDictionary({
+        "name": "Person",
+        "required": ["name", "age"],
+        "properties": {
+          "name": {"$ref": "DOMString"},
+          "age": {"$ref": "unsigned short"}
+        }
+
+      });
+
+      stub.addDictionary({
+        "name": "PersonID",
+        "required": ["person", "id"],
+        "properties": {
+          "person": {"$ref": "Person"},
+          "id": {"$ref": "unsigned long"}
+        }
+      });
+
+      stub.addInterface({
+        "name": "MyInterface",
+        "functions": [
+          {
+            "name": "getPeople",
+            "params": [
+              {"$ref" : "unsigned short"}
+            ],
+            "returnType": {"type":"array", "items": {"$ref": "PersonID"}}
+          }
+        ]
+      });
+
+
+
+      var successCallback, errorCallback;
+      var responseData;
+      runtimeMock.sendRequest = jasmine.createSpy("sendRequest").and.callFake(function(name, params, successCB, errorCB){
+        // sending a request simply calls the callback function.
+        successCB.call(null, responseData);
+      });
+
+      var getPeople = stub.getInterface("MyInterface").getFunction("getPeople");
+
+      // get people takes an unsigned short and returns an array of PeopleID's
+
+      // working case
+      responseData = [
+        {"id": 1, "person": {"name": "Mohamed", "age": 12}},
+        {"id": 2, "person": {"name": "James", "age": 12}}
+      ];
+      getPeople(10, successCallback = jasmine.createSpy("callback1"), errorCallback = jasmine.createSpy("eCallback1"));
+      expect(successCallback).toHaveBeenCalledWith(responseData);
+      expect(errorCallback).not.toHaveBeenCalled();
+
+      // failing cases
+      responseData = [
+        {"id": 1, "person": {"name": "Mohamed", "age": 12}},
+        {"id": 2, "person": {"name": 500, "age": 12}} // name is supposed to be DOMString
+      ];
+      successCallback = jasmine.createSpy("callback2");
+      errorCallback = jasmine.createSpy("eCallback1").and.callFake(function(data){
+        // the error should have the data
+        expect(data.data).toBe(responseData);
+      });
+
+      getPeople(10, successCallback, errorCallback);
+      expect(successCallback).not.toHaveBeenCalled();
+      expect(errorCallback).toHaveBeenCalled();
+
+    });
+
+
+    it("should export the NaCl Module", function(){
+      var stub = new RPCStub(runtimeMock);
+      var naclmodule = stub.getModule();
+      expect(naclmodule instanceof NaClModule).toBe(true);
     });
 
   });
