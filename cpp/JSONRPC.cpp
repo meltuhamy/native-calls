@@ -1,8 +1,10 @@
 #include "JSONRPC.h"
 #include "RPCTransport.h"
+#include "RPCRuntime.h"
 #include "ppapi/cpp/var.h"
 #include "ppapi/cpp/var_array.h"
 #include "ppapi/cpp/var_dictionary.h"
+#include "RPCRequest.h"
 
 #include <string>
 
@@ -13,13 +15,20 @@ JSONRPC::JSONRPC(RPCTransport* transport) {
 	setTransport(transport);
 }
 
+JSONRPC::JSONRPC(RPCTransport* transport, RPCRuntime* runtime){
+	setTransport(transport);
+	setRuntime(runtime);
+}
+
 void JSONRPC::setTransport(RPCTransport* transport) {
 	this->transport = transport;
 	transport->setJSONRPC(this);
 }
 
-//JSONRPC::JSONRPC(RPCTransport transport, RPCRuntime runtime) {
-//}
+
+void JSONRPC::setRuntime(RPCRuntime* runtime) {
+	this->runtime = runtime;
+}
 
 JSONRPC::~JSONRPC() {
 }
@@ -44,6 +53,17 @@ bool JSONRPC::ValidateRPCRequest(const pp::Var& requestObj) {
 	return false;
 }
 
+RPCRequest JSONRPC::ExtractRPCRequest(const pp::Var& requestObj) {
+	pp::VarDictionary dict(requestObj);
+	RPCRequest request(dict);
+	if(ValidateRPCRequest(requestObj)){
+		request.setValid(true);
+	} else {
+		request.setValid(false);
+	}
+	return request;
+}
+
 bool JSONRPC::ValidateRPCCallback(const pp::Var& callbackObj) {
 	if(is_basic_json_rpc(callbackObj)){
 		pp::VarDictionary d(callbackObj);
@@ -64,10 +84,12 @@ bool JSONRPC::ValidateRPCError(const pp::Var& errorObj) {
 }
 
 void JSONRPC::HandleRPC(const pp::Var& rpcObj) {
-	if(ValidateRPCRequest(rpcObj)){
+	RPCRequest r = ExtractRPCRequest(rpcObj);
+	if(r.isValid){
 		// todo call runtime
 	} else if(ValidateRPCCallback(rpcObj)){
 		// todo call runtime
+
 	} else if(ValidateRPCError(rpcObj)){
 		// todo call runtime
 	} else {
@@ -75,14 +97,17 @@ void JSONRPC::HandleRPC(const pp::Var& rpcObj) {
 	}
 }
 
-pp::VarDictionary JSONRPC::ConstructRPCRequest(std::string& method,
+RPCRequest JSONRPC::ConstructRPCRequest(std::string& method,
 		unsigned int id, const pp::VarArray& params) {
-	pp::VarDictionary obj;
-	obj.Set("jsonrpc","2.0");
-	obj.Set("method", method);
-	obj.Set("params",params);
-	obj.Set("id",(int)id);
-	return obj;
+	return RPCRequest(method, params, id);
+}
+
+RPCRequest JSONRPC::ConstructRPCRequest(std::string& method, const pp::VarArray& params) {
+	return RPCRequest(method, params);
+}
+
+RPCRequest JSONRPC::ConstructRPCRequest(std::string& method) {
+	return RPCRequest(method);
 }
 
 pp::VarDictionary JSONRPC::ConstructRPCCallback(unsigned int id,

@@ -12,22 +12,28 @@ class VarDictionary;
 
 class RPCRuntime;
 class RPCTransport;
+class RPCRuntime;
+class RPCRequest;
 class JSONRPC {
 public:
 	JSONRPC();
 	JSONRPC(RPCTransport* transport);
-//	JSONRPC(RPCTransport* transport, RPCRuntime* runtime);
+	JSONRPC(RPCTransport* transport, RPCRuntime* runtime);
+
 	virtual ~JSONRPC();
 
 	virtual bool is_basic_json_rpc(const pp::Var& obj);
 
 	virtual bool ValidateRPCRequest(const pp::Var& requestObj);
+	RPCRequest ExtractRPCRequest(const pp::Var& requestObj);
 
 	virtual bool ValidateRPCCallback(const pp::Var& callbackObj);
 
 	virtual bool ValidateRPCError(const pp::Var& errorObj);
 
-	virtual pp::VarDictionary ConstructRPCRequest(std::string& method, unsigned int id, const pp::VarArray& params);
+	virtual RPCRequest ConstructRPCRequest(std::string& method, unsigned int id, const pp::VarArray& params);
+	virtual RPCRequest ConstructRPCRequest(std::string& method, const pp::VarArray& params);
+	virtual RPCRequest ConstructRPCRequest(std::string& method);
 
 	virtual pp::VarDictionary ConstructRPCCallback(unsigned int id, pp::Var& result);
 
@@ -47,18 +53,15 @@ public:
 
 	virtual void setTransport(RPCTransport* transport);
 
-//
-//	virtual const RPCRuntime* getRuntime() const {
-//		return runtime;
-//	}
-//
-//	virtual void setRuntime(RPCRuntime* runtime) {
-//		this->runtime = runtime;
-//	}
+
+	virtual RPCRuntime* getRuntime() const {
+		return runtime;
+	}
+	virtual void setRuntime(RPCRuntime* runtime);
 
 private:
 	RPCTransport *transport;
-//	RPCRuntime *runtime;
+	RPCRuntime *runtime;
 };
 
 #endif /* JSONRPC_H_ */

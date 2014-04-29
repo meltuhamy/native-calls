@@ -9,6 +9,11 @@ define(['RPCModule', 'NaClModule'], function(RPCModule, NaClModule){
             "name": "fib",
             "params": [{"$ref": "unsigned long"}],
             "returnType": {"$ref": "unsigned long"}
+          },
+          {
+            "name": "countUp",
+            "params": [],
+            "returnType": {"$ref": "long"}
           }
         ]
       }

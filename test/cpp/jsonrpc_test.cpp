@@ -6,6 +6,7 @@
 #include "ppapi/cpp/var.h"
 #include "ppapi/cpp/var_array.h"
 #include "ppapi/cpp/var_dictionary.h"
+#include "RPCRequest.h"
 
 #include <string>
 
@@ -480,7 +481,7 @@ TEST(JSONRPCLayer, JSONRPCRequestObjectTest){
 	params.Set(0, "hello!");
 	std::string method = "helloWorld";
 	unsigned int id = 1;
-	pp::VarDictionary request = jsonRPC.ConstructRPCRequest(method, id, params);
+	pp::VarDictionary request = jsonRPC.ConstructRPCRequest(method, id, params).AsDictionary();
 
 	ASSERT_TRUE(jsonRPC.ValidateRPCRequest(request) == true);
 

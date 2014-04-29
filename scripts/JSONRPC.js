@@ -89,7 +89,6 @@ define(['RPCTransport', 'lodash', "TagLogger"], function(RPCTransport, _, TagLog
 
     if(this.validateRPCCallback(rpcObject)){
       // it's a successful response that is a callback
-      logger.debug("Received response", rpcObject.result);
       if(!_.isUndefined(this.runtime)){
         this.runtime.handleCallback(rpcObject);
         return true;
@@ -100,7 +99,6 @@ define(['RPCTransport', 'lodash', "TagLogger"], function(RPCTransport, _, TagLog
 
     } else if(this.validateRPCError(rpcObject)){
       // it's a "successful" response that is an error
-      logger.debug("Received error response", rpcObject.error);
       if(!_.isUndefined(this.runtime)){
         this.runtime.handleError(rpcObject);
         return true;
@@ -133,10 +131,9 @@ define(['RPCTransport', 'lodash', "TagLogger"], function(RPCTransport, _, TagLog
   JSONRPC.prototype.sendRPCRequest = function(rpcObject){
     if(!_.isUndefined(this.transport)){
       if(this.validateRPCRequest(rpcObject)){
-        logger.debug("Sending request");
         return this.transport.send(rpcObject);
       } else {
-        logger.debug("Failed to send rpc object because it is invalid");
+        logger.warn("Failed to send rpc object because it is invalid");
         // might be better doing an error callback.
         return false;
       }

@@ -7,11 +7,49 @@
 
 #ifndef RPCRUNTIME_H_
 #define RPCRUNTIME_H_
+#include <string>
+#include <map>
+namespace pp{
+class Var;
+class VarArray;
+}
+class RPCRequest;
+class JSONRPC;
+
+class RPCFunctor{
+public:
+	RPCFunctor(){
+		setValid(false);
+	}
+
+	pp::Var operator()(pp::VarArray params);
+
+	void setValid(bool v){
+		valid = v;
+	}
+
+	bool isValid(){
+		return valid;
+	}
+
+private:
+	bool valid;
+};
+
 
 class RPCRuntime {
 public:
-	RPCRuntime();
+	RPCRuntime(JSONRPC& jsonRPC);
 	virtual ~RPCRuntime();
+
+	virtual bool AddFunctor(std::string name, RPCFunctor functor);
+	virtual RPCFunctor GetFunctor(std::string name);
+	virtual pp::Var CallFunctor(std::string name, pp::VarArray params);
+
+//	virtual void HandleRequest(const pp::Var& request);
+private:
+	JSONRPC *jsonRPC;
+	std::map<std::string, RPCFunctor*> *functorMap;
 };
 
 #endif /* RPCRUNTIME_H_ */

@@ -24,6 +24,10 @@ public:
 					PostMessage(*ConstructResponseDictionary(id, responseData));
 				}
 			}
+		} else if(name == "Fib::countUp"){
+			int result = Fib::countUp();
+			pp::Var responseData = pp::Var(result);
+			PostMessage(*ConstructResponseDictionary(id, responseData));
 		}
 	}
 

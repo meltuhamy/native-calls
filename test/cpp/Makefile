@@ -3,8 +3,8 @@ VALID_TOOLCHAINS := newlib glibc pnacl
 # force newlib for faster builds
 TOOLCHAIN = newlib
 
-SOURCE_NAMES = testing tester_test instance_test transport_test jsonrpc_test
-LINKER_LIBS := JSONRPC RPCTransport NaClRPCInstance
+SOURCE_NAMES = testing tester_test instance_test transport_test rpcruntime_test jsonrpc_test 
+LINKER_LIBS := RPCRuntime JSONRPC RPCTransport NaClRPCInstance RPCRequest
 
 ifeq ($(FORCE),y)
 $(info Forcing make)

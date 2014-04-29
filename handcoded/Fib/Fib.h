@@ -3,6 +3,26 @@
 
 namespace Fib{
 int fib(int x);
+int countUp();
+
+class MyClass{
+public:
+	MyClass(){
+		counter = 0;
+	}
+
+	virtual ~MyClass(){
+
+	}
+
+	int inc(){
+		return counter++;
+	}
+
+private:
+	int counter;
+};
+
 }
 
 
