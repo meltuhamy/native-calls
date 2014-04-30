@@ -9,7 +9,7 @@ class VarDictionary;
 }
 
 
-
+namespace pprpc{
 class RPCRuntime;
 class RPCTransport;
 class RPCRuntime;
@@ -63,5 +63,6 @@ private:
 	RPCTransport *transport;
 	RPCRuntime *runtime;
 };
+}
 
 #endif /* JSONRPC_H_ */

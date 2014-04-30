@@ -10,6 +10,8 @@
 
 #include <string>
 
+using namespace pprpc;
+
 using ::testing::AtLeast;
 using ::testing::_;
 using ::testing::DefaultValue;

@@ -7,7 +7,7 @@
 #include "RPCRequest.h"
 
 #include <string>
-
+namespace pprpc{
 JSONRPC::JSONRPC() {
 }
 
@@ -152,3 +152,4 @@ bool JSONRPC::SendRPCRequest(const pp::Var& rpcObj) {
 }
 
 
+} /*namespace pprpc*/

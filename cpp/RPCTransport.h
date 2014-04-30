@@ -5,6 +5,8 @@ namespace pp{
 class Var;
 }
 
+
+namespace pprpc{
 class JSONRPC;
 
 class RPCTransport : public pp::Instance{
@@ -34,4 +36,6 @@ private:
 	void init(JSONRPC *jsonRPC);
 };
 
+
+} /*namespace pprpc*/
 #endif /* RPCTRANSPORT_H_ */

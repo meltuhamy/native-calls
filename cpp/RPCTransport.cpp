@@ -5,6 +5,7 @@
 
 #include "JSONRPC.h"
 
+namespace pprpc{
 RPCTransport::RPCTransport(PP_Instance instance) : pp::Instance(instance) {
 	init(new JSONRPC());
 }
@@ -37,3 +38,5 @@ void RPCTransport::init() {
 void RPCTransport::init(JSONRPC* jsonRPC) {
 	this->setJSONRPC(jsonRPC);
 }
+
+} /*namespace pprpc*/

@@ -2,7 +2,7 @@
 #include "ppapi/cpp/var.h"
 #include "RPCTransport.h"
 
-
+using namespace pprpc;
 class MockRPCTransport: public RPCTransport{
 public:
 	MockRPCTransport() : RPCTransport(123){}

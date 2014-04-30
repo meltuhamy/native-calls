@@ -13,6 +13,10 @@ namespace pp{
 class Var;
 class VarArray;
 }
+
+namespace pprpc{
+
+
 class RPCRequest;
 class JSONRPC;
 
@@ -22,7 +26,9 @@ public:
 		setValid(false);
 	}
 
-	pp::Var operator()(pp::VarArray params);
+	virtual ~RPCFunctor(){}
+
+	virtual pp::Var call(pp::VarArray params);
 
 	void setValid(bool v){
 		valid = v;
@@ -42,8 +48,8 @@ public:
 	RPCRuntime(JSONRPC& jsonRPC);
 	virtual ~RPCRuntime();
 
-	virtual bool AddFunctor(std::string name, RPCFunctor functor);
-	virtual RPCFunctor GetFunctor(std::string name);
+	virtual bool AddFunctor(std::string name, RPCFunctor* functor);
+	virtual RPCFunctor* GetFunctor(std::string name);
 	virtual pp::Var CallFunctor(std::string name, pp::VarArray params);
 
 //	virtual void HandleRequest(const pp::Var& request);
@@ -51,5 +57,7 @@ private:
 	JSONRPC *jsonRPC;
 	std::map<std::string, RPCFunctor*> *functorMap;
 };
+
+} /*namespace pprpc*/
 
 #endif /* RPCRUNTIME_H_ */

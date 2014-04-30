@@ -5,6 +5,8 @@
 #include "ppapi/cpp/var_dictionary.h"
 #include "RPCRequest.h"
 
+using namespace pprpc;
+
 class MockJSONRPC: public JSONRPC {
 public:
 	MOCK_METHOD1(is_basic_json_rpc, bool(const pp::Var& obj));

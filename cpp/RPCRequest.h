@@ -15,6 +15,7 @@ class VarArray;
 class VarDictionary;
 }
 
+namespace pprpc{
 class RPCRequest {
 public:
 	RPCRequest(const pp::VarDictionary&);
@@ -52,5 +53,6 @@ private:
 	void init(const std::string& method);
 
 };
+} /* namespace pprpc */
 
 #endif /* RPCREQUEST_H_ */

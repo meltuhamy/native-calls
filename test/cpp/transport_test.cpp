@@ -4,6 +4,8 @@
 #include "RPCTransport.h"
 #include "ppapi/cpp/instance.h"
 
+using namespace pprpc;
+
 using ::testing::AtLeast;
 using ::testing::_;
 

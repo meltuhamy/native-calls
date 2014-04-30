@@ -3,6 +3,7 @@
 #include "ppapi/cpp/var_array.h"
 #include "ppapi/cpp/var_dictionary.h"
 
+namespace pprpc{
 RPCRequest::~RPCRequest() {
 	// TODO Auto-generated destructor stub
 }
@@ -88,3 +89,4 @@ pp::VarDictionary RPCRequest::AsDictionary() {
 		return obj;
 	}
 }
+} /*namespace pprpc*/
