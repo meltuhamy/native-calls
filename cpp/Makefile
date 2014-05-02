@@ -48,3 +48,11 @@ $(eval $(call LIB_RULE,RPCRuntime,RPCRuntime.cpp))
 ifeq ($(TOOLCHAIN),glibc)
 $(eval $(call SO_RULE,RPCRuntime,RPCRuntime.cpp))
 endif
+
+#RPCType
+$(foreach src,RPCType.cpp,$(eval $(call COMPILE_RULE,$(src),$(CFLAGS))))
+$(eval $(call LIB_RULE,RPCType,RPCType.cpp))
+
+ifeq ($(TOOLCHAIN),glibc)
+$(eval $(call SO_RULE,RPCType,RPCType.cpp))
+endif
