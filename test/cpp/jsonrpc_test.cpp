@@ -407,6 +407,49 @@ TEST(JSONRPCLayer, SendRequestWithoutTransportTest){
 	ASSERT_FALSE(jsonRPC->SendRPCRequest(obj) == true);
 }
 
+// it should send callbacks
+TEST(JSONRPCLayer, SendJSONRPCCallbackTest){
+	// SendRPCCallback with a valid object, check PostMessage called.
+	MockRPCTransport transport;
+	EXPECT_CALL(transport, PostMessage(_)).Times(1);
+
+	JSONRPC* jsonRPC = new JSONRPC(&transport);
+
+	pp::VarDictionary obj;
+	obj.Set("jsonrpc","2.0");
+	obj.Set("id",1);
+	obj.Set("result", 23); // some random result
+
+	ASSERT_TRUE(jsonRPC->ValidateRPCCallback(obj) == true);
+
+	bool sent = jsonRPC->SendRPCCallback(obj);
+
+	ASSERT_TRUE(sent);
+}
+
+// it should send errors
+TEST(JSONRPCLayer, SendJSONRPCErrorTest){
+	// SendRPCCallback with a valid object, check PostMessage called.
+	MockRPCTransport transport;
+	EXPECT_CALL(transport, PostMessage(_)).Times(1);
+
+	JSONRPC* jsonRPC = new JSONRPC(&transport);
+
+	pp::VarDictionary obj;
+	obj.Set("jsonrpc","2.0");
+	pp::VarDictionary obj_error;
+	obj_error.Set("code",-32700);
+	obj_error.Set("message","failed to parse");
+	obj_error.Set("data","the server failed to parse the message: 123");
+	obj.Set("error",obj_error);
+	obj.Set("id",1);
+
+	ASSERT_TRUE(jsonRPC->ValidateRPCError(obj) == true);
+
+	bool sent = jsonRPC->SendRPCError(obj);
+
+	ASSERT_TRUE(sent);
+}
 
 // it should handle json-rpc requests
 TEST(JSONRPCLayer, HandleJSONRPCRequestTest){

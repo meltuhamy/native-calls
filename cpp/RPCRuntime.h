@@ -52,7 +52,8 @@ public:
 	virtual RPCFunctor* GetFunctor(std::string name);
 	virtual pp::Var CallFunctor(std::string name, pp::VarArray params);
 
-//	virtual void HandleRequest(const pp::Var& request);
+	virtual bool HandleRequest(const pp::Var& request);
+	virtual bool HandleRequest(const RPCRequest& request);
 private:
 	JSONRPC *jsonRPC;
 	std::map<std::string, RPCFunctor*> *functorMap;

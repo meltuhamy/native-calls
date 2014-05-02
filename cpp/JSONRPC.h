@@ -43,6 +43,8 @@ public:
 	virtual void HandleRPC(const pp::Var& rpcObj);
 
 	virtual bool SendRPCRequest(const pp::Var& rpcObj);
+	virtual bool SendRPCCallback(const pp::Var& rpcObj);
+	virtual bool SendRPCError(const pp::Var& rpcObj);
 
 
 

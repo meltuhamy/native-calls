@@ -2,12 +2,13 @@
 #include "JSONRPC.h"
 #include "ppapi/cpp/var.h"
 #include "ppapi/cpp/var_array.h"
+#include "ppapi/cpp/var_dictionary.h"
 #include <map>
 #include <string>
 #include <stdio.h>
+#include "RPCRequest.h"
 
 namespace pprpc{
-
 
 pp::Var RPCFunctor::call(pp::VarArray params) {
 	fprintf(stdout, "WARNING: CALLING DEFAULT FUNCTOR\n");
@@ -66,6 +67,27 @@ pp::Var RPCRuntime::CallFunctor(std::string name, pp::VarArray params) {
 		fprintf(stdout, "Invalid function.\n");
 	}
 	return returnValue;
+}
+
+bool RPCRuntime::HandleRequest(const pp::Var& requestVar) {
+	return HandleRequest(RPCRequest(pp::VarDictionary(requestVar)));
+}
+
+bool RPCRuntime::HandleRequest(const RPCRequest& request) {
+	if(request.isValid){
+		// if an id was given, do a callback
+		pp::Var returned = CallFunctor(*request.method, *request.params);
+		if(request.hasID){
+			// todo if an id was given, do a callback
+//			jsonRPC->SendRPCCallback(jsonRPC->ConstructRPCCallback(request.id, returned));
+		}
+
+		return true;
+
+	} else {
+		// invalid request!
+		return false;
+	}
 }
 
 } /*namespace pprpc*/

@@ -151,5 +151,23 @@ bool JSONRPC::SendRPCRequest(const pp::Var& rpcObj) {
 	}
 }
 
+bool JSONRPC::SendRPCCallback(const pp::Var& rpcObj) {
+	if(ValidateRPCCallback(rpcObj) && transport){
+		transport->PostMessage(rpcObj);
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool JSONRPC::SendRPCError(const pp::Var& rpcObj) {
+	if(ValidateRPCError(rpcObj) && transport){
+		transport->PostMessage(rpcObj);
+		return true;
+	} else {
+		return false;
+	}
+}
+
 
 } /*namespace pprpc*/

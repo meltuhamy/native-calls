@@ -6,6 +6,14 @@
 #include "ppapi/cpp/var_array.h"
 #include <string>
 #include <stdio.h>
+#include "RPCType.h"
+#include "gmock/gmock.h"
+
+using ::testing::AtLeast;
+using ::testing::_;
+using ::testing::DefaultValue;
+using ::testing::Invoke;
+
 
 using namespace pprpc;
 
@@ -14,10 +22,33 @@ bool foo(){
 	return true;
 }
 
+long add(long first, long second){
+	return first+second;
+}
+
 class Functor_foo : public RPCFunctor{
 public:
 	virtual pp::Var call(pp::VarArray params) {
 		return pp::Var(foo());
+	}
+};
+
+class MockFunctor : public RPCFunctor{
+public:
+	MOCK_METHOD1(call, pp::Var(pp::VarArray params));
+};
+
+class Functor_add : public RPCFunctor{
+public:
+	virtual pp::Var call(pp::VarArray params){
+		// extract the paramaters and check
+		LongType p0(params.Get(0));
+		LongType p1(params.Get(1));
+		LongType r;
+		if(p0.isValid() && p1.isValid()){
+			r = LongType(add(p0.Extract().getValue() , p1.Extract().getValue()));
+		}
+		return r.AsVar();
 	}
 };
 
@@ -58,30 +89,81 @@ TEST(RPCRuntimeLayer, CallFunction){
 	EXPECT_TRUE(returnValue.AsBool() == true); // foo returns true.
 }
 
+// should call functions with type checking
+TEST(RPCRuntimeLayer, CallFunctionCheckType){
+	// do one with correct type
+	RPCRuntime runtime(mockJSONRPC);
+	bool added = runtime.AddFunctor("add", new Functor_add());
+	EXPECT_TRUE(added == true);
+	pp::VarArray correctParams;
+	correctParams.Set(0, pp::Var(1));
+	correctParams.Set(1, pp::Var(2));
+
+	pp::Var returnValue = runtime.CallFunctor("add", correctParams);
+	EXPECT_TRUE(returnValue.AsInt() == 3); // 1+2=3
+
+	// do one with not correct types
+	pp::VarArray incorrectParams;
+	correctParams.Set(0, pp::Var("not a number!"));
+	correctParams.Set(1, pp::Var(2));
+	returnValue = runtime.CallFunctor("add", correctParams);
+	EXPECT_FALSE(returnValue.AsInt() == 3); // 1+2=3
+
+
+}
+
 // should handle rpc messages (requests, callbacks, errors)
 TEST(RPCRuntimeLayer, HandleRequest){
-//	runtime.HandleRequest(pp::Var());
+	// handle request: give me a request and I'll call the function
+	MockJSONRPC myMock;
+	RPCRuntime runtime(myMock);
+	MockFunctor mockFoo;
+	bool added = runtime.AddFunctor("mockFoo", &mockFoo);
+	EXPECT_TRUE(added==true);
+
+
+	// mockFoo should be called when we call HandleRequest
+	EXPECT_CALL(mockFoo, call(_)).Times(1);
+
+
+	// the callback should be sent
+	EXPECT_CALL(mockJSONRPC, SendRPCCallback(_)).Times(1);
+
+
+	// we force the request to be valid
+	RPCRequest request("mockFoo", 23);
+	request.setValid(true);
+	bool handledOK = runtime.HandleRequest(request);
+
+	EXPECT_TRUE(handledOK == true);
+
+
 }
 
-TEST(RPCRuntimeLayer, HandleCallback){
-//	runtime.HandleCallback(pp::Var());
-}
+// todo C++ - JS RPC
+//TEST(RPCRuntimeLayer, HandleCallback){
+////	runtime.HandleCallback(pp::Var());
+//}
 
-TEST(RPCRuntimeLayer, HandleError){
-//	runtime.HandleError(pp::Var());
-}
+// todo C++ - JS RPC
+//TEST(RPCRuntimeLayer, HandleError){
+////	runtime.HandleError(pp::Var());
+//}
 
+// todo C++ - JS RPC
 // should send C++ - JS requests
-TEST(RPCRuntimeLayer, MakeRequest){
+//TEST(RPCRuntimeLayer, MakeRequest){
+//
+//}
 
-}
-
+// todo C++ - JS RPC
 // should match callbacks with requests
-TEST(RPCRuntimeLayer, RequestCallbackMatch){
+//TEST(RPCRuntimeLayer, RequestCallbackMatch){
+//
+//}
 
-}
-
+// todo C++ - JS RPC
 // should match errors with requests
-TEST(RPCRuntimeLayer, RequestErrorMatch){
-
-}
+//TEST(RPCRuntimeLayer, RequestErrorMatch){
+//
+//}

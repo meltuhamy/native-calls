@@ -122,6 +122,7 @@ DEFINE_TYPE_CLASS(BooleanType,bool)
 // complex-ish types
 DEFINE_TYPE_CLASS(NullType,pp::Var::Null)
 DEFINE_TYPE_CLASS(ObjectType,pp::VarDictionary)
+
 typedef NullType VoidType;
 }
 
