@@ -23,7 +23,7 @@ NACL_EXE_STDOUT ?= ${current_dir}/nacl_std_out.log
 NM_BIN_PATH := ${current_dir}/node_modules/.bin 
 
 # Pass the arguments on to other Makefiles
-MAKE_ARGS := TOOLCHAIN=$(TOOLCHAIN) CONFIG=$(CONFIG)
+MAKE_ARGS := TOOLCHAIN=$(TOOLCHAIN) CONFIG=$(CONFIG) NACL_ARCH=$(NACL_ARCH)
 
 all: .PHONY
 
