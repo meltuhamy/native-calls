@@ -10,11 +10,14 @@
 
 #include <string>
 #include "ppapi/cpp/var.h"
-
+#include "ppapi/cpp/var_dictionary.h"
 namespace pprpc{
+class ValidTypeBase {
+
+};
 
 template <class T>
-class ValidType{
+class ValidType : ValidTypeBase{
 public:
 	ValidType(){
 		setValid(false); // false by default, if no value given.
@@ -50,9 +53,13 @@ private:
 
 
 // this is an incredibly hacky solution
+class RPCType {
+	virtual std::string getTypeString() = 0;
+};
 
+#define QUOTEVALUE(s) #s
 #define DEFINE_TYPE_CLASS_WITH_TYPESTRING(CLSNAME,CPPTYPE,TYPESTRING)\
-class CLSNAME {\
+class CLSNAME : RPCType {\
 public:\
 	CLSNAME(){}\
 	CLSNAME(pp::Var v){ setValue(v); }\
@@ -82,16 +89,42 @@ public:\
 		}\
 	}\
 	bool isValid(){ return valueValidType.isValid() && !valueVar.is_undefined();}\
+	virtual std::string getTypeString(){ return QUOTEVALUE(TYPESTRING); }\
 	pp::Var AsVar(pprpc::ValidType<CPPTYPE> v);\
 	pprpc::ValidType<CPPTYPE> Extract(pp::Var v);\
 private:\
-	static const std::string typeString;\
 	pprpc::ValidType<CPPTYPE> valueValidType;\
 	pp::Var valueVar;\
 };\
-const std::string CLSNAME::typeString = TYPESTRING;\
 
 
-#define DEFINE_TYPE_CLASS(CLSNAME,CPPNAME) DEFINE_TYPE_CLASS_WITH_TYPESTRING(CLSNAME,CPPNAME,"CPPNAME")
+#define DEFINE_TYPE_CLASS(CLSNAME,CPPNAME) DEFINE_TYPE_CLASS_WITH_TYPESTRING(CLSNAME,CPPNAME,CPPNAME)
+
+
+
+
+
+// DEFINE SOME IDL TYPES
+namespace pprpc{
+DEFINE_TYPE_CLASS(ByteType,char)
+DEFINE_TYPE_CLASS(OctetType,unsigned char)
+DEFINE_TYPE_CLASS(ShortType,short)
+DEFINE_TYPE_CLASS(UShortType,unsigned short)
+DEFINE_TYPE_CLASS(LongType,long)
+DEFINE_TYPE_CLASS(ULongType,unsigned long)
+DEFINE_TYPE_CLASS(LongLongType,long long)
+DEFINE_TYPE_CLASS(ULongLongType,unsigned long long)
+
+DEFINE_TYPE_CLASS(FloatType,double)
+DEFINE_TYPE_CLASS(DOMStringType,std::string)
+DEFINE_TYPE_CLASS(BooleanType,bool)
+
+// complex-ish types
+DEFINE_TYPE_CLASS(NullType,pp::Var::Null)
+DEFINE_TYPE_CLASS(ObjectType,pp::VarDictionary)
+typedef NullType VoidType;
+}
+
+
 
 #endif /* RPCTYPE_H_ */
