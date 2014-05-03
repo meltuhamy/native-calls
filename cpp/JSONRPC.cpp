@@ -9,6 +9,7 @@
 #include <string>
 namespace pprpc{
 JSONRPC::JSONRPC() {
+	transportSet = false;
 }
 
 JSONRPC::JSONRPC(RPCTransport* transport) {
@@ -23,6 +24,7 @@ JSONRPC::JSONRPC(RPCTransport* transport, RPCRuntime* runtime){
 void JSONRPC::setTransport(RPCTransport* transport) {
 	this->transport = transport;
 	transport->setJSONRPC(this);
+	transportSet = true;
 }
 
 
@@ -85,7 +87,7 @@ bool JSONRPC::ValidateRPCError(const pp::Var& errorObj) {
 
 void JSONRPC::HandleRPC(const pp::Var& rpcObj) {
 	RPCRequest r = ExtractRPCRequest(rpcObj);
-	if(r.isValid){
+	if(r.isValid()){
 		// todo call runtime
 	} else if(ValidateRPCCallback(rpcObj)){
 		// todo call runtime
@@ -143,7 +145,7 @@ pp::VarDictionary JSONRPC::ConstructRPCError(unsigned int id, int code,
 
 
 bool JSONRPC::SendRPCRequest(const pp::Var& rpcObj) {
-	if(ValidateRPCRequest(rpcObj) && transport){
+	if(ValidateRPCRequest(rpcObj) && transportSet){
 		transport->PostMessage(rpcObj);
 		return true;
 	} else {
@@ -152,7 +154,7 @@ bool JSONRPC::SendRPCRequest(const pp::Var& rpcObj) {
 }
 
 bool JSONRPC::SendRPCCallback(const pp::Var& rpcObj) {
-	if(ValidateRPCCallback(rpcObj) && transport){
+	if(ValidateRPCCallback(rpcObj) && transportSet){
 		transport->PostMessage(rpcObj);
 		return true;
 	} else {
@@ -161,7 +163,7 @@ bool JSONRPC::SendRPCCallback(const pp::Var& rpcObj) {
 }
 
 bool JSONRPC::SendRPCError(const pp::Var& rpcObj) {
-	if(ValidateRPCError(rpcObj) && transport){
+	if(ValidateRPCError(rpcObj) && transportSet){
 		transport->PostMessage(rpcObj);
 		return true;
 	} else {

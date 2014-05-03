@@ -6,7 +6,8 @@
 #include "RPCRequest.h"
 
 using namespace pprpc;
-
+using ::testing::Invoke;
+using ::testing::_;
 class MockJSONRPC: public JSONRPC {
 public:
 	MOCK_METHOD1(is_basic_json_rpc, bool(const pp::Var& obj));
@@ -24,4 +25,17 @@ public:
 	void HandleRPC_concrete(const pp::Var& obj){
 		JSONRPC::HandleRPC(obj);
 	}
+
+	void DelegateToRealValidators() {
+		ON_CALL(*this, is_basic_json_rpc(_)).WillByDefault(Invoke(&real_, &JSONRPC::is_basic_json_rpc));
+		ON_CALL(*this, ValidateRPCRequest(_)).WillByDefault(Invoke(&real_, &JSONRPC::ValidateRPCRequest));
+		ON_CALL(*this, ValidateRPCCallback(_)).WillByDefault(Invoke(&real_, &JSONRPC::ValidateRPCCallback));
+		ON_CALL(*this, ValidateRPCError(_)).WillByDefault(Invoke(&real_, &JSONRPC::ValidateRPCError));
+//		ON_CALL(*this, ConstructRPCRequest(_,_,_)).WillByDefault(Invoke(&real_, &JSONRPC::ConstructRPCRequest)); //not sure why no compile :(
+		ON_CALL(*this, ConstructRPCCallback(_,_)).WillByDefault(Invoke(&real_, &JSONRPC::ConstructRPCCallback));
+//		ON_CALL(*this, ConstructRPCError(_,_,_,_)).WillByDefault(Invoke(&real_, &JSONRPC::ConstructRPCError)); //not sure why no compile :(
+	}
+
+private:
+	JSONRPC real_;
 };

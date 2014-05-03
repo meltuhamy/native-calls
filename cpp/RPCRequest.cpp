@@ -11,12 +11,38 @@ RPCRequest::~RPCRequest() {
 RPCRequest::RPCRequest(const pp::VarDictionary& dict) {
 	hasID = dict.HasKey("id");
 	hasParams = dict.HasKey("params");
+	bool hasMethod = dict.HasKey("method");
 
-	init(std::string(dict.Get("method").AsString()),
-			pp::VarArray(dict.Get("params")),
-			(unsigned long) dict.Get("id").AsInt());
-
+	if(hasMethod){
+		pp::Var methodVar(dict.Get("method"));
+		if(methodVar.is_string()){
+			std::string methodString(methodVar.AsString());
+			if(hasParams && hasID){
+				pp::Var paramsVar(dict.Get("params"));
+				pp::Var idVar = dict.Get("id");
+				if(paramsVar.is_dictionary() && idVar.is_int()){
+					init(methodString, pp::VarArray(paramsVar), (unsigned long) idVar.AsInt());
+				}
+			} else if(hasParams){
+				pp::Var paramsVar(dict.Get("params"));
+				init(methodString, pp::VarArray(paramsVar));
+			} else if(hasID){
+				pp::Var idVar = dict.Get("id");
+				if(idVar.is_int()){
+					init(methodString, idVar.AsInt());
+				}
+			} else {
+				init(methodString);
+			}
+		} else {
+			setValid(false);
+		}
+	} else {
+		// invalid
+		setValid(false);
+	}
 	original = &dict;
+	fromOriginal = true;
 
 }
 
@@ -56,11 +82,21 @@ void RPCRequest::init(const std::string& method, unsigned long id) {
 	this->id = id;
 }
 
+const pp::VarArray* RPCRequest::getParams() const {
+	if(isHasParams()){
+		return params;
+	} else {
+		return new pp::VarArray();
+	}
+}
+
 void RPCRequest::init(const std::string& method) {
-	this->method = &method;
-	hasID = false;
-	hasParams = false;
-	isValid = false;
+	this->method = method;
+
+	setHasId(false);
+	setHasParams(false);
+	setValid(false);
+	setFromOriginal(false);
 }
 
 
@@ -70,11 +106,11 @@ pp::Var RPCRequest::AsVar() {
 
 
 pp::VarDictionary RPCRequest::AsDictionary() {
-	if(original){
+	if(isFromOriginal()){
 		return *original;
 	} else {
 		pp::VarDictionary obj;
-		obj.Set("method", *method);
+		obj.Set("method", method);
 		obj.Set("jsonrpc","2.0");
 
 		if(hasParams){

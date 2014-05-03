@@ -51,6 +51,15 @@ define(["NaClModule"], function(NaClModule){
           type: "application/x-nacl"
         });
 
+        testingModule.on("crash", function(progressEvent){
+          if(this.exitCode != 0){
+            throw new Error("Module Crashed with exit code "+this.exitCode);
+          } else {
+            console.log("NaClModule Exited with code "+this.exitCode);
+          }
+          done();
+        });
+
         var testingFramework = {
           startCommand: function(testName) {
           },
@@ -108,7 +117,7 @@ define(["NaClModule"], function(NaClModule){
           cmdFunction.apply(null, args);
 
         });
-        testingModule.load(done);
+        testingModule.load();
       } else {
         done();
       }

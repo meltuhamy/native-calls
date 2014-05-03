@@ -18,7 +18,7 @@ using ::testing::Invoke;
 using namespace pprpc;
 
 bool foo(){
-	fprintf(stdout,"CALLED FOO!\n");
+//	fprintf(stdout,"CALLED FOO!\n");
 	return true;
 }
 
@@ -33,10 +33,30 @@ public:
 	}
 };
 
+
+class FakeFunctor : public RPCFunctor{
+public:
+	virtual pp::Var call(pp::VarArray params){
+		return pp::Var(true);
+	}
+};
+
+
 class MockFunctor : public RPCFunctor{
 public:
 	MOCK_METHOD1(call, pp::Var(pp::VarArray params));
+
+	// Delegates the default actions of the methods to a FakeFoo object.
+	// This must be called *before* the custom ON_CALL() statements.
+	void DelegateToFake() {
+		ON_CALL(*this, call(_)).WillByDefault(Invoke(&fake_, &FakeFunctor::call));
+	}
+
+private:
+	FakeFunctor fake_;  // Keeps an instance of the fake in the mock.
+
 };
+
 
 class Functor_add : public RPCFunctor{
 public:
@@ -115,9 +135,16 @@ TEST(RPCRuntimeLayer, CallFunctionCheckType){
 // should handle rpc messages (requests, callbacks, errors)
 TEST(RPCRuntimeLayer, HandleRequest){
 	// handle request: give me a request and I'll call the function
+
+	// myMock constructs actual objects!
 	MockJSONRPC myMock;
+	myMock.DelegateToRealValidators();
+
 	RPCRuntime runtime(myMock);
+
 	MockFunctor mockFoo;
+	mockFoo.DelegateToFake(); //makes call return true
+
 	bool added = runtime.AddFunctor("mockFoo", &mockFoo);
 	EXPECT_TRUE(added==true);
 
@@ -127,7 +154,7 @@ TEST(RPCRuntimeLayer, HandleRequest){
 
 
 	// the callback should be sent
-	EXPECT_CALL(mockJSONRPC, SendRPCCallback(_)).Times(1);
+	EXPECT_CALL(myMock, SendRPCCallback(_)).Times(1);
 
 
 	// we force the request to be valid

@@ -1,5 +1,6 @@
 #include "JSONRPC_mock.h"
 #include "RPCTransport_mock.h"
+#include "RPCRuntime_mock.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "JSONRPC.h"
@@ -424,7 +425,7 @@ TEST(JSONRPCLayer, SendJSONRPCCallbackTest){
 
 	bool sent = jsonRPC->SendRPCCallback(obj);
 
-	ASSERT_TRUE(sent);
+	ASSERT_TRUE(sent==true);
 }
 
 // it should send errors
@@ -508,15 +509,15 @@ TEST(JSONRPCLayer, HandleJSONRPErrorsTest){
 
 
 // it should call runtime methods when handling a json-rpc message, if a runtime is provided
-TEST(JSONRPCLayer, HandleCallbacksWithRuntimeTest){
-	// todo
-}
-
-
-// it shouldn't call rpc runtime methods if a runtime is not set
-TEST(JSONRPCLayer, HandleCallbacksWithoutRuntimeTest){
-	// todo
-}
+//TEST(JSONRPCLayer, HandleCallbacksWithRuntimeTest){
+//	// todo
+//}
+//
+//
+//// it shouldn't call rpc runtime methods if a runtime is not set
+//TEST(JSONRPCLayer, HandleCallbacksWithoutRuntimeTest){
+//	// todo
+//}
 
 
 // it should construct valid json rpc request objects

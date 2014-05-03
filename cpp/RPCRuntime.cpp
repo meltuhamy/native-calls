@@ -30,27 +30,21 @@ RPCRuntime::RPCRuntime(JSONRPC& jsonRPC) {
 }
 
 bool RPCRuntime::AddFunctor(std::string name, RPCFunctor* functor) {
-	fprintf(stdout, "Adding function: ");
 	if(functorMap->find(name) == functorMap->end()){
 		functorMap->insert(std::pair<std::string,RPCFunctor*>(name, functor));
-		fprintf(stdout, "OK.\n");
 		return true;
 	}
-	fprintf(stdout, "Already exists.\n");
 	return false;
 }
 
 RPCFunctor* RPCRuntime::GetFunctor(std::string name) {
-	fprintf(stdout, "Getting function: ");
 	std::map<std::string, RPCFunctor*>::const_iterator pos = functorMap->find(name);
 	if(pos == functorMap->end()){
 		// not found
-		fprintf(stdout, "Not found.\n");
 		RPCFunctor* invalid = new RPCFunctor();
 		invalid->setValid(false);
 		return invalid;
 	} else {
-		fprintf(stdout, "OK.\n");
 		pos->second->setValid(true);
 		return pos->second;
 	}
@@ -59,12 +53,9 @@ RPCFunctor* RPCRuntime::GetFunctor(std::string name) {
 pp::Var RPCRuntime::CallFunctor(std::string name, pp::VarArray params) {
 	pp::Var returnValue; //default undefined
 	RPCFunctor* functor = GetFunctor(name);
-	fprintf(stdout, "Calling function: ");
 	if(functor->isValid()){
-		fprintf(stdout, "OK.\n");
 		returnValue = functor->call(params);
 	} else {
-		fprintf(stdout, "Invalid function.\n");
 	}
 	return returnValue;
 }
@@ -74,12 +65,14 @@ bool RPCRuntime::HandleRequest(const pp::Var& requestVar) {
 }
 
 bool RPCRuntime::HandleRequest(const RPCRequest& request) {
-	if(request.isValid){
+	bool valid = request.isValid();
+	if(valid){
 		// if an id was given, do a callback
-		pp::Var returned = CallFunctor(*request.method, *request.params);
-		if(request.hasID){
-			// todo if an id was given, do a callback
-//			jsonRPC->SendRPCCallback(jsonRPC->ConstructRPCCallback(request.id, returned));
+		pp::Var returned = CallFunctor(request.getMethod(), *request.getParams());
+		if(request.isHasId()){
+			//if an id was given, do a callback
+			jsonRPC->SendRPCCallback(jsonRPC->ConstructRPCCallback(request.getId(), returned));
+		} else {
 		}
 
 		return true;

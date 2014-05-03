@@ -30,20 +30,66 @@ public:
 	pp::Var AsVar();
 	pp::VarDictionary AsDictionary();
 
+	bool isFromOriginal() const {
+		return fromOriginal;
+	}
 
-	const std::string* method;
+	void setFromOriginal(bool fromOriginal) {
+		this->fromOriginal = fromOriginal;
+	}
 
-	const pp::VarArray* params;
-	bool hasParams;
+	bool isHasId() const {
+		return hasID;
+	}
 
-	unsigned long id;
-	bool hasID;
+	void setHasId(bool hasId) {
+		hasID = hasId;
+	}
 
-	const pp::VarDictionary* original;
+	bool isHasParams() const {
+		return hasParams;
+	}
 
-	bool isValid;
-	void setValid(bool v){
-		isValid = v;
+	void setHasParams(bool hasParams) {
+		this->hasParams = hasParams;
+	}
+
+	unsigned long getId() const {
+		return id;
+	}
+
+	void setId(unsigned long id) {
+		this->id = id;
+	}
+
+	const std::string& getMethod() const {
+		return method;
+	}
+
+	void setMethod(const std::string& method) {
+		this->method = method;
+	}
+
+	const pp::VarDictionary* getOriginal() const {
+		return original;
+	}
+
+	void setOriginal(const pp::VarDictionary*& original) {
+		this->original = original;
+	}
+
+	const pp::VarArray* getParams() const;
+
+	void setParams(const pp::VarArray*& params) {
+		this->params = params;
+	}
+
+	bool isValid() const {
+		return valid;
+	}
+
+	void setValid(bool valid) {
+		this->valid = valid;
 	}
 
 private:
@@ -52,6 +98,19 @@ private:
 	void init(const std::string& method, unsigned long id);
 	void init(const std::string& method);
 
+
+	std::string method;
+
+	const pp::VarArray* params;
+	bool hasParams;
+
+	unsigned long id;
+	bool hasID;
+
+	const pp::VarDictionary* original;
+	bool fromOriginal;
+
+	bool valid;
 };
 } /* namespace pprpc */
 
