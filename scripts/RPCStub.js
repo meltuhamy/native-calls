@@ -30,15 +30,17 @@ define(['RPCRuntime', 'lodash', 'TagLogger', 'TypeChecker'], function(RPCRuntime
   };
 
   RPCInterface.prototype.constructFunction = function(defn){
-    var defnName = defn.name,
-        interfacePrefix = this.name + "::";
-        defnParams = _.isArray(defn.params) ? defn.params : [],
-        defnParamsLength = defn.params.length,
-        defnReturnType = _.isObject(defn.returnType) ? defn.returnType : {"$ref": "any"},
+    var interfacePrefix = this.name + "::",
         type = this.stub.type,
-        runtime = this.stub.runtime,
-        body = function () {
+        runtime = this.stub.runtime;
+
+    var body = function () {
           var args = Array.prototype.slice.call(arguments, 0);
+          var defnName = defn.name,
+              defnParams = _.isArray(defn.params) ? defn.params : [],
+              defnParamsLength = defnParams.length,
+              defnReturnType = _.isObject(defn.returnType) ? defn.returnType : {"$ref": "any"};
+
 
           // the expected number of parameters is known, defnParamsLength.
           // if the user gives more params, then these are probably callbacks.
@@ -76,7 +78,9 @@ define(['RPCRuntime', 'lodash', 'TagLogger', 'TypeChecker'], function(RPCRuntime
                 });
               }
             } else {
-              userSuccessCallback.call(null, d);
+              if(_.isFunction(userSuccessCallback)){
+                userSuccessCallback.call(null, d);
+              }
             }
           };
 

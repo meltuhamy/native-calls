@@ -18,8 +18,8 @@ class VarDictionary;
 namespace pprpc{
 class RPCRequest {
 public:
+	RPCRequest();
 	RPCRequest(const pp::VarDictionary&);
-
 	RPCRequest(const std::string& method, const pp::VarArray& params, unsigned long id);
 	RPCRequest(const std::string& method, const pp::VarArray& params);
 	RPCRequest(const std::string& method, unsigned long id);

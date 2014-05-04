@@ -2,8 +2,8 @@
 #define FIB_H_
 
 namespace Fib{
-int fib(int x);
-int countUp();
+long fib(long x);
+long countUp();
 
 class MyClass{
 public:
@@ -20,7 +20,7 @@ public:
 	}
 
 private:
-	int counter;
+	long counter;
 };
 
 }

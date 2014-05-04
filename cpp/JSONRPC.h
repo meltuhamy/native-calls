@@ -65,6 +65,7 @@ private:
 	RPCTransport *transport;
 	RPCRuntime *runtime;
 	bool transportSet;
+	bool runtimeSet;
 };
 }
 

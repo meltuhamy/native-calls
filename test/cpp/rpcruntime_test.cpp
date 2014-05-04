@@ -18,7 +18,6 @@ using ::testing::Invoke;
 using namespace pprpc;
 
 bool foo(){
-//	fprintf(stdout,"CALLED FOO!\n");
 	return true;
 }
 
@@ -28,7 +27,7 @@ long add(long first, long second){
 
 class Functor_foo : public RPCFunctor{
 public:
-	virtual pp::Var call(pp::VarArray params) {
+	virtual pp::Var call(const pp::VarArray* params) {
 		return pp::Var(foo());
 	}
 };
@@ -36,7 +35,7 @@ public:
 
 class FakeFunctor : public RPCFunctor{
 public:
-	virtual pp::Var call(pp::VarArray params){
+	virtual pp::Var call(const pp::VarArray* params){
 		return pp::Var(true);
 	}
 };
@@ -44,7 +43,7 @@ public:
 
 class MockFunctor : public RPCFunctor{
 public:
-	MOCK_METHOD1(call, pp::Var(pp::VarArray params));
+	MOCK_METHOD1(call, pp::Var(const pp::VarArray* params));
 
 	// Delegates the default actions of the methods to a FakeFoo object.
 	// This must be called *before* the custom ON_CALL() statements.
@@ -60,10 +59,10 @@ private:
 
 class Functor_add : public RPCFunctor{
 public:
-	virtual pp::Var call(pp::VarArray params){
+	virtual pp::Var call(const pp::VarArray* params){
 		// extract the paramaters and check
-		LongType p0(params.Get(0));
-		LongType p1(params.Get(1));
+		LongType p0(params->Get(0));
+		LongType p1(params->Get(1));
 		LongType r;
 		if(p0.isValid() && p1.isValid()){
 			r = LongType(add(p0.Extract().getValue() , p1.Extract().getValue()));
@@ -78,7 +77,7 @@ MockJSONRPC mockJSONRPC;
 
 // should allow adding functions by string
 TEST(RPCRuntimeLayer, AddFunctionTest){
-	RPCRuntime runtime(mockJSONRPC);
+	RPCRuntime runtime(&mockJSONRPC);
 	bool added = runtime.AddFunctor("foo", new Functor_foo());
 	EXPECT_TRUE(added==true);
 
@@ -89,7 +88,7 @@ TEST(RPCRuntimeLayer, AddFunctionTest){
 
 // should allow getting functions by string
 TEST(RPCRuntimeLayer, GetFunction){
-	RPCRuntime runtime(mockJSONRPC);
+	RPCRuntime runtime(&mockJSONRPC);
 	bool added = runtime.AddFunctor("foo", new Functor_foo());
 	EXPECT_TRUE(added==true);
 	RPCFunctor* functor = runtime.GetFunctor("foo");
@@ -100,11 +99,11 @@ TEST(RPCRuntimeLayer, GetFunction){
 
 // should allow calling functions by string
 TEST(RPCRuntimeLayer, CallFunction){
-	RPCRuntime runtime(mockJSONRPC);
+	RPCRuntime runtime(&mockJSONRPC);
 	// foo returns true!
 	bool added = runtime.AddFunctor("foo", new Functor_foo());
 	EXPECT_TRUE(added==true);
-	pp::Var returnValue = runtime.CallFunctor("foo", pp::VarArray());
+	pp::Var returnValue = runtime.CallFunctor("foo", new pp::VarArray());
 	EXPECT_TRUE(returnValue.is_bool() == true); // foo returns a bool.
 	EXPECT_TRUE(returnValue.AsBool() == true); // foo returns true.
 }
@@ -112,21 +111,21 @@ TEST(RPCRuntimeLayer, CallFunction){
 // should call functions with type checking
 TEST(RPCRuntimeLayer, CallFunctionCheckType){
 	// do one with correct type
-	RPCRuntime runtime(mockJSONRPC);
+	RPCRuntime runtime(&mockJSONRPC);
 	bool added = runtime.AddFunctor("add", new Functor_add());
 	EXPECT_TRUE(added == true);
 	pp::VarArray correctParams;
 	correctParams.Set(0, pp::Var(1));
 	correctParams.Set(1, pp::Var(2));
 
-	pp::Var returnValue = runtime.CallFunctor("add", correctParams);
+	pp::Var returnValue = runtime.CallFunctor("add", &correctParams);
 	EXPECT_TRUE(returnValue.AsInt() == 3); // 1+2=3
 
 	// do one with not correct types
 	pp::VarArray incorrectParams;
 	correctParams.Set(0, pp::Var("not a number!"));
 	correctParams.Set(1, pp::Var(2));
-	returnValue = runtime.CallFunctor("add", correctParams);
+	returnValue = runtime.CallFunctor("add", &correctParams);
 	EXPECT_FALSE(returnValue.AsInt() == 3); // 1+2=3
 
 
@@ -140,7 +139,7 @@ TEST(RPCRuntimeLayer, HandleRequest){
 	MockJSONRPC myMock;
 	myMock.DelegateToRealValidators();
 
-	RPCRuntime runtime(myMock);
+	RPCRuntime runtime(&myMock);
 
 	MockFunctor mockFoo;
 	mockFoo.DelegateToFake(); //makes call return true

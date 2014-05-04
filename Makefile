@@ -1,20 +1,34 @@
-VALID_TOOLCHAINS ?= newlib glibc pnacl
-
-###
-### NOTE: Changing CONFIG and TOOLCHAIN will require you to change the following files
+# Warning: setting these might break the tests, which currently have hardcoded links:
+# You'll need to change the files below to fix this: 
 ### test/CPPTestsSpec.js - Change the testingModule src.
 ### scripts/NaClConfig.js - Change the CONFIG and TOOLCHAIN properties.
-###
-CONFIG ?= Debug
+
+
 TOOLCHAIN ?= newlib
+CONFIG ?= Debug
+ARCH ?= x86_32
+
+ifneq ($(TOOLCHAIN),pnacl)
+ifneq ($(MAKECMDGOALS),hardclean)
+ifneq ($(TOOLCHAIN),all)
+NACL_ARCH ?= $(ARCH)
+$(info Exporting NACL_ARCH=$(NACL_ARCH))
+export NACL_ARCH 
+endif
+endif
+endif
+
+
+export TOOLCHAIN
+export CONFIG
 
 
 mkfile_path = $(abspath $(lastword $(MAKEFILE_LIST)))
 current_dir = $(patsubst %/,%,$(dir $(mkfile_path)))
 
 RPCLIB_DIR = cpp
-DEMOS_DIR = handcoded
 TEST_CODE_DIR = test/cpp
+EETEST_CODE_DIR = test/e2e
 
 # Used to pipe stdout. useful for gtest output.
 NACL_EXE_STDOUT ?= ${current_dir}/nacl_std_out.log
@@ -22,12 +36,9 @@ NACL_EXE_STDOUT ?= ${current_dir}/nacl_std_out.log
 # Used to easily run npm module binaries (e.g. karma)
 NM_BIN_PATH := ${current_dir}/node_modules/.bin 
 
-# Pass the arguments on to other Makefiles
-MAKE_ARGS := TOOLCHAIN=$(TOOLCHAIN) CONFIG=$(CONFIG) NACL_ARCH=$(NACL_ARCH)
-
 all: .PHONY
 
-.PHONY: libs demos tests
+.PHONY: libs tests
 
 # anything that needs an npm module will need to install packages
 $(NM_BIN_PATH):
@@ -36,34 +47,35 @@ $(NM_BIN_PATH):
 # Make each part
 
 libs: 
-	$(MAKE) -C $(RPCLIB_DIR) $(MAKE_ARGS)
-
-demos: libs
-	$(MAKE) -C $(DEMOS_DIR) $(MAKE_ARGS)
+	$(MAKE) -C $(RPCLIB_DIR)
 
 tests: libs
-	$(MAKE) -C $(TEST_CODE_DIR) $(MAKE_ARGS) ARCH=$(ARCH)
+	$(MAKE) -C $(TEST_CODE_DIR)
+
+eetests: libs
+	$(MAKE) -C $(EETEST_CODE_DIR)
 
 # Use this to re-link tests with the libraries
 rebuildtests: libs
-	$(MAKE) -C $(TEST_CODE_DIR) $(MAKE_ARGS) FORCE=y
+	$(MAKE) -C $(TEST_CODE_DIR) FORCE=y
+
+rebuildee: libs
+	$(MAKE) -C $(EETEST_CODE_DIR) FORCE=y
+
 
 # cleaning
 
-cleandemo:
-	$(MAKE) -C $(DEMOS_DIR) clean $(MAKE_ARGS)
-
 cleanlib:
-	$(MAKE) -C $(RPCLIB_DIR) clean $(MAKE_ARGS)
+	$(MAKE) -C $(RPCLIB_DIR) clean
 
 cleantest:
-	$(MAKE) -C $(TEST_CODE_DIR) clean $(MAKE_ARGS)
+	$(MAKE) -C $(TEST_CODE_DIR) clean
 
-cleantestkeepnmf:
-	$(MAKE) -C $(TEST_CODE_DIR) clean $(MAKE_ARGS) KEEPNMF=Y
+cleanee:
+	$(MAKE) -C $(EETEST_CODE_DIR) clean
 
 
-clean: cleantest cleanlib cleandemo
+clean: cleantest cleanlib cleanlib
 cleanbuild: clean all
 
 # hard clean cleans ALL TOOLCHAIN builds and also for both Release and Debug.
@@ -72,27 +84,32 @@ hardclean:
 	$(MAKE) clean TOOLCHAIN=all CONFIG=Debug
 
 # testing
-test: nodetest jstest cpptest
+test: nodetest jstest cpptest eetest
 
 nodetest: $(NM_BIN_PATH)
-	npm run nodetest
+	@echo "\n\n** RUNNING NODE.JS TESTS **\n\n"
+	@npm run nodetest
 
 cpptest: libs tests $(NM_BIN_PATH)
-	touch $(NACL_EXE_STDOUT)
-	export NACL_EXE_STDOUT="$(NACL_EXE_STDOUT)" ; tail -n 0 -f $(NACL_EXE_STDOUT) & TAILPID=$$! && npm run cpptest ; kill $$TAILPID
+	@echo "\n\n** RUNNING C++ TESTS **\n\n"
+	@touch $(NACL_EXE_STDOUT)
+	@export NACL_EXE_STDOUT="$(NACL_EXE_STDOUT)" ; tail -n 0 -f $(NACL_EXE_STDOUT) & TAILPID=$$! && npm run cpptest ; kill $$TAILPID
 
-cppwatch: libs tests $(NM_BIN_PATH)
-	touch $(NACL_EXE_STDOUT)
-	export NACL_EXE_STDOUT="$(NACL_EXE_STDOUT)" ; tail -n 0 -f $(NACL_EXE_STDOUT) & TAILPID=$$! && npm run cppwatch ; kill $$TAILPID
+eetest: libs eetests $(NM_BIN_PATH)
+	@echo "\n\n** RUNNING E2E TESTS **\n\n"
+	@touch $(NACL_EXE_STDOUT)
+	@export NACL_EXE_STDOUT="$(NACL_EXE_STDOUT)" ; tail -n 0 -f $(NACL_EXE_STDOUT) & TAILPID=$$! && npm run eetest ; kill $$TAILPID
+
 
 
 jstest: $(NM_BIN_PATH)
-	npm run jstest
+	@echo "\n\n** RUNNING JAVASCRIPT TESTS **\n\n"
+	@npm run jstest
 
 jswatch: $(NM_BIN_PATH)
-	npm run jswatch
+	@npm run jswatch
 
 # running
 serve: $(NM_BIN_PATH)
-	npm run serve
+	@npm run serve
 	

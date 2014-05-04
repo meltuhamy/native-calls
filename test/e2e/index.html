@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../../scripts/paths.require.js"></script>
+    <script src="../../scripts/lib/requirejs/require.js"></script>
+    <script>
+        requirejs.config({
+            baseUrl: '../../scripts',
+            paths: REQUIRE_PATHS
+        });
+        require(['RPCModule', 'loglevel', '/test/e2e/Fib/FibRPC.js'], function(RPCModule, loglevel, FibRPC){
+            loglevel.enableAll();
+            window.RPCModule = RPCModule;
+            window.loglevel = loglevel;
+            window.Fib = FibRPC('/test/e2e/');
+
+            window.FibModule  = RPCModule.getModule(window.Fib);
+            FibModule.load();
+        });
+    </script>
+</head>
+<body>
+
+</body>
+</html>

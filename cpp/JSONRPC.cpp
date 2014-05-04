@@ -5,15 +5,19 @@
 #include "ppapi/cpp/var_array.h"
 #include "ppapi/cpp/var_dictionary.h"
 #include "RPCRequest.h"
+#include <stdio.h>
 
 #include <string>
 namespace pprpc{
 JSONRPC::JSONRPC() {
 	transportSet = false;
+	runtimeSet = false;
 }
 
 JSONRPC::JSONRPC(RPCTransport* transport) {
 	setTransport(transport);
+	runtimeSet = false;
+
 }
 
 JSONRPC::JSONRPC(RPCTransport* transport, RPCRuntime* runtime){
@@ -30,9 +34,11 @@ void JSONRPC::setTransport(RPCTransport* transport) {
 
 void JSONRPC::setRuntime(RPCRuntime* runtime) {
 	this->runtime = runtime;
+	runtimeSet = true;
 }
 
 JSONRPC::~JSONRPC() {
+	// fprintf(stdout, "\nJSONRPC::~JSONRPC()\n");
 }
 
 bool JSONRPC::is_basic_json_rpc(const pp::Var& obj) {
@@ -56,14 +62,20 @@ bool JSONRPC::ValidateRPCRequest(const pp::Var& requestObj) {
 }
 
 RPCRequest JSONRPC::ExtractRPCRequest(const pp::Var& requestObj) {
-	pp::VarDictionary dict(requestObj);
-	RPCRequest request(dict);
-	if(ValidateRPCRequest(requestObj)){
-		request.setValid(true);
+	if(requestObj.is_dictionary()){
+		pp::VarDictionary dict(requestObj);
+			RPCRequest request(dict);
+			if(ValidateRPCRequest(requestObj)){
+				request.setValid(true);
+			} else {
+				request.setValid(false);
+			}
+			return request;
 	} else {
-		request.setValid(false);
+		RPCRequest request;
+		return request;
 	}
-	return request;
+
 }
 
 bool JSONRPC::ValidateRPCCallback(const pp::Var& callbackObj) {
@@ -88,7 +100,9 @@ bool JSONRPC::ValidateRPCError(const pp::Var& errorObj) {
 void JSONRPC::HandleRPC(const pp::Var& rpcObj) {
 	RPCRequest r = ExtractRPCRequest(rpcObj);
 	if(r.isValid()){
-		// todo call runtime
+		if(runtimeSet){
+			runtime->HandleRequest(r);
+		}
 	} else if(ValidateRPCCallback(rpcObj)){
 		// todo call runtime
 

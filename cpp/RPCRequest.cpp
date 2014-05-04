@@ -2,12 +2,18 @@
 #include "ppapi/cpp/var.h"
 #include "ppapi/cpp/var_array.h"
 #include "ppapi/cpp/var_dictionary.h"
-
+#include <stdio.h>
 namespace pprpc{
+
 RPCRequest::~RPCRequest() {
-	// TODO Auto-generated destructor stub
+	// fprintf(stdout, "\nRPCRequest::~RPCRequest()\n");
 }
 
+RPCRequest::RPCRequest(){
+	setValid(false);
+}
+
+// todo clean this up, it's absolutely filthy.
 RPCRequest::RPCRequest(const pp::VarDictionary& dict) {
 	hasID = dict.HasKey("id");
 	hasParams = dict.HasKey("params");
@@ -20,8 +26,14 @@ RPCRequest::RPCRequest(const pp::VarDictionary& dict) {
 			if(hasParams && hasID){
 				pp::Var paramsVar(dict.Get("params"));
 				pp::Var idVar = dict.Get("id");
-				if(paramsVar.is_dictionary() && idVar.is_int()){
+				if(paramsVar.is_array() && idVar.is_int()){
 					init(methodString, pp::VarArray(paramsVar), (unsigned long) idVar.AsInt());
+				} else if(paramsVar.is_array()){
+					init(methodString, pp::VarArray(paramsVar));
+				} else if(idVar.is_int()){
+					init(methodString, (unsigned long) idVar.AsInt());
+				} else{
+					init(methodString);
 				}
 			} else if(hasParams){
 				pp::Var paramsVar(dict.Get("params"));
@@ -73,7 +85,7 @@ void RPCRequest::init(const std::string& method, const pp::VarArray& params,
 void RPCRequest::init(const std::string& method, const pp::VarArray& params) {
 	init(method);
 	hasParams = true;
-	this->params = &params;
+	this->params = new pp::VarArray(params);
 }
 
 void RPCRequest::init(const std::string& method, unsigned long id) {

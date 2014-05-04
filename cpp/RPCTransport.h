@@ -27,10 +27,12 @@ public:
 
 	virtual void setJSONRPC(JSONRPC* jsonRpc) {
 		jsonRPC = jsonRpc;
+		hasJSONRPC = true;
 	}
 
 private:
 	JSONRPC *jsonRPC;
+	bool hasJSONRPC;
 
 	void init();
 	void init(JSONRPC *jsonRPC);

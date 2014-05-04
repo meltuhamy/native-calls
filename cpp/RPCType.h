@@ -11,6 +11,7 @@
 #include <string>
 #include "ppapi/cpp/var.h"
 #include "ppapi/cpp/var_dictionary.h"
+ #include <stdio.h>
 namespace pprpc{
 class ValidTypeBase {
 
@@ -65,7 +66,7 @@ public:\
 	CLSNAME(pp::Var v){ setValue(v); }\
 	CLSNAME(CPPTYPE v){ setValue(pprpc::ValidType<CPPTYPE>(v)); }\
 	CLSNAME(pprpc::ValidType<CPPTYPE> v){ setValue(v); }\
-	virtual ~CLSNAME(){}\
+	virtual ~CLSNAME(){ /*fprintf(stdout, "\n%s::~%s()\n", QUOTEVALUE(CLSNAME), QUOTEVALUE(CLSNAME) );*/ }\
 	pp::Var AsVar(){ return valueVar.is_undefined() ? AsVar(valueValidType) : valueVar; }\
 	pprpc::ValidType<CPPTYPE> Extract(){ return valueValidType.isValid() ? valueValidType : Extract(valueVar); }\
 	bool setValue(pp::Var v){\

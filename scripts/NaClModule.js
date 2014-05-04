@@ -35,7 +35,7 @@ define(['lodash', 'TagLogger', 'NaClConfig'], function(_, TagLogger, NaClConfig)
     // infer src
     if(!moduleSrc){
       // e.g. Logger/pnacl/Release/Logger.nmf
-      moduleSrc = moduleName+'/'+NaClConfig.TOOLCHAIN+'/'+NaClConfig.CONFIG+'/'+moduleName+'.nmf';
+      moduleSrc = (_.isString(attrs.srcPrefix) ? attrs.srcPrefix : '') + moduleName+'/'+NaClConfig.TOOLCHAIN+'/'+NaClConfig.CONFIG+'/'+moduleName+'.nmf';
     }
 
     // infer id

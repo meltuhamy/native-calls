@@ -10,8 +10,7 @@
 
 namespace pprpc{
 
-pp::Var RPCFunctor::call(pp::VarArray params) {
-	fprintf(stdout, "WARNING: CALLING DEFAULT FUNCTOR\n");
+pp::Var RPCFunctor::call(const pp::VarArray* params) {
 	return pp::Var(); //return undefined by default.
 }
 
@@ -21,11 +20,12 @@ pp::Var RPCFunctor::call(pp::VarArray params) {
 
 
 RPCRuntime::~RPCRuntime() {
-
+	// fprintf(stdout, "\nRPCRuntime::~RPCRuntime()\n");
 }
 
-RPCRuntime::RPCRuntime(JSONRPC& jsonRPC) {
-	this->jsonRPC = &jsonRPC;
+RPCRuntime::RPCRuntime(JSONRPC* jsonRPC) {
+	this->jsonRPC = jsonRPC;
+	this->jsonRPC->setRuntime(this);
 	this->functorMap = new std::map<std::string, RPCFunctor*>();
 }
 
@@ -50,7 +50,7 @@ RPCFunctor* RPCRuntime::GetFunctor(std::string name) {
 	}
 }
 
-pp::Var RPCRuntime::CallFunctor(std::string name, pp::VarArray params) {
+pp::Var RPCRuntime::CallFunctor(std::string name, const pp::VarArray* params) {
 	pp::Var returnValue; //default undefined
 	RPCFunctor* functor = GetFunctor(name);
 	if(functor->isValid()){
@@ -68,7 +68,7 @@ bool RPCRuntime::HandleRequest(const RPCRequest& request) {
 	bool valid = request.isValid();
 	if(valid){
 		// if an id was given, do a callback
-		pp::Var returned = CallFunctor(request.getMethod(), *request.getParams());
+		pp::Var returned = CallFunctor(request.getMethod(), request.getParams());
 		if(request.isHasId()){
 			//if an id was given, do a callback
 			jsonRPC->SendRPCCallback(jsonRPC->ConstructRPCCallback(request.getId(), returned));
