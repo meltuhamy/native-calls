@@ -125,5 +125,113 @@ describe('Augmented AST', function () {
 
   });
 
+
+  it('should convert complicated types into schema format', function(){
+    var augmentedAST = new AugmentedAST({});
+
+    expect(augmentedAST.idlTypeToSchema("hello")).toEqual({"$ref": "hello"});
+    expect(augmentedAST.idlTypeToSchema({
+      array: 1,
+      idlType:"myType"
+    })).toEqual({
+      type: "array",
+      "items": {"$ref": "myType"}
+    });
+
+    expect(augmentedAST.idlTypeToSchema({
+      array: 3,
+      idlType:"myType"
+    })).toEqual({
+      type: "array",
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "myType"
+          }
+        }
+      }
+    });
+
+  });
+
+
+
+  it("should export types in schema format", function(){
+    var ast = parser.parse('dictionary MyDict{ long[] myLong; }; interface MyInterface { long[][] myOp( MyDict[] param, unsigned long long extraLongParam); };');
+    var augmentedAST = new AugmentedAST(ast);
+
+    // inside dictionaries
+    expect(augmentedAST.dictionaries.MyDict.members[0].schemaType).toEqual({
+      "type": "array",
+      "items": {"$ref": "long"}
+    });
+
+    // operations return type
+    var op = augmentedAST.interfaces.MyInterface.operations[0];
+    expect(op.schemaType).toEqual({
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": {"$ref": "long"}
+      }
+    });
+
+    // and operation arguments
+    expect(op.arguments[0].schemaType).toEqual({
+      "type": "array",
+      "items": {"$ref": "MyDict"}
+    });
+
+    expect(op.arguments[1].schemaType).toEqual({
+      "$ref": "unsigned long long"
+    });
+  });
+
+
+  it("should export the defined interfaces as an array", function(){
+    var ast = parser.parse('' +
+    'dictionary MyDict{ long[] myLong; }; ' +
+    'interface MyInterface { long[][] myOp( MyDict[] param, unsigned long long extraLongParam); };' +
+    'interface SecondInterface {};');
+    var augmentedAST = new AugmentedAST(ast);
+
+    var interfaceArray = augmentedAST.getInterfaceArray();
+    expect(interfaceArray.length).toBe(2); //2 interfaces
+
+    var expectedNames = ["MyInterface", "SecondInterface"];
+    var checkedNames = [];
+    for(var i = 0; i < interfaceArray.length; i++){
+      expect(typeof interfaceArray[i]).toBe("object");
+      expect(typeof interfaceArray[i].name).toBe("string");
+      expect(expectedNames.indexOf(interfaceArray[i].name)).toBeGreaterThan(-1); // found
+      expect(checkedNames.indexOf(interfaceArray[i].name)).toBeLessThan(0); // unique
+      checkedNames.push(interfaceArray[i].name);
+    }
+  });
+
+
+  it("should export the defined dictionaries as an array", function(){
+    var ast = parser.parse('' +
+    'dictionary MyDict{ long[] myLong; }; ' +
+    'dictionary SecondDict {};' +
+    'interface MyInterface { long[][] myOp( MyDict[] param, unsigned long long extraLongParam); };' +
+    'interface SecondInterface {};');
+    var augmentedAST = new AugmentedAST(ast);
+
+    var dictionaryArray = augmentedAST.getDictionaryArray();
+    expect(dictionaryArray.length).toBe(2); //2 dictionaries
+
+    var expectedNames = ["MyDict", "SecondDict"];
+    var checkedNames = [];
+    for(var i = 0; i < dictionaryArray.length; i++){
+      expect(typeof dictionaryArray[i]).toBe("object");
+      expect(typeof dictionaryArray[i].name).toBe("string");
+      expect(expectedNames.indexOf(dictionaryArray[i].name)).toBeGreaterThan(-1); // found
+      expect(checkedNames.indexOf(dictionaryArray[i].name)).toBeLessThan(0); // unique
+      checkedNames.push(dictionaryArray[i].name);
+    }
+  });
 });
 

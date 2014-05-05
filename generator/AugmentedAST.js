@@ -193,8 +193,12 @@ AugmentedAST.prototype.addDictionary = function (d, index) {
   } else {
     // doesn't exist. Add it as a new key.
     this.dictionaries[d.name] = d;
-    // add members
+    // augment and add members
+    for(var i = 0 ; i < d.members.length; i++){
+      d.members[i].schemaType = this.idlTypeToSchema(d.members[i].idlType);
+    }
     this.addToTypeCheckQueue(d.members);
+
   }
 
   return true;
@@ -212,6 +216,12 @@ AugmentedAST.prototype.addInterfaceMember = function (interfaceName, interfaceMe
   }
 
   if (interfaceMember.type === 'operation') {
+    // we add schema type info to the operation first
+    interfaceMember.schemaType = this.idlTypeToSchema(interfaceMember.idlType);
+
+    for(var i = 0; i < interfaceMember.arguments.length; i++){
+      interfaceMember.arguments[i].schemaType = this.idlTypeToSchema(interfaceMember.arguments[i].idlType);
+    }
     this.interfaces[interfaceName].operations.push(interfaceMember);
   }
 
@@ -387,5 +397,59 @@ AugmentedAST.getTypeName = AugmentedAST.prototype.getTypeName = function (obj) {
   return undefined;
 };
 
+
+AugmentedAST.prototype.idlTypeToSchema = function(idlType){
+  if(typeof idlType == 'string'){
+    return {"$ref": idlType};
+  }
+
+  if(typeof idlType == 'object'){
+    if(idlType.array && idlType.idlType){
+      // todo union types, etc.
+      var arrayDepth = idlType.array;
+      var arrayItemType = this.idlTypeToSchema(idlType.idlType);
+      return this.idlArrayToSchema(arrayDepth, arrayItemType);
+    } else if(idlType.idlType){
+      return this.idlTypeToSchema(idlType.idlType);
+    }
+  }
+
+  // if we haven't returned yet, there's a case we haven't handled...
+  throw new Error("Couldn't handle idl type :" + JSON.stringify(idlType) );
+
+};
+
+
+AugmentedAST.prototype.idlArrayToSchema = function(depth, itemType){
+  //pre: itemType needs to be a schema...
+  if(depth > 0){
+    return {
+      "type": "array",
+      "items": this.idlArrayToSchema(depth-1, itemType)
+    };
+  } else {
+    return itemType;
+  }
+};
+
+
+AugmentedAST.prototype.getInterfaceArray = function(){
+  var out = [];
+  for(var key in this.interfaces){
+    out.push(this.interfaces[key]);
+  }
+
+  return out;
+};
+
+
+AugmentedAST.prototype.getDictionaryArray = function(){
+  var out = [];
+  for(var key in this.dictionaries){
+    out.push(this.dictionaries[key]);
+  }
+
+  return out;
+};
 
 module.exports = AugmentedAST;

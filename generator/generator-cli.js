@@ -9,6 +9,7 @@ var argv = require('minimist')(process.argv.slice(2)),
 
     files = argv['_'],
     generate = argv['gen'],
+    genName = argv['name'],
     genPackage = argv['package'];
 
 
@@ -19,16 +20,17 @@ var augAST = new AugmentedAST((parser.parse(reader.readFiles(files))));
 // maybe the caller wants just one file to stdout?
 if(generate){
   if(generate == 'js'){
-    console.log(Generator.generateJS(augAST));
+    console.log(Generator.genJSString(augAST, genName));
   } else if(generate == 'cpp') {
-    console.log(Generator.generateCPP(augAST));
+    console.log(Generator.genCPPString(augAST, genName));
   } else if(generate == 'makefile'){
-    console.log(Generator.generateMakefile(augAST));
+    console.log(Generator.genMakefileString(augAST, genName));
   } else {
     // make a package
     console.error("Generating " + generate + " files is not really my job. Exiting.");
     process.exit();
   }
+  process.exit();
 }
 
 // todo, use cross-platform paths (using '/' is bad...)

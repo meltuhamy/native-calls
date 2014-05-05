@@ -1,0 +1,34 @@
+define(['RPCModule', 'NaClModule'], function(RPCModule, NaClModule){
+    return function(srcPrefix){
+        srcPrefix=srcPrefix?srcPrefix:'';
+        return new RPCModule({
+            "module": new NaClModule({name:"{{{name}}}", srcPrefix: srcPrefix}),
+            "interfaces": [
+                {{#interfaces}}
+                    {
+                        "name": "{{{name}}}",
+                        "functions": [
+                            {{#operations}}
+                                {
+                                    "name": "{{name}}",
+                                    "params": {{{argumentsArrayString}}},
+                                    "returnType": {{{schemaTypeString}}}
+                                }{{^endOps}},{{/endOps}}
+                            {{/operations}}
+                        ]
+                    }{{^end}},{{/end}}
+                {{/interfaces}}
+            ],
+
+            "dictionaries": [
+                {{#dictionaries}}
+                    {
+                      "name": "{{{name}}}",
+                      "required": {{{dictRequired}}},
+                      "properties": {{{dictProperties}}}
+                    }{{^end}},{{/end}}
+                {{/dictionaries}}
+            ]
+        });
+    };
+});

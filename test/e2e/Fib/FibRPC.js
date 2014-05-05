@@ -1,3 +1,4 @@
+// This file was actually generated! :O
 define(['RPCModule', 'NaClModule'], function(RPCModule, NaClModule){
   return function(srcPrefix){
     srcPrefix=srcPrefix?srcPrefix:'';
@@ -9,19 +10,20 @@ define(['RPCModule', 'NaClModule'], function(RPCModule, NaClModule){
           "functions": [
             {
               "name": "fib",
-              "params": [{"$ref": "unsigned long"}],
-              "returnType": {"$ref": "unsigned long"}
+              "params": [{"$ref":"unsigned long"}],
+              "returnType": {"$ref":"long"}
             },
             {
               "name": "countUp",
               "params": [],
-              "returnType": {"$ref": "long"}
+              "returnType": {"$ref":"long"}
             }
           ]
         }
       ],
-      "dictionaries": []
+
+      "dictionaries": [
+      ]
     });
   };
 });
-
