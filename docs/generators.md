@@ -1,5 +1,7 @@
 # Code Transpilers
 
+**Note: Code generation method has changed to use templates. Documentation soon**
+
 The process of using WebIDL to generate JS and CPP code is similar to transpiling.
 
 As discussed in the [WebIDL doc](https://github.com/meltuhamy/native-calls/tree/master/docs/webidl.md), we take a Abstract Syntax Tree (AST) representing the syntactic structure of the WebIDL, then we augment it to give more semantic meaning. We use the augmented AST to generate code.

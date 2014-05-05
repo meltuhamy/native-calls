@@ -57,6 +57,8 @@ On top of this parser, we implement our own parser that will read in multiple ID
 
 ```
 
+**Note: Code generation method has changed to use templates. Documentation soon**
+
 We can see that the generator itself is composed of an AST generator and then a source generator. For example, if we are generating the JavaScript module, it goes through the JSGenerator which is composed of the JS AST generator. The JS AST generator is a list of JS AST nodes, which when passed through the JS code generator, produces string source code. The same is the case for C++ code generation.
 
 For more details about the code generation process, read the [generators doc](https://github.com/meltuhamy/native-calls/blob/master/docs/generators.md).
