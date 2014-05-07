@@ -12,4 +12,6 @@ complex_double multiply(complex_double x, complex_double y);
 complex_double sum_all(std::vector<complex_double> contents);
 complex_double multiply_all(std::vector<complex_double> contents);
 
+std::vector<double> map_abs(std::vector<complex_double> contents);
+
 #endif /* CALCULATOR_H_ */

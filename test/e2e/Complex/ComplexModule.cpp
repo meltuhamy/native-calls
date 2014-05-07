@@ -123,6 +123,20 @@ public:
 };
 
 
+class Functor_map_abs : public RPCFunctor{
+public:
+	virtual pp::Var call(const pp::VarArray* params){
+		if(params->GetLength() == 1){
+			ValidType<std::vector<complex_double> > p0 = complex_doubleType::ExtractVector(params->Get(0));
+			if(p0.isValid()){
+				return DoubleType::AsVarArray(map_abs(p0.getValue()));
+			}
+		}
+		return pp::Var();
+	}
+};
+
+
 
 #include <ppapi/cpp/module.h>
 
@@ -144,6 +158,7 @@ public:
 		rpcRuntime->AddFunctor("Calculator::multiply", new Functor_multiply);
 		rpcRuntime->AddFunctor("Calculator::sum_all", new Functor_sum_all);
 		rpcRuntime->AddFunctor("Calculator::multiply_all", new Functor_multiply_all);
+		rpcRuntime->AddFunctor("Calculator::map_abs", new Functor_map_abs);
 		return rpcTransport;
 	}
 };

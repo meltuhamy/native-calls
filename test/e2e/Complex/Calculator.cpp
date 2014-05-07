@@ -51,3 +51,13 @@ complex_double multiply_all(std::vector<complex_double> contents){
 	sum.imaginary = currentSum.imag();
 	return sum;
 }
+
+
+std::vector<double> map_abs(std::vector<complex_double> contents){
+	std::vector<double> r;
+	for(std::vector<complex_double>::iterator it = contents.begin(); it != contents.end(); ++it) {
+		complex_double current_cd = *it;
+	    r.push_back(abs(std::complex<double>(current_cd.real, current_cd.imaginary)));
+	}
+	return r;
+}

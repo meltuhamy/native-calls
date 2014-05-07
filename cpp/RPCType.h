@@ -111,6 +111,14 @@ public:\
 			return ValidType<std::vector<CPPTYPE> >();\
 		}\
 	}\
+	static pp::VarArray AsVarArray(std::vector<CPPTYPE> v){\
+		pp::VarArray r;\
+		r.SetLength(v.size());\
+		for(std::vector<CPPTYPE>::size_type i = 0; i != v.size(); i++) {\
+			r.Set(i, CLSNAME(v[i]).AsVar());\
+		}\
+		return r;\
+	}\
 	pprpc::ValidType<CPPTYPE> Extract(pp::Var v);\
 private:\
 	pprpc::ValidType<CPPTYPE> valueValidType;\

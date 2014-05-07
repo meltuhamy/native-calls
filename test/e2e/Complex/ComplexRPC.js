@@ -31,6 +31,11 @@ define(['RPCModule', 'NaClModule'], function(RPCModule, NaClModule){
               "name": "multiply_all",
               "params": [{"type":"array","items":{"$ref":"complex_double"}}],
               "returnType": {"$ref":"complex_double"}
+            },
+            {
+              "name": "map_abs",
+              "params": [{"type":"array","items":{"$ref":"complex_double"}}],
+              "returnType": {"type":"array","items":{"$ref":"double"}}
             }
           ]
         }

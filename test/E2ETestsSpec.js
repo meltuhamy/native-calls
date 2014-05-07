@@ -194,6 +194,28 @@ define(["RPCModule", "loglevel"], function(RPCModule, loglevel){
       });
     });
 
+
+    it("should map complex numbers to their magnitudes", function(){
+      var numComplices = 100; // not that much, since we'll lose a lot of precision.
+      var complices = [];
+      var expectedResults = [];
+      for(var i = 0; i < numComplices; i++ ){
+        var current = {real: getRandom(), imaginary: getRandom()};
+
+        //http://en.wikipedia.org/wiki/Complex_number#Absolute_value_and_argument
+        expectedResults.push(Math.pow(current.real, 2) + Math.pow(current.imaginary, 2));
+        complices.push(current);
+      }
+
+      ComplexModule.Calculator.map_abs(complices, function(results){
+        for(var i = 0; i < results.length; i++){
+          expect(results[i]).toBeCloseTo(expectedResults[i], 3);
+        }
+        done();
+      });
+
+    });
+
   });
 
 });
