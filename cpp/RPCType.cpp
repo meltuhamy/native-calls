@@ -8,6 +8,7 @@
 #include <string>
 #include "ppapi/cpp/var.h"
 #include "RPCType.h"
+#include <vector>
 
 namespace pprpc{
 
@@ -120,17 +121,32 @@ ValidType<unsigned long long> ULongLongType::Extract(pp::Var v){
 }
 
 // float
-pp::Var FloatType::AsVar(ValidType<double> v){
+pp::Var FloatType::AsVar(ValidType<float> v){
 	return pp::Var(v.getValue());
 }
 
-ValidType<double> FloatType::Extract(pp::Var v){
-	if(v.is_double()){
+ValidType<float> FloatType::Extract(pp::Var v){
+	if(v.is_number()){
+		return ValidType<float>((float)v.AsDouble());
+	} else {
+		return ValidType<float>();
+	}
+}
+
+
+// double
+pp::Var DoubleType::AsVar(ValidType<double> v){
+	return pp::Var(v.getValue());
+}
+
+ValidType<double> DoubleType::Extract(pp::Var v){
+	if(v.is_number()){
 		return ValidType<double>(v.AsDouble());
 	} else {
 		return ValidType<double>();
 	}
 }
+
 
 // domstring
 pp::Var DOMStringType::AsVar(ValidType<std::string> v){

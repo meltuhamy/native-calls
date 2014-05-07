@@ -116,7 +116,8 @@ DEFINE_TYPE_CLASS(ULongType,unsigned long)
 DEFINE_TYPE_CLASS(LongLongType,long long)
 DEFINE_TYPE_CLASS(ULongLongType,unsigned long long)
 
-DEFINE_TYPE_CLASS(FloatType,double)
+DEFINE_TYPE_CLASS(FloatType,float)
+DEFINE_TYPE_CLASS(DoubleType,double)
 DEFINE_TYPE_CLASS(DOMStringType,std::string)
 DEFINE_TYPE_CLASS(BooleanType,bool)
 

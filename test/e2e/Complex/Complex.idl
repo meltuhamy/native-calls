@@ -1,0 +1,12 @@
+dictionary complex_double {
+  double real;
+  double imaginary;
+};
+
+interface Calculator {
+  complex_double add(complex_double x, complex_double y);
+  complex_double subtract(complex_double x, complex_double y);
+  complex_double multiply(complex_double x, complex_double y);
+  complex_double sum_all(complex_double[] contents);
+  complex_double multiply_all(complex_double[] contents);
+};

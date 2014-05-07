@@ -71,7 +71,7 @@ bool RPCRuntime::HandleRequest(const RPCRequest& request) {
 		pp::Var returned = CallFunctor(request.getMethod(), request.getParams());
 		if(request.isHasId()){
 			//if an id was given, do a callback
-			jsonRPC->SendRPCCallback(jsonRPC->ConstructRPCCallback(request.getId(), returned));
+			return jsonRPC->SendRPCCallback(jsonRPC->ConstructRPCCallback(request.getId(), returned));
 		} else {
 		}
 

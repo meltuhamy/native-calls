@@ -10,14 +10,20 @@
             baseUrl: '../../scripts',
             paths: REQUIRE_PATHS
         });
-        require(['RPCModule', 'loglevel', '/test/e2e/Fib/FibRPC.js'], function(RPCModule, loglevel, FibRPC){
+        require(['RPCModule',
+                 'loglevel',
+                 '/test/e2e/Fib/FibRPC.js',
+                 '/test/e2e/Complex/ComplexRPC.js'],
+                function(RPCModule, loglevel, FibRPC, ComplexRPC){
+
             loglevel.enableAll();
             window.RPCModule = RPCModule;
             window.loglevel = loglevel;
             window.Fib = FibRPC('/test/e2e/');
+            window.Complex = ComplexRPC('/test/e2e/');
 
-            window.FibModule  = RPCModule.getModule(window.Fib);
-            FibModule.load();
+            window.ComplexModule  = RPCModule.getModule(window.Fib);
+            window.ComplexModule  = RPCModule.getModule(window.Complex);
         });
     </script>
 </head>

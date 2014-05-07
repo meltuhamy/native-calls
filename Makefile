@@ -38,7 +38,7 @@ NM_BIN_PATH := ${current_dir}/node_modules/.bin
 
 all: .PHONY
 
-.PHONY: libs tests
+.PHONY: libs tests eetests
 
 # anything that needs an npm module will need to install packages
 $(NM_BIN_PATH):
@@ -75,7 +75,7 @@ cleanee:
 	$(MAKE) -C $(EETEST_CODE_DIR) clean
 
 
-clean: cleantest cleanlib cleanlib
+clean: cleantest cleanlib cleanlib cleanee
 cleanbuild: clean all
 
 # hard clean cleans ALL TOOLCHAIN builds and also for both Release and Debug.
