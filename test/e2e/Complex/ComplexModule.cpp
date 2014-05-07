@@ -99,56 +99,23 @@ class Functor_sum_all : public RPCFunctor{
 public:
 	virtual pp::Var call(const pp::VarArray* params){
 		if(params->GetLength() == 1){
-			pp::Var p0Var = params->Get(0);
-			std::vector<complex_double> complexVector;
-			if(p0Var.is_array()){
-				pp::VarArray p0VarArray(p0Var);
-				unsigned int p0VarArrayLength = p0VarArray.GetLength();
-				bool p0VarArrayAllValid = true;
-				for(unsigned int i = 0 ; i < p0VarArrayLength; i++){
-					// check each element
-					complex_doubleType current(p0VarArray.Get(i));
-					if(current.isValid()){
-						complexVector.push_back(current.Extract().getValue());
-					} else {
-						p0VarArrayAllValid = false;
-						break;
-					}
-				}
-				if(p0VarArrayAllValid){
-					// finally call the function
-					return complex_doubleType(sum_all(complexVector)).AsVar();
-				}
+			ValidType<std::vector<complex_double> > p0 = complex_doubleType::ExtractVector(params->Get(0));
+			if(p0.isValid()){
+				return complex_doubleType(sum_all(p0.getValue())).AsVar();
 			}
 		}
 		return pp::Var();
 	}
+
 };
 
 class Functor_multiply_all : public RPCFunctor{
 public:
 	virtual pp::Var call(const pp::VarArray* params){
 		if(params->GetLength() == 1){
-			pp::Var p0Var = params->Get(0);
-			std::vector<complex_double> complexVector;
-			if(p0Var.is_array()){
-				pp::VarArray p0VarArray(p0Var);
-				unsigned int p0VarArrayLength = p0VarArray.GetLength();
-				bool p0VarArrayAllValid = true;
-				for(unsigned int i = 0 ; i < p0VarArrayLength; i++){
-					// check each element
-					complex_doubleType current(p0VarArray.Get(i));
-					if(current.isValid()){
-						complexVector.push_back(current.Extract().getValue());
-					} else {
-						p0VarArrayAllValid = false;
-						break;
-					}
-				}
-				if(p0VarArrayAllValid){
-					// finally call the function
-					return complex_doubleType(multiply_all(complexVector)).AsVar();
-				}
+			ValidType<std::vector<complex_double> > p0 = complex_doubleType::ExtractVector(params->Get(0));
+			if(p0.isValid()){
+				return complex_doubleType(multiply_all(p0.getValue())).AsVar();
 			}
 		}
 		return pp::Var();

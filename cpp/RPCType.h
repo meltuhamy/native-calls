@@ -9,9 +9,10 @@
 #define RPCTYPE_H_
 
 #include <string>
+#include <vector>
 #include "ppapi/cpp/var.h"
 #include "ppapi/cpp/var_dictionary.h"
- #include <stdio.h>
+#include <stdio.h>
 namespace pprpc{
 class ValidTypeBase {
 
@@ -92,6 +93,24 @@ public:\
 	bool isValid(){ return valueValidType.isValid() && !valueVar.is_undefined();}\
 	virtual std::string getTypeString(){ return QUOTEVALUE(TYPESTRING); }\
 	pp::Var AsVar(pprpc::ValidType<CPPTYPE> v);\
+	static ValidType<std::vector<CPPTYPE> > ExtractVector(pp::Var v){\
+		if(v.is_array()){\
+			pp::VarArray vArray(v);\
+			unsigned int length = vArray.GetLength();\
+			std::vector<CPPTYPE> vector_CPPTYPE;\
+			for(unsigned int i = 0; i < length; i++){\
+				CLSNAME valid_CLSNAME(vArray.Get(i));\
+				if(!valid_CLSNAME.isValid()){\
+					return ValidType<std::vector<CPPTYPE> >();\
+				} else {\
+					vector_CPPTYPE.push_back(valid_CLSNAME.Extract().getValue());\
+				}\
+			}\
+			return ValidType<std::vector<CPPTYPE> >(vector_CPPTYPE);\
+		} else {\
+			return ValidType<std::vector<CPPTYPE> >();\
+		}\
+	}\
 	pprpc::ValidType<CPPTYPE> Extract(pp::Var v);\
 private:\
 	pprpc::ValidType<CPPTYPE> valueValidType;\
