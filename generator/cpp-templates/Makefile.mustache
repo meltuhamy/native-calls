@@ -1,5 +1,7 @@
-SOURCES = FibModule.cpp Fib.cpp
-TARGET = Fib
+# AUTOMATICALLY GENERATED ON {{timestamp}} #
+
+SOURCES = {{moduleName}}RPC.cpp {{#interfaces}}{{name}}.cpp {{/interfaces}}
+TARGET = {{moduleName}}
 CFLAGS = -I../../../cpp
 
 include $(NACL_SDK_ROOT)/tools/common.mk

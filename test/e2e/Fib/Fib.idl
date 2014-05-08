@@ -1,4 +1,0 @@
-interface Fib {
-  long fib(unsigned long x);
-  long countUp();
-};

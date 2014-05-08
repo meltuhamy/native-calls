@@ -46,6 +46,10 @@ public:
 		this->value = value;
 	}
 
+	ValidType<T> Extract(){
+		return *this;
+	}
+
 private:
 	T value;
 	bool valid;
@@ -137,11 +141,11 @@ namespace pprpc{
 DEFINE_TYPE_CLASS(ByteType,char)
 DEFINE_TYPE_CLASS(OctetType,unsigned char)
 DEFINE_TYPE_CLASS(ShortType,short)
-DEFINE_TYPE_CLASS(UShortType,unsigned short)
+DEFINE_TYPE_CLASS(UnsignedShortType,unsigned short)
 DEFINE_TYPE_CLASS(LongType,long)
-DEFINE_TYPE_CLASS(ULongType,unsigned long)
+DEFINE_TYPE_CLASS(UnsignedLongType,unsigned long)
 DEFINE_TYPE_CLASS(LongLongType,long long)
-DEFINE_TYPE_CLASS(ULongLongType,unsigned long long)
+DEFINE_TYPE_CLASS(UnsignedLongLongType,unsigned long long)
 
 DEFINE_TYPE_CLASS(FloatType,float)
 DEFINE_TYPE_CLASS(DoubleType,double)

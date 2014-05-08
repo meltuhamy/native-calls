@@ -1,8 +1,2 @@
-*.bc
-*.o
-*.pexe
-*.nexe
-*.nmf
-*/glibc
-*/newlib
-*/pnacl
+Fib
+Complex

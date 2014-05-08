@@ -1,0 +1,143 @@
+/* AUTOMATICALLY GENERATED ON {{timestamp}} */
+
+// user
+{{#isDictTypes}}
+#include "{{{moduleName}}}Types.h"
+{{/isDictTypes}}
+
+{{#interfaces}}
+#include "{{{name}}}.h"
+{{/interfaces}}
+
+//ppapi
+#include <ppapi/cpp/instance.h>
+#include "ppapi/cpp/var.h"
+#include "ppapi/cpp/var_array.h"
+#include "ppapi/cpp/var_dictionary.h"
+
+//pprpc
+#include "RPCTransport.h"
+#include "JSONRPC.h"
+#include "RPCRuntime.h"
+#include "RPCType.h"
+
+using namespace pprpc;
+
+//std
+#include <stdio.h>
+
+
+// we define types here, and marshalling/demarshalling methods of each type.
+{{#dictionaries}}
+DEFINE_TYPE_CLASS({{{name}}}Type, {{{name}}});
+{{/dictionaries}}
+
+{{#dictionaries}}
+pp::Var {{{name}}}Type::AsVar(ValidType<{{{name}}}> v){
+	{{{name}}} value = v.getValue();
+	pp::VarDictionary r;
+	{{#members}}
+	r.Set("{{{name}}}", {{IDLTypeName}}Type(value.{{{name}}}).AsVar());
+	{{/members}}
+	return r;
+}
+
+ValidType<{{{name}}}> {{{name}}}Type::Extract(pp::Var v){
+	ValidType<{{{name}}}> invalid;
+	if(v.is_dictionary()){
+		pp::VarDictionary vDict(v);
+		{{{name}}} r;
+
+		{{#members}}
+		/* member: {{{name}}} */
+		if(!vDict.HasKey("{{{name}}}")) return invalid;
+		{{IDLTypeName}}Type {{{name}}}Part(vDict.Get("{{{name}}}"));
+		if(!{{{name}}}Part.isValid()) return invalid;
+		r.{{{name}}} = {{{name}}}Part.Extract().getValue();
+
+		{{/members}}
+
+		return ValidType<{{{name}}}>(r);
+	}
+	return ValidType<{{{name}}}>();
+}
+
+{{/dictionaries}}
+
+// we define functors.
+// functors are how we plug in our own code to the library.
+// parameter marshaling happens here too.
+
+{{#interfaces}}
+/* interface {{{name}}} */
+{{#operations}}
+/* operation {{{name}}} */
+class Functor_{{{name}}} : public RPCFunctor{
+public:
+	virtual pp::Var call(const pp::VarArray* params){
+		if(params->GetLength() == {{numParams}}){
+			{{#arguments}}
+			{{^argumentIsArray}}
+			{{IDLTypeName}}Type param_{{name}}(params->Get({{paramIndex}}));
+			{{/argumentIsArray}}
+			{{#argumentIsArray}}
+			ValidType<std::vector<{{IDLTypeName}}> > param_{{name}} = {{IDLTypeName}}Type::ExtractVector(params->Get({{paramIndex}}));
+			{{/argumentIsArray}}
+			if(!param_{{name}}.isValid()) return pp::Var();
+			{{/arguments}}
+
+
+			{{^argumentIsArray}}
+			return {{IDLTypeName}}Type({{name}}(
+				{{#arguments}}
+				param_{{name}}.Extract().getValue(){{^finalParam}},{{/finalParam}}
+				{{/arguments}}
+			)).AsVar();
+			{{/argumentIsArray}}
+
+			{{#argumentIsArray}}
+			return {{IDLTypeName}}Type::AsVarArray({{name}}(
+				{{#arguments}}
+				param_{{name}}.Extract().getValue(){{^finalParam}},{{/finalParam}}
+				{{/arguments}}
+			));
+			{{/argumentIsArray}}
+
+		}
+		return pp::Var();
+	}
+};
+{{/operations}}
+
+{{/interfaces}}
+
+
+#include <ppapi/cpp/module.h>
+
+class {{moduleName}}Module: public pp::Module {
+public:
+	{{moduleName}}Module() : pp::Module() {}
+	virtual ~{{moduleName}}Module() {
+		fprintf(stdout, "\n~{{moduleName}}Module\n");
+	}
+	virtual pp::Instance* CreateInstance(PP_Instance instance) {
+		// set up
+		pprpc::RPCTransport* rpcTransport = new RPCTransport(instance);
+		pprpc::JSONRPC* jsonRPC = new pprpc::JSONRPC(rpcTransport);
+		pprpc::RPCRuntime* rpcRuntime = new pprpc::RPCRuntime(jsonRPC);
+
+		// add methods
+		{{#interfaces}}
+		{{#operations}}
+		rpcRuntime->AddFunctor("{{interfaceName}}::{{name}}", new Functor_{{name}});
+		{{/operations}}
+		{{/interfaces}}
+		return rpcTransport;
+	}
+};
+
+namespace pp {
+	Module* CreateModule() {
+	  return new {{moduleName}}Module();
+	}
+}

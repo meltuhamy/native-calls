@@ -1,0 +1,18 @@
+/* AUTOMATICALLY GENERATED ON {{timestamp}} */
+
+#ifndef {{includeDefName}}_H_
+#define {{includeDefName}}_H_
+
+{{#isDictTypes}}
+#include "{{moduleName}}Types.h"
+
+{{/isDictTypes}}
+#include <vector>
+
+{{#operations}}
+{{^typeIsArray}}{{cppIDLName}}{{/typeIsArray}}{{#typeIsArray}}std::vector<{{cppIDLName}}>{{/typeIsArray}}
+{{name}}({{#arguments}}{{^typeIsArray}}{{cppIDLName}}{{/typeIsArray}}{{#typeIsArray}}std::vector<{{cppIDLName}}>{{/typeIsArray}} {{name}}{{^finalParam}}, {{/finalParam}}{{/arguments}});
+
+{{/operations}}
+
+#endif /* {{includeDefName}}_H_ */

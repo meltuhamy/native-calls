@@ -10,8 +10,11 @@ var argv = require('minimist')(process.argv.slice(2)),
     files = argv['_'],
     generate = argv['gen'],
     genName = argv['name'],
-    genPackage = argv['package'];
+    genPackage = argv['package'],
 
+    cwd = process.cwd();
+
+var Q = require('q');
 
 // create an ast
 var augAST = new AugmentedAST((parser.parse(reader.readFiles(files))));
@@ -37,7 +40,7 @@ if(generate){
 // todo create a different header file for each *interface*
 if(typeof genPackage == "string"){
   // create a module folder called genPackage
-  var packagePath = __dirname + "/" + genPackage;
+  var packagePath = cwd + "/" + genPackage;
   console.log("Creating directory... (" + packagePath + ")");
   qfs.makeDirectory(packagePath)
       .then(function(){
@@ -53,10 +56,25 @@ if(typeof genPackage == "string"){
         return qfs.write(cppFileName, cppString);
       })
       .then(function(){
-        var headerString = Generator.genHeaderString(augAST, genPackage);
-        var headerFilename = packagePath + "/" + genPackage + ".h";
-        console.log("Creating header file(s)... (" + headerFilename + ")");
-        return qfs.write(headerFilename, headerString);
+        // actually, we need to generate a header string for each interface!
+        // we also generate 1 header string for all dictionary definitions.
+        var headerFilename, headerString;
+        var returned = [];
+        for(var interfaceName in augAST.interfaces){
+          headerString = Generator.genInterfaceString(augAST, interfaceName, genPackage);
+          headerFilename = packagePath + "/" + interfaceName + ".h";
+          console.log("Creating header file... (" + headerFilename + ")");
+          returned.push(qfs.write(headerFilename, headerString));
+        }
+
+        if(Object.keys(augAST.dictionaries).length > 0){
+          // we'll need to generate the types
+          headerFilename = packagePath + "/" + genPackage + "Types.h";
+          headerString = Generator.genDictionaryTypesString(augAST, genPackage);
+          console.log("IDL defines some dictionary types.\nCreating header file... (" + headerFilename + ")");
+          returned.push(qfs.write(headerFilename, headerString));
+        }
+        return Q.all(returned);
       })
       .then(function(){
         var makefileString = Generator.genMakefileString(augAST, genPackage);

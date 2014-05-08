@@ -1,0 +1,15 @@
+/* AUTOMATICALLY GENERATED ON {{timestamp}} */
+
+#ifndef {{includeDefName}}TYPES_H_
+#define {{includeDefName}}TYPES_H_
+
+{{#dictionaries}}
+typedef struct {
+	{{#members}}
+	{{^typeIsArray}}{{cppIDLName}}{{/typeIsArray}}{{#typeIsArray}}std::vector<{{cppIDLName}}>{{/typeIsArray}} {{name}};
+	{{/members}}
+} {{name}};
+
+{{/dictionaries}}
+
+#endif /* {{includeDefName}}TYPES_H_ */

@@ -28,7 +28,8 @@
     "webidl2": "~2.0.4",
     "minimist": "0.0.8",
     "hogan.js": "~2.0.0",
-    "q-io": "~1.11.0"
+    "q-io": "~1.11.0",
+    "q": "~1.0.1"
   },
   "devDependencies": {
     "jasmine-node": "~1.14.3",

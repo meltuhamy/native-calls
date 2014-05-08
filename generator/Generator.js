@@ -6,11 +6,11 @@ function getTemplate(templateSrc){
 }
 
 function getJSTemplate(templateName){
-  return getTemplate("js-templates/"+templateName+".mustache");
+  return getTemplate(__dirname+"/js-templates/"+templateName+".mustache");
 }
 
 function getCPPTemplate(templateName){
-  return getTemplate("js-templates/"+templateName+".mustache");
+  return getTemplate(__dirname+"/cpp-templates/"+templateName+".mustache");
 
 }
 
@@ -31,6 +31,7 @@ module.exports.genJSString = function(ast, moduleName){
 
   return hogan.compile(getJSTemplate('rpcmodule')).render({
     name: moduleName ? moduleName : "JSRPCModule",
+    timestamp: ""+(new Date()),
     interfaces: ast.getInterfaceArray(),
     dictionaries: ast.getDictionaryArray(),
     schemaTypeString: function(){
@@ -60,17 +61,67 @@ module.exports.genJSString = function(ast, moduleName){
 
 
 module.exports.genCPPString = function(ast, moduleName){
-  return "/* TODO: "+ moduleName + " C++ */";
+  var dictionaries = ast.getDictionaryArray();
+  return hogan.compile(getCPPTemplate('cppmodule')).render({
+    moduleName: moduleName ? moduleName : "CPPRPCModule",
+    timestamp: ""+(new Date()),
+    interfaces: ast.getInterfaceArray(),
+    dictionaries: dictionaries,
+    IDLTypeName: function(){
+      var typeName = ast.getTypeName(this);
+      if(ast.isDictionaryType(typeName)){
+        return typeName;
+      } else if(ast.isPrimitiveType(typeName)){
+        // CamelCased version of primitive type. eg. unsigned long long => UnsignedLongLong
+        return typeName.replace(/(?:^\w|[A-Z]|\b\w)/g,function(l){return l.toUpperCase();}).replace(/\s+/g,'');
+      }
+    },
+    argumentIsArray: function(){
+      return this.idlType && this.idlType.array > 0;
+    },
+    numParams: function(){
+      return (this.arguments ? this.arguments : []).length;
+    },
+    isDictTypes: function(){
+      return dictionaries.length > 0;
+    }
+  });
 };
 
 
-module.exports.genHeaderString = function(ast, moduleName){
-  return "/* TODO: "+ moduleName + " Header */";
+module.exports.genInterfaceString = function(ast, interfaceName, moduleName){
+  if(ast.interfaces[interfaceName]){
+    var renderContext = ast.interfaces[interfaceName];
+    renderContext.moduleName = moduleName;
+    renderContext.includeDefName = interfaceName.toUpperCase();
+    renderContext.cppIDLName = function(){ return ast.getTypeName(this); };
+    renderContext.typeIsArray = function(){ return this.idlType && this.idlType.array > 0; };
+    renderContext.timestamp = ""+(new Date());
+    renderContext.isDictTypes = function(){ return ast.getDictionaryArray().length > 0 };
+    return hogan.compile(getCPPTemplate("interface")).render(renderContext);
+  } else {
+    throw "Could not find interface "+interfaceName;
+  }
 };
 
+
+module.exports.genDictionaryTypesString = function(ast, moduleName){
+  return hogan.compile(getCPPTemplate("types")).render({
+    dictionaries: ast.getDictionaryArray(),
+    moduleName: moduleName,
+    timestamp: ""+(new Date()),
+    includeDefName: moduleName.toUpperCase(),
+    typeIsArray: function(){ return this.idlType && this.idlType.array > 0; },
+    cppIDLName: function(){ return ast.getTypeName(this); }
+  });
+};
 
 module.exports.genMakefileString = function(ast, moduleName){
-  return "# TODO: "+ moduleName + " Makefile";
+  return hogan.compile(getCPPTemplate("makefile")).render({
+    moduleName: moduleName,
+    timestamp: ""+(new Date()),
+    interfaces: ast.getInterfaceArray()
+  });
 };
 
 

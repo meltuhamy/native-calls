@@ -218,9 +218,14 @@ AugmentedAST.prototype.addInterfaceMember = function (interfaceName, interfaceMe
   if (interfaceMember.type === 'operation') {
     // we add schema type info to the operation first
     interfaceMember.schemaType = this.idlTypeToSchema(interfaceMember.idlType);
+    interfaceMember.interfaceName = interfaceName;
 
     for(var i = 0; i < interfaceMember.arguments.length; i++){
       interfaceMember.arguments[i].schemaType = this.idlTypeToSchema(interfaceMember.arguments[i].idlType);
+      interfaceMember.arguments[i].paramIndex = i;
+      if(i == interfaceMember.arguments.length-1){
+        interfaceMember.arguments[i].finalParam = true;
+      }
     }
     this.interfaces[interfaceName].operations.push(interfaceMember);
   }

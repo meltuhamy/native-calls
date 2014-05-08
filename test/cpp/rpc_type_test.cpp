@@ -10,7 +10,7 @@ using namespace pprpc;
 // TODO write a test for each type
 
 TEST(RPCType, ConvertUnsignedLong){
-	ULongType twentyThree(23);
+	UnsignedLongType twentyThree(23);
 	pp::Var ulongVar = twentyThree.AsVar();
 	EXPECT_TRUE(ulongVar.is_int()==true);
 	EXPECT_TRUE(ulongVar.AsInt() == 23);

@@ -54,11 +54,11 @@ ValidType<short> ShortType::Extract(pp::Var v){
 }
 
 // ushort
-pp::Var UShortType::AsVar(ValidType<unsigned short> v){
+pp::Var UnsignedShortType::AsVar(ValidType<unsigned short> v){
 	return pp::Var((int) v.getValue());
 }
 
-ValidType<unsigned short> UShortType::Extract(pp::Var v){
+ValidType<unsigned short> UnsignedShortType::Extract(pp::Var v){
 	if(v.is_int()){
 		return ValidType<unsigned short>((unsigned short)v.AsInt());
 	} else {
@@ -81,11 +81,11 @@ ValidType<long> LongType::Extract(pp::Var v){
 
 // ulong
 
-pp::Var ULongType::AsVar(ValidType<unsigned long> v){
+pp::Var UnsignedLongType::AsVar(ValidType<unsigned long> v){
 	return pp::Var((int) v.getValue());
 }
 
-ValidType<unsigned long> ULongType::Extract(pp::Var v){
+ValidType<unsigned long> UnsignedLongType::Extract(pp::Var v){
 	if(v.is_int()){
 		return ValidType<unsigned long>((unsigned long)v.AsInt());
 	} else {
@@ -108,11 +108,11 @@ ValidType<long long> LongLongType::Extract(pp::Var v){
 }
 
 // ulonglong
-pp::Var ULongLongType::AsVar(ValidType<unsigned long long> v){
+pp::Var UnsignedLongLongType::AsVar(ValidType<unsigned long long> v){
 	return pp::Var((int) v.getValue());
 }
 
-ValidType<unsigned long long> ULongLongType::Extract(pp::Var v){
+ValidType<unsigned long long> UnsignedLongLongType::Extract(pp::Var v){
 	if(v.is_int()){
 		return ValidType<unsigned long long>((unsigned long long)v.AsInt());
 	} else {
