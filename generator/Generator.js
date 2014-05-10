@@ -156,7 +156,7 @@ module.exports.genDictionaryTypesString = function(ast, moduleName){
 };
 
 module.exports.genMakefileString = function(ast, moduleName){
-  return hogan.compile(getCPPTemplate("makefile")).render({
+  return hogan.compile(getCPPTemplate("Makefile")).render({
     moduleName: moduleName,
     timestamp: ""+(new Date()),
     interfaces: ast.getInterfaceArray()
