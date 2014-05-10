@@ -1,3 +1,6 @@
 [submodule "docs/report"]
 	path = docs/report
 	url = git@github.com:meltuhamy/native-calls-report.git
+[submodule "naclports"]
+	path = naclports
+	url = https://chromium.googlesource.com/external/naclports

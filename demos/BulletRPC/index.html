@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="../../scripts/paths.require.js"></script>
+    <script src="../../scripts/lib/threejs/build/three.min.js"></script>
+    <script src="OrbitControls.js"></script>
+    <script src="scene.js"></script>
+    <script src="world.js"></script>
+    <script src="scenes.js"></script>
+    <script src="main.js"></script>
+
+    <script src="../../scripts/lib/requirejs/require.js"></script>
+    <script>
+        // some configuration
+        window.NaClConfig = { CONFIG: 'Debug', TOOLCHAIN: 'newlib' };
+        requirejs.config({ baseUrl: '../../scripts', paths: REQUIRE_PATHS});
+        var prefix = "/demos/BulletRPC/";
+
+        var fps = 35;
+
+        require(['loglevel', 'RPCModule', prefix+'Bullet/BulletRPC.js'], function (loglevel, RPCModule, BulletRPC) {
+            loglevel.disableAll();
+            window.bullet = BulletRPC(prefix);
+
+            // load the module.
+            RPCModule.getModule(bullet).load(function(){
+                console.log("module loaded!");
+                init();
+                // load the scene then animate
+                loadWorld(randomCubeScene(10), animate);
+            });
+
+        });
+    </script>
+</head>
+<body>
+
+</body>
+</html>

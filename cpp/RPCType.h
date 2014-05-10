@@ -134,8 +134,6 @@ private:\
 
 
 
-
-
 // DEFINE SOME IDL TYPES
 namespace pprpc{
 DEFINE_TYPE_CLASS(ByteType,char)

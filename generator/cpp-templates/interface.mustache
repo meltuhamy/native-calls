@@ -10,8 +10,8 @@
 #include <vector>
 
 {{#operations}}
-{{^typeIsArray}}{{cppIDLName}}{{/typeIsArray}}{{#typeIsArray}}std::vector<{{cppIDLName}}>{{/typeIsArray}}
-{{name}}({{#arguments}}{{^typeIsArray}}{{cppIDLName}}{{/typeIsArray}}{{#typeIsArray}}std::vector<{{cppIDLName}}>{{/typeIsArray}} {{name}}{{^finalParam}}, {{/finalParam}}{{/arguments}});
+{{^typeIsArray}}{{STDTypeName}}{{/typeIsArray}}{{#typeIsArray}}std::vector<{{STDTypeName}}>{{/typeIsArray}}
+{{name}}({{#arguments}}{{^typeIsArray}}{{STDTypeName}}{{/typeIsArray}}{{#typeIsArray}}std::vector<{{STDTypeName}}>{{/typeIsArray}} {{name}}{{^finalParam}}, {{/finalParam}}{{/arguments}});
 
 {{/operations}}
 

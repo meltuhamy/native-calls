@@ -3,10 +3,14 @@
 #ifndef {{includeDefName}}TYPES_H_
 #define {{includeDefName}}TYPES_H_
 
+// these are included to simplify generator. Remove if not needed.
+#include <string>
+#include <vector>
+
 {{#dictionaries}}
 typedef struct {
 	{{#members}}
-	{{^typeIsArray}}{{cppIDLName}}{{/typeIsArray}}{{#typeIsArray}}std::vector<{{cppIDLName}}>{{/typeIsArray}} {{name}};
+	{{^typeIsArray}}{{STDTypeName}}{{/typeIsArray}}{{#typeIsArray}}std::vector<{{STDTypeName}}>{{/typeIsArray}} {{name}};
 	{{/members}}
 } {{name}};
 

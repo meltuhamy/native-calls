@@ -14,6 +14,50 @@ function getCPPTemplate(templateName){
 
 }
 
+var STDIDLTypeMap = {
+  "DOMString": "std::string",
+  "boolean" : "bool"
+};
+
+
+var getSTDTypeName = function(ast){
+  return function(){
+    var typeName = ast.getTypeName(this);
+    if(ast.isDictionaryType(typeName)){
+      // it's a dictionary, we don't need formatting.
+      return typeName;
+    } else if(ast.isPrimitiveType(typeName)){
+      if(STDIDLTypeMap[typeName]){
+        return STDIDLTypeMap[typeName];
+      } else {
+        // assume the idl primitive type is supported in std c++!
+        return typeName;
+      }
+    } else {
+      // it's something else.
+      throw "Type case not handled: "+typeName;
+    }
+  };
+};
+
+var getTypeWrapperName = function(ast){
+  return function(){
+    var typeName = ast.getTypeName(this);
+    if(ast.isDictionaryType(typeName)){
+      // it's a dictionary, we don't need formatting.
+      return typeName;
+    } else if(ast.isPrimitiveType(typeName)){
+      // CamelCase it
+      return typeName.replace(/(?:^\w|[A-Z]|\b\w)/g, function (l) {
+        return l.toUpperCase();
+      }).replace(/\s+/g, '');
+    } else {
+      // it's something else.
+      throw "Type case not handled: "+typeName;
+    }
+  };
+};
+
 module.exports.genJSString = function(ast, moduleName){
   var dictionaries = ast.getDictionaryArray() || [];
   var interfaces = ast.getInterfaceArray() || [];
@@ -67,15 +111,8 @@ module.exports.genCPPString = function(ast, moduleName){
     timestamp: ""+(new Date()),
     interfaces: ast.getInterfaceArray(),
     dictionaries: dictionaries,
-    IDLTypeName: function(){
-      var typeName = ast.getTypeName(this);
-      if(ast.isDictionaryType(typeName)){
-        return typeName;
-      } else if(ast.isPrimitiveType(typeName)){
-        // CamelCased version of primitive type. eg. unsigned long long => UnsignedLongLong
-        return typeName.replace(/(?:^\w|[A-Z]|\b\w)/g,function(l){return l.toUpperCase();}).replace(/\s+/g,'');
-      }
-    },
+    TypeWrapperName: getTypeWrapperName(ast),
+    STDTypeName: getSTDTypeName(ast),
     argumentIsArray: function(){
       return this.idlType && this.idlType.array > 0;
     },
@@ -94,7 +131,8 @@ module.exports.genInterfaceString = function(ast, interfaceName, moduleName){
     var renderContext = ast.interfaces[interfaceName];
     renderContext.moduleName = moduleName;
     renderContext.includeDefName = interfaceName.toUpperCase();
-    renderContext.cppIDLName = function(){ return ast.getTypeName(this); };
+    renderContext.STDTypeName = getSTDTypeName(ast);
+    renderContext.TypeWrapperName = getTypeWrapperName(ast);
     renderContext.typeIsArray = function(){ return this.idlType && this.idlType.array > 0; };
     renderContext.timestamp = ""+(new Date());
     renderContext.isDictTypes = function(){ return ast.getDictionaryArray().length > 0 };
@@ -112,7 +150,8 @@ module.exports.genDictionaryTypesString = function(ast, moduleName){
     timestamp: ""+(new Date()),
     includeDefName: moduleName.toUpperCase(),
     typeIsArray: function(){ return this.idlType && this.idlType.array > 0; },
-    cppIDLName: function(){ return ast.getTypeName(this); }
+    STDTypeName: getSTDTypeName(ast),
+    TypeWrapperName: getTypeWrapperName(ast)
   });
 };
 

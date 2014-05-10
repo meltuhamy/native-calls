@@ -37,7 +37,14 @@ pp::Var {{{name}}}Type::AsVar(ValidType<{{{name}}}> v){
 	{{{name}}} value = v.getValue();
 	pp::VarDictionary r;
 	{{#members}}
-	r.Set("{{{name}}}", {{IDLTypeName}}Type(value.{{{name}}}).AsVar());
+	/* member: {{{name}}} */
+	{{^argumentIsArray}}
+	r.Set("{{{name}}}", {{TypeWrapperName}}Type(value.{{{name}}}).AsVar());
+	{{/argumentIsArray}}
+	{{#argumentIsArray}}
+	r.Set("{{{name}}}", {{TypeWrapperName}}Type::AsVarArray(value.{{{name}}}));
+	{{/argumentIsArray}}
+
 	{{/members}}
 	return r;
 }
@@ -51,7 +58,12 @@ ValidType<{{{name}}}> {{{name}}}Type::Extract(pp::Var v){
 		{{#members}}
 		/* member: {{{name}}} */
 		if(!vDict.HasKey("{{{name}}}")) return invalid;
-		{{IDLTypeName}}Type {{{name}}}Part(vDict.Get("{{{name}}}"));
+		{{^argumentIsArray}}
+		{{TypeWrapperName}}Type {{{name}}}Part(vDict.Get("{{{name}}}"));
+		{{/argumentIsArray}}
+		{{#argumentIsArray}}
+		ValidType<std::vector<{{STDTypeName}}> > {{name}}Part = {{TypeWrapperName}}Type::ExtractVector(vDict.Get("{{{name}}}"));
+		{{/argumentIsArray}}
 		if(!{{{name}}}Part.isValid()) return invalid;
 		r.{{{name}}} = {{{name}}}Part.Extract().getValue();
 
@@ -78,17 +90,17 @@ public:
 		if(params->GetLength() == {{numParams}}){
 			{{#arguments}}
 			{{^argumentIsArray}}
-			{{IDLTypeName}}Type param_{{name}}(params->Get({{paramIndex}}));
+			{{TypeWrapperName}}Type param_{{name}}(params->Get({{paramIndex}}));
 			{{/argumentIsArray}}
 			{{#argumentIsArray}}
-			ValidType<std::vector<{{IDLTypeName}}> > param_{{name}} = {{IDLTypeName}}Type::ExtractVector(params->Get({{paramIndex}}));
+			ValidType<std::vector<{{STDTypeName}}> > param_{{name}} = {{TypeWrapperName}}Type::ExtractVector(params->Get({{paramIndex}}));
 			{{/argumentIsArray}}
 			if(!param_{{name}}.isValid()) return pp::Var();
 			{{/arguments}}
 
 
 			{{^argumentIsArray}}
-			return {{IDLTypeName}}Type({{name}}(
+			return {{TypeWrapperName}}Type({{name}}(
 				{{#arguments}}
 				param_{{name}}.Extract().getValue(){{^finalParam}},{{/finalParam}}
 				{{/arguments}}
@@ -96,7 +108,7 @@ public:
 			{{/argumentIsArray}}
 
 			{{#argumentIsArray}}
-			return {{IDLTypeName}}Type::AsVarArray({{name}}(
+			return {{TypeWrapperName}}Type::AsVarArray({{name}}(
 				{{#arguments}}
 				param_{{name}}.Extract().getValue(){{^finalParam}},{{/finalParam}}
 				{{/arguments}}

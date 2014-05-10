@@ -1,0 +1,50 @@
+dictionary XYZ{
+	float x;
+	float y;
+	float z;
+};
+
+dictionary Cube{
+	DOMString name;
+	float wx;
+	float wy;
+	float wz;
+};
+
+dictionary Convex{
+	DOMString name;
+	XYZ[] points;
+};
+
+dictionary Sphere{
+	DOMString name;
+	float radius;
+};
+
+dictionary Cylinder{
+	DOMString name;
+	float radius;
+	float height;
+};
+
+dictionary Body{
+	DOMString shapeName;
+	float mass;
+	float friction;
+	float[] transform;
+};
+
+dictionary Scene{
+	Cube[] cubes;
+	Convex[] convices;
+	Sphere[] spheres;
+	Cylinder[] cylinders;
+	Body[] bodies;
+};
+
+interface BulletInterface {
+	double LoadScene(Scene scene);
+	float[] StepScene(XYZ rayTo, XYZ rayFrom);
+	boolean PickObject(double index, XYZ pos, XYZ cpos);
+	boolean DropObject();
+};
