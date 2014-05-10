@@ -6,7 +6,8 @@ NACL_ARCH ?= x86_32
 
 SOURCES = BulletRPC.cpp BulletInterface.cpp 
 TARGET = Bullet
-CFLAGS = -I../../../cpp -I$(NACL_SDK_ROOT)/toolchain/mac_pnacl/usr/include/bullet
+OSNAME := $(shell python $(NACL_SDK_ROOT)/tools/getos.py)
+CFLAGS = -I../../../cpp -I$(NACL_SDK_ROOT)/toolchain/$(OSNAME)_pnacl/usr/include/bullet
 
 include $(NACL_SDK_ROOT)/tools/common.mk
 
