@@ -278,26 +278,26 @@ std::vector<float> StepScene(XYZ rayFrom, XYZ rayTo) {
 	// Build transform frame
 	if(bulletScene.dynamicsWorld){
 		int numObjects = bulletScene.dynamicsWorld->getNumCollisionObjects();
-			std::vector<float> transformVector;
+		std::vector<float> transformVector;
+		transformVector.reserve((numObjects - 1) * 16);
+		// todo this is probably wrong
+		for (int i = 1; i < numObjects; i++) {
+			btCollisionObject* obj = bulletScene.dynamicsWorld->getCollisionObjectArray()[i];
+			btRigidBody* body = btRigidBody::upcast(obj);
 
-			// todo this is probably wrong
-			for (int i = 1; i < numObjects; i++) {
-				btCollisionObject* obj = bulletScene.dynamicsWorld->getCollisionObjectArray()[i];
-				btRigidBody* body = btRigidBody::upcast(obj);
-
-				if (body && body->getMotionState()) {
-					btTransform xform;
-					body->getMotionState()->getWorldTransform(xform);
-					float bulletTransform[16];
-					xform.getOpenGLMatrix(bulletTransform);
-					// we just set 16 items, update return vector
-					for(int j = 0; j < 16; j++){
-						transformVector.push_back(bulletTransform[j]);
-					}
+			if (body && body->getMotionState()) {
+				btTransform xform;
+				body->getMotionState()->getWorldTransform(xform);
+				float bulletTransform[16];
+				xform.getOpenGLMatrix(bulletTransform);
+				// we just set 16 items, update return vector
+				for(int j = 0; j < 16; j++){
+					transformVector.push_back(bulletTransform[j]);
 				}
 			}
+		}
 
-			return transformVector;
+		return transformVector;
 	} else {
 		// error
 		return std::vector<float>();

@@ -34,7 +34,7 @@ function loadShape(shape, rpcScene) {
 
   if (shape.type == "cube") {
     rpcScene.cubes.push(shape);
-    shapes[shape.name] = new THREE.CubeGeometry(shape['wx'], shape['wy'], shape['wz']);
+    shapes[shape.name] = new THREE.BoxGeometry(shape['wx'], shape['wy'], shape['wz']);
     return shapes[shape.name];
   }
 
@@ -360,23 +360,27 @@ function animate() {
   window.requestAnimationFrame(function(){
     setTimeout(function() {
       requestAnimationFrame(animate);
-      animate();
+      bullet.BulletInterface.StepScene(camera.position, offset, function(transformBuffer){
+        if (skipSceneUpdates > 0) {
+          skipSceneUpdates--;
+          return;
+        }
+        var numTransforms = transformBuffer.length / 16;
+        for (var i = 0; i < numTransforms; i++) {
+          if(objects[i]){
+            for (var j = 0; j < 16; j++) {
+              if(objects[i].matrixWorld){
+                objects[i].matrixWorld.elements[j] = transformBuffer[i*16+j];
+              }
+            }
+          }
+        }
+      });
+      render();
+
     }, 1000 / fps);
   });
-  bullet.BulletInterface.StepScene(camera.position, offset, function(transformBuffer){
-    if (skipSceneUpdates > 0) {
-      skipSceneUpdates--;
-      return;
-    }
-    var numTransforms = transformBuffer.length / 16;
-    for (var i = 0; i < numTransforms; i++) {
-      for (var j = 0; j < 16; j++) {
-        objects[i].matrixWorld.elements[j] = transformBuffer[i*16+j];
-      }
-    }
-  });
 
-  render();
 }
 
 function render() {

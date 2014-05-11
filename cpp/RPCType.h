@@ -102,6 +102,7 @@ public:\
 			pp::VarArray vArray(v);\
 			unsigned int length = vArray.GetLength();\
 			std::vector<CPPTYPE> vector_CPPTYPE;\
+			vector_CPPTYPE.reserve(length);\
 			for(unsigned int i = 0; i < length; i++){\
 				CLSNAME valid_CLSNAME(vArray.Get(i));\
 				if(!valid_CLSNAME.isValid()){\

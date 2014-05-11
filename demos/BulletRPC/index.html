@@ -9,7 +9,6 @@
     <script src="scene.js"></script>
     <script src="world.js"></script>
     <script src="scenes.js"></script>
-    <script src="main.js"></script>
 
     <script src="../../scripts/lib/requirejs/require.js"></script>
     <script>
@@ -18,10 +17,11 @@
         requirejs.config({ baseUrl: '../../scripts', paths: REQUIRE_PATHS});
         var prefix = "/demos/BulletRPC/";
 
-        var fps = 35;
+        var fps = 60;
 
         require(['loglevel', 'RPCModule', prefix+'Bullet/BulletRPC.js'], function (loglevel, RPCModule, BulletRPC) {
             loglevel.disableAll();
+            window.loglevel = loglevel;
             window.bullet = BulletRPC(prefix);
 
             // load the module.
@@ -29,7 +29,7 @@
                 console.log("module loaded!");
                 init();
                 // load the scene then animate
-                loadWorld(randomCubeScene(10), animate);
+                loadWorld(randomCubeScene(1), animate);
             });
 
         });
