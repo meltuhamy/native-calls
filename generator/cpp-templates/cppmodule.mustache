@@ -33,7 +33,7 @@ DEFINE_TYPE_CLASS({{{name}}}Type, {{{name}}});
 {{/dictionaries}}
 
 {{#dictionaries}}
-pp::Var {{{name}}}Type::AsVar(ValidType<{{{name}}}> v){
+pp::Var {{{name}}}Type::AsVar(const ValidType<{{{name}}}>& v){
 	{{{name}}} value = v.getValue();
 	pp::VarDictionary r;
 	{{#members}}
@@ -49,7 +49,7 @@ pp::Var {{{name}}}Type::AsVar(ValidType<{{{name}}}> v){
 	return r;
 }
 
-ValidType<{{{name}}}> {{{name}}}Type::Extract(pp::Var v){
+ValidType<{{{name}}}> {{{name}}}Type::Extract(const pp::Var& v){
 	ValidType<{{{name}}}> invalid;
 	if(v.is_dictionary()){
 		pp::VarDictionary vDict(v);
@@ -59,13 +59,13 @@ ValidType<{{{name}}}> {{{name}}}Type::Extract(pp::Var v){
 		/* member: {{{name}}} */
 		if(!vDict.HasKey("{{{name}}}")) return invalid;
 		{{^argumentIsArray}}
-		{{TypeWrapperName}}Type {{{name}}}Part(vDict.Get("{{{name}}}"));
+		const ValidType<{{STDTypeName}}>& {{{name}}}Part = {{TypeWrapperName}}Type::Extract(vDict.Get("{{{name}}}"));
 		{{/argumentIsArray}}
 		{{#argumentIsArray}}
-		ValidType<std::vector<{{STDTypeName}}> > {{name}}Part = {{TypeWrapperName}}Type::ExtractVector(vDict.Get("{{{name}}}"));
+		const ValidType<std::vector<{{STDTypeName}}> >& {{name}}Part = {{TypeWrapperName}}Type::ExtractVector(vDict.Get("{{{name}}}"));
 		{{/argumentIsArray}}
 		if(!{{{name}}}Part.isValid()) return invalid;
-		r.{{{name}}} = {{{name}}}Part.Extract().getValue();
+		r.{{{name}}} = {{{name}}}Part.getValue();
 
 		{{/members}}
 
@@ -90,7 +90,7 @@ public:
 		if(params->GetLength() == {{numParams}}){
 			{{#arguments}}
 			{{^argumentIsArray}}
-			{{TypeWrapperName}}Type param_{{name}}(params->Get({{paramIndex}}));
+			ValidType <{{STDTypeName}}> param_{{name}} = {{TypeWrapperName}}Type::Extract(params->Get({{paramIndex}}));
 			{{/argumentIsArray}}
 			{{#argumentIsArray}}
 			ValidType<std::vector<{{STDTypeName}}> > param_{{name}} = {{TypeWrapperName}}Type::ExtractVector(params->Get({{paramIndex}}));
@@ -100,11 +100,11 @@ public:
 
 
 			{{^argumentIsArray}}
-			return {{TypeWrapperName}}Type({{name}}(
+			return {{TypeWrapperName}}Type::AsVar({{name}}(
 				{{#arguments}}
 				param_{{name}}.Extract().getValue(){{^finalParam}},{{/finalParam}}
 				{{/arguments}}
-			)).AsVar();
+			));
 			{{/argumentIsArray}}
 
 			{{#argumentIsArray}}

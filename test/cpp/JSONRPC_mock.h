@@ -27,6 +27,11 @@ public:
 	}
 
 	void DelegateToRealValidators() {
+		// sending messages always works, if the message is valid.
+		ON_CALL(*this, SendRPCRequest(_)).WillByDefault(Invoke(this, &MockJSONRPC::returnTrue));
+		ON_CALL(*this, SendRPCCallback(_)).WillByDefault(Invoke(this, &MockJSONRPC::returnTrue));
+		ON_CALL(*this, SendRPCError(_)).WillByDefault(Invoke(this, &MockJSONRPC::returnTrue));
+
 		ON_CALL(*this, is_basic_json_rpc(_)).WillByDefault(Invoke(&real_, &JSONRPC::is_basic_json_rpc));
 		ON_CALL(*this, ValidateRPCRequest(_)).WillByDefault(Invoke(&real_, &JSONRPC::ValidateRPCRequest));
 		ON_CALL(*this, ValidateRPCCallback(_)).WillByDefault(Invoke(&real_, &JSONRPC::ValidateRPCCallback));
@@ -38,4 +43,8 @@ public:
 
 private:
 	JSONRPC real_;
+
+	bool returnTrue(const pp::Var& obj){
+		return true;
+	}
 };

@@ -1,6 +1,6 @@
 include $(NACL_SDK_ROOT)/tools/common.mk
 
-CFLAGS = -Wall -Wno-strict-aliasing
+CFLAGS = -Wall -Wno-strict-aliasing -O3
 
 all: install
 

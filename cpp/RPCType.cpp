@@ -15,11 +15,11 @@ namespace pprpc{
 //TODO - right now all the integer type marshaling is just wrapping the int32_t type!
 
 // byte
-pp::Var ByteType::AsVar(ValidType<char> v){
+pp::Var ByteType::AsVar(const ValidType<char>& v){
 	return pp::Var((int) v.getValue());
 }
 
-ValidType<char> ByteType::Extract(pp::Var v){
+ValidType<char> ByteType::Extract(const pp::Var& v){
 	if(v.is_int()){
 		return ValidType<char>((char)v.AsInt());
 	} else {
@@ -28,11 +28,11 @@ ValidType<char> ByteType::Extract(pp::Var v){
 }
 
 // octet
-pp::Var OctetType::AsVar(ValidType<unsigned char> v){
+pp::Var OctetType::AsVar(const ValidType<unsigned char>& v){
 	return pp::Var((int) v.getValue());
 }
 
-ValidType<unsigned char> OctetType::Extract(pp::Var v){
+ValidType<unsigned char> OctetType::Extract(const pp::Var& v){
 	if(v.is_int()){
 		return ValidType<unsigned char>((unsigned char)v.AsInt());
 	} else {
@@ -41,11 +41,11 @@ ValidType<unsigned char> OctetType::Extract(pp::Var v){
 }
 
 // short
-pp::Var ShortType::AsVar(ValidType<short> v){
+pp::Var ShortType::AsVar(const ValidType<short>& v){
 	return pp::Var((int) v.getValue());
 }
 
-ValidType<short> ShortType::Extract(pp::Var v){
+ValidType<short> ShortType::Extract(const pp::Var& v){
 	if(v.is_int()){
 		return ValidType<short>((short)v.AsInt());
 	} else {
@@ -54,11 +54,11 @@ ValidType<short> ShortType::Extract(pp::Var v){
 }
 
 // ushort
-pp::Var UnsignedShortType::AsVar(ValidType<unsigned short> v){
+pp::Var UnsignedShortType::AsVar(const ValidType<unsigned short>& v){
 	return pp::Var((int) v.getValue());
 }
 
-ValidType<unsigned short> UnsignedShortType::Extract(pp::Var v){
+ValidType<unsigned short> UnsignedShortType::Extract(const pp::Var& v){
 	if(v.is_int()){
 		return ValidType<unsigned short>((unsigned short)v.AsInt());
 	} else {
@@ -67,11 +67,11 @@ ValidType<unsigned short> UnsignedShortType::Extract(pp::Var v){
 }
 
 // long
-pp::Var LongType::AsVar(ValidType<long> v){
+pp::Var LongType::AsVar(const ValidType<long>& v){
 	return pp::Var((int) v.getValue());
 }
 
-ValidType<long> LongType::Extract(pp::Var v){
+ValidType<long> LongType::Extract(const pp::Var& v){
 	if(v.is_int()){
 		return ValidType<long>((long)v.AsInt());
 	} else {
@@ -81,11 +81,11 @@ ValidType<long> LongType::Extract(pp::Var v){
 
 // ulong
 
-pp::Var UnsignedLongType::AsVar(ValidType<unsigned long> v){
+pp::Var UnsignedLongType::AsVar(const ValidType<unsigned long>& v){
 	return pp::Var((int) v.getValue());
 }
 
-ValidType<unsigned long> UnsignedLongType::Extract(pp::Var v){
+ValidType<unsigned long> UnsignedLongType::Extract(const pp::Var& v){
 	if(v.is_int()){
 		return ValidType<unsigned long>((unsigned long)v.AsInt());
 	} else {
@@ -95,11 +95,11 @@ ValidType<unsigned long> UnsignedLongType::Extract(pp::Var v){
 
 
 // longlong
-pp::Var LongLongType::AsVar(ValidType<long long> v){
+pp::Var LongLongType::AsVar(const ValidType<long long>& v){
 	return pp::Var((int) v.getValue());
 }
 
-ValidType<long long> LongLongType::Extract(pp::Var v){
+ValidType<long long> LongLongType::Extract(const pp::Var& v){
 	if(v.is_int()){
 		return ValidType<long long>((long long)v.AsInt());
 	} else {
@@ -108,11 +108,11 @@ ValidType<long long> LongLongType::Extract(pp::Var v){
 }
 
 // ulonglong
-pp::Var UnsignedLongLongType::AsVar(ValidType<unsigned long long> v){
+pp::Var UnsignedLongLongType::AsVar(const ValidType<unsigned long long>& v){
 	return pp::Var((int) v.getValue());
 }
 
-ValidType<unsigned long long> UnsignedLongLongType::Extract(pp::Var v){
+ValidType<unsigned long long> UnsignedLongLongType::Extract(const pp::Var& v){
 	if(v.is_int()){
 		return ValidType<unsigned long long>((unsigned long long)v.AsInt());
 	} else {
@@ -121,11 +121,11 @@ ValidType<unsigned long long> UnsignedLongLongType::Extract(pp::Var v){
 }
 
 // float
-pp::Var FloatType::AsVar(ValidType<float> v){
+pp::Var FloatType::AsVar(const ValidType<float>& v){
 	return pp::Var(v.getValue());
 }
 
-ValidType<float> FloatType::Extract(pp::Var v){
+ValidType<float> FloatType::Extract(const pp::Var& v){
 	if(v.is_number()){
 		return ValidType<float>((float)v.AsDouble());
 	} else {
@@ -135,11 +135,11 @@ ValidType<float> FloatType::Extract(pp::Var v){
 
 
 // double
-pp::Var DoubleType::AsVar(ValidType<double> v){
+pp::Var DoubleType::AsVar(const ValidType<double>& v){
 	return pp::Var(v.getValue());
 }
 
-ValidType<double> DoubleType::Extract(pp::Var v){
+ValidType<double> DoubleType::Extract(const pp::Var& v){
 	if(v.is_number()){
 		return ValidType<double>(v.AsDouble());
 	} else {
@@ -149,11 +149,11 @@ ValidType<double> DoubleType::Extract(pp::Var v){
 
 
 // domstring
-pp::Var DOMStringType::AsVar(ValidType<std::string> v){
+pp::Var DOMStringType::AsVar(const ValidType<std::string>& v){
 	return pp::Var(v.getValue());
 }
 
-ValidType<std::string> DOMStringType::Extract(pp::Var v){
+ValidType<std::string> DOMStringType::Extract(const pp::Var& v){
 	if(v.is_string()){
 		return ValidType<std::string>(v.AsString());
 	} else {
@@ -162,11 +162,11 @@ ValidType<std::string> DOMStringType::Extract(pp::Var v){
 }
 
 // boolean
-pp::Var BooleanType::AsVar(ValidType<bool> v){
+pp::Var BooleanType::AsVar(const ValidType<bool>& v){
 	return pp::Var(v.getValue());
 }
 
-ValidType<bool> BooleanType::Extract(pp::Var v){
+ValidType<bool> BooleanType::Extract(const pp::Var& v){
 	if(v.is_bool()){
 		return ValidType<bool>(v.AsBool());
 	} else {
@@ -175,11 +175,11 @@ ValidType<bool> BooleanType::Extract(pp::Var v){
 }
 
 // null
-pp::Var NullType::AsVar(ValidType<pp::Var::Null> v){
+pp::Var NullType::AsVar(const ValidType<pp::Var::Null>& v){
 	return pp::Var(pp::Var::Null());
 }
 
-ValidType<pp::Var::Null> NullType::Extract(pp::Var v){
+ValidType<pp::Var::Null> NullType::Extract(const pp::Var& v){
 	if(v.is_null()){
 		return ValidType<pp::Var::Null>(pp::Var::Null());
 	} else {
@@ -188,11 +188,11 @@ ValidType<pp::Var::Null> NullType::Extract(pp::Var v){
 }
 
 // object
-pp::Var ObjectType::AsVar(ValidType<pp::VarDictionary> v){
+pp::Var ObjectType::AsVar(const ValidType<pp::VarDictionary>& v){
 	return v.getValue();
 }
 
-ValidType<pp::VarDictionary> ObjectType::Extract(pp::Var v){
+ValidType<pp::VarDictionary> ObjectType::Extract(const pp::Var& v){
 	if(v.is_dictionary()){
 		return ValidType<pp::VarDictionary>(pp::VarDictionary(v));
 	} else {

@@ -25,7 +25,7 @@ public:
 		setValid(false); // false by default, if no value given.
 	}
 
-	ValidType(T value){
+	ValidType(const T& value){
 		setValue(value);
 		setValid(true); //true by default, if a value is given
 	}
@@ -42,7 +42,7 @@ public:
 		return value;
 	}
 
-	void setValue(T value) {
+	void setValue(const T& value) {
 		this->value = value;
 	}
 
@@ -96,8 +96,8 @@ public:\
 	}\
 	bool isValid(){ return valueValidType.isValid() && !valueVar.is_undefined();}\
 	virtual std::string getTypeString(){ return QUOTEVALUE(TYPESTRING); }\
-	pp::Var AsVar(pprpc::ValidType<CPPTYPE> v);\
-	static ValidType<std::vector<CPPTYPE> > ExtractVector(pp::Var v){\
+	static pp::Var AsVar(const pprpc::ValidType<CPPTYPE>& v);\
+	static ValidType<std::vector<CPPTYPE> > ExtractVector(const pp::Var& v){\
 		if(v.is_array()){\
 			pp::VarArray vArray(v);\
 			unsigned int length = vArray.GetLength();\
@@ -115,7 +115,7 @@ public:\
 			return ValidType<std::vector<CPPTYPE> >();\
 		}\
 	}\
-	static pp::VarArray AsVarArray(std::vector<CPPTYPE> v){\
+	static pp::VarArray AsVarArray(const std::vector<CPPTYPE>& v){\
 		pp::VarArray r;\
 		r.SetLength(v.size());\
 		for(std::vector<CPPTYPE>::size_type i = 0; i != v.size(); i++) {\
@@ -123,7 +123,7 @@ public:\
 		}\
 		return r;\
 	}\
-	pprpc::ValidType<CPPTYPE> Extract(pp::Var v);\
+	static pprpc::ValidType<CPPTYPE> Extract(const pp::Var& v);\
 private:\
 	pprpc::ValidType<CPPTYPE> valueValidType;\
 	pp::Var valueVar;\
