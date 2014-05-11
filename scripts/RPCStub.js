@@ -1,4 +1,4 @@
-define(['RPCRuntime', 'lodash', 'TagLogger', 'TypeChecker'], function(RPCRuntime, _, TagLogger, TypeChecker){
+define(['RPCRuntime', 'lodash', 'TagLogger', 'TypeChecker', 'NaClConfig'], function(RPCRuntime, _, TagLogger, TypeChecker, CONFIG){
   var logger = new TagLogger("Stub");
 
   // RPCInterface
@@ -169,6 +169,14 @@ define(['RPCRuntime', 'lodash', 'TagLogger', 'TypeChecker'], function(RPCRuntime
 
     this.runtime = rpcRuntime;
     this.type = new TypeChecker(this.getModule().id);
+
+    if(!CONFIG.VALIDATION){
+      // if validation turned off, all checks return true!
+      this.type.check = function(){
+        return true;
+      };
+    }
+
     this.interfaceMap = new Object(null);
     this.dictionaryMap = new Object(null);
 

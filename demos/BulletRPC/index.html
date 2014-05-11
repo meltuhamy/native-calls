@@ -13,7 +13,7 @@
     <script src="../../scripts/lib/requirejs/require.js"></script>
     <script>
         // some configuration
-        window.NaClConfig = { CONFIG: 'Debug', TOOLCHAIN: 'newlib' };
+        window.NaClConfig = { CONFIG: 'Debug', TOOLCHAIN: 'newlib', VALIDATION: false };
         requirejs.config({ baseUrl: '../../scripts', paths: REQUIRE_PATHS});
         var prefix = "/demos/BulletRPC/";
 
