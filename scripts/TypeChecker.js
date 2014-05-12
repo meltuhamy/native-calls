@@ -32,9 +32,19 @@ define(['tv4', 'lodash', 'TagLogger'], function(tv4, _, TagLogger){
 
     this.setModuleID(moduleID);
     this.registerDefaultIDLTypes();
+    this.addBinaryValidator();
     this.extraTypes = {};
 
   }
+
+  TypeChecker.prototype.addBinaryValidator = function(){
+    this.tv4.defineKeyword("binary", function(data, value, schema){
+      if(value && !(data instanceof ArrayBuffer)){
+        return "Expected "+data+" to be instanceof ArrayBuffer";
+      }
+      return null;
+    });
+  };
 
   TypeChecker.prototype.registerDictionary = function(dict, moduleID){
     moduleID = _.isString(moduleID) ? moduleID : this.moduleID;

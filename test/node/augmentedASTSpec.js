@@ -126,12 +126,27 @@ describe('Augmented AST', function () {
   });
 
 
-  it('should convert complicated types into schema format', function(){
+  it('should convert array types into schema format', function(){
     var augmentedAST = new AugmentedAST({});
 
     expect(augmentedAST.idlTypeToSchema("hello")).toEqual({"$ref": "hello"});
     expect(augmentedAST.idlTypeToSchema({
       array: 1,
+      idlType:"myType"
+    })).toEqual({ binary: true});
+
+    expect(augmentedAST.idlTypeToSchema({
+      array: 3,
+      idlType:"myType"
+    })).toEqual({ binary: true });
+
+  });
+
+
+  it('should convert sequence types into schema format', function(){
+    var augmentedAST = new AugmentedAST({});
+    expect(augmentedAST.idlTypeToSchema({
+      sequence: 1,
       idlType:"myType"
     })).toEqual({
       type: "array",
@@ -139,7 +154,7 @@ describe('Augmented AST', function () {
     });
 
     expect(augmentedAST.idlTypeToSchema({
-      array: 3,
+      sequence: 3,
       idlType:"myType"
     })).toEqual({
       type: "array",
@@ -153,13 +168,11 @@ describe('Augmented AST', function () {
         }
       }
     });
-
   });
-
-
+  
 
   it("should export types in schema format", function(){
-    var ast = parser.parse('dictionary MyDict{ long[] myLong; }; interface MyInterface { long[][] myOp( MyDict[] param, unsigned long long extraLongParam); };');
+    var ast = parser.parse('dictionary MyDict{ sequence<long> myLong; }; interface MyInterface { sequence<sequence<long>> myOp( sequence<MyDict> param, unsigned long long extraLongParam); };');
     var augmentedAST = new AugmentedAST(ast);
 
     // inside dictionaries
@@ -192,8 +205,8 @@ describe('Augmented AST', function () {
 
   it("should export the defined interfaces as an array", function(){
     var ast = parser.parse('' +
-    'dictionary MyDict{ long[] myLong; }; ' +
-    'interface MyInterface { long[][] myOp( MyDict[] param, unsigned long long extraLongParam); };' +
+    'dictionary MyDict{ sequence<long> myLong; }; ' +
+    'interface MyInterface { sequence<sequence<long>> myOp( sequence<MyDict> param, unsigned long long extraLongParam); };' +
     'interface SecondInterface {};');
     var augmentedAST = new AugmentedAST(ast);
 
@@ -214,9 +227,9 @@ describe('Augmented AST', function () {
 
   it("should export the defined dictionaries as an array", function(){
     var ast = parser.parse('' +
-    'dictionary MyDict{ long[] myLong; }; ' +
+    'dictionary MyDict{ sequence<long> myLong; }; ' +
     'dictionary SecondDict {};' +
-    'interface MyInterface { long[][] myOp( MyDict[] param, unsigned long long extraLongParam); };' +
+    'interface MyInterface { sequence<sequence<long>> myOp( sequence<MyDict> param, unsigned long long extraLongParam); };' +
     'interface SecondInterface {};');
     var augmentedAST = new AugmentedAST(ast);
 

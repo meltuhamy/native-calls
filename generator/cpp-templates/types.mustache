@@ -10,7 +10,7 @@
 {{#dictionaries}}
 typedef struct {
 	{{#members}}
-	{{^typeIsArray}}{{STDTypeName}}{{/typeIsArray}}{{#typeIsArray}}std::vector<{{STDTypeName}}>{{/typeIsArray}} {{name}};
+	{{^typeIsSequence}}{{STDTypeName}}{{/typeIsSequence}}{{#typeIsSequence}}std::vector<{{STDTypeName}}>{{/typeIsSequence}} {{name}};
 	{{/members}}
 } {{name}};
 

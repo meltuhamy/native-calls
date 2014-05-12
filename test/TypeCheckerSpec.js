@@ -196,5 +196,21 @@ define(['TypeChecker'], function(TypeChecker){
     });
 
 
+    it("should support binary data", function(){
+      var tc = new TypeChecker('myModule');
+
+      var schema = {"binary":true};
+
+      var correct = new ArrayBuffer(10);
+      var incorrect = [123, "hello", [], {}, {numbers: 234}];
+
+      expect(tc.check(schema, correct)).toBe(true);
+
+      for(var i = 0; i < incorrect.length; i++){
+        expect(tc.check(schema, incorrect[i])).toBe(false);
+      }
+
+    });
+
   });
 });

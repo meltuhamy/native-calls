@@ -1,9 +1,9 @@
 /* AUTOMATICALLY GENERATED ON {{timestamp}} */
 
 // user
-{{#isDictTypes}}
+{{#hasDictTypes}}
 #include "{{{moduleName}}}Types.h"
-{{/isDictTypes}}
+{{/hasDictTypes}}
 
 {{#interfaces}}
 #include "{{{name}}}.h"
@@ -38,12 +38,12 @@ pp::Var {{{name}}}Type::AsVar(const ValidType<{{{name}}}>& v){
 	pp::VarDictionary r;
 	{{#members}}
 	/* member: {{{name}}} */
-	{{^argumentIsArray}}
+	{{^typeIsSequence}}
 	r.Set("{{{name}}}", {{TypeWrapperName}}Type(value.{{{name}}}).AsVar());
-	{{/argumentIsArray}}
-	{{#argumentIsArray}}
+	{{/typeIsSequence}}
+	{{#typeIsSequence}}
 	r.Set("{{{name}}}", {{TypeWrapperName}}Type::AsVarArray(value.{{{name}}}));
-	{{/argumentIsArray}}
+	{{/typeIsSequence}}
 
 	{{/members}}
 	return r;
@@ -58,12 +58,12 @@ ValidType<{{{name}}}> {{{name}}}Type::Extract(const pp::Var& v){
 		{{#members}}
 		/* member: {{{name}}} */
 		if(!vDict.HasKey("{{{name}}}")) return invalid;
-		{{^argumentIsArray}}
+		{{^typeIsSequence}}
 		const ValidType<{{STDTypeName}}>& {{{name}}}Part = {{TypeWrapperName}}Type::Extract(vDict.Get("{{{name}}}"));
-		{{/argumentIsArray}}
-		{{#argumentIsArray}}
+		{{/typeIsSequence}}
+		{{#typeIsSequence}}
 		const ValidType<std::vector<{{STDTypeName}}> >& {{name}}Part = {{TypeWrapperName}}Type::ExtractVector(vDict.Get("{{{name}}}"));
-		{{/argumentIsArray}}
+		{{/typeIsSequence}}
 		if(!{{{name}}}Part.isValid()) return invalid;
 		r.{{{name}}} = {{{name}}}Part.getValue();
 
@@ -89,31 +89,31 @@ public:
 	virtual pp::Var call(const pp::VarArray* params){
 		if(params->GetLength() == {{numParams}}){
 			{{#arguments}}
-			{{^argumentIsArray}}
+			{{^typeIsSequence}}
 			ValidType <{{STDTypeName}}> param_{{name}} = {{TypeWrapperName}}Type::Extract(params->Get({{paramIndex}}));
-			{{/argumentIsArray}}
-			{{#argumentIsArray}}
+			{{/typeIsSequence}}
+			{{#typeIsSequence}}
 			ValidType<std::vector<{{STDTypeName}}> > param_{{name}} = {{TypeWrapperName}}Type::ExtractVector(params->Get({{paramIndex}}));
-			{{/argumentIsArray}}
+			{{/typeIsSequence}}
 			if(!param_{{name}}.isValid()) return pp::Var();
 			{{/arguments}}
 
 
-			{{^argumentIsArray}}
+			{{^typeIsSequence}}
 			return {{TypeWrapperName}}Type::AsVar({{name}}(
 				{{#arguments}}
 				param_{{name}}.Extract().getValue(){{^finalParam}},{{/finalParam}}
 				{{/arguments}}
 			));
-			{{/argumentIsArray}}
+			{{/typeIsSequence}}
 
-			{{#argumentIsArray}}
+			{{#typeIsSequence}}
 			return {{TypeWrapperName}}Type::AsVarArray({{name}}(
 				{{#arguments}}
 				param_{{name}}.Extract().getValue(){{^finalParam}},{{/finalParam}}
 				{{/arguments}}
 			));
-			{{/argumentIsArray}}
+			{{/typeIsSequence}}
 
 		}
 		return pp::Var();

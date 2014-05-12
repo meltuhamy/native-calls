@@ -409,11 +409,13 @@ AugmentedAST.prototype.idlTypeToSchema = function(idlType){
   }
 
   if(typeof idlType == 'object'){
-    if(idlType.array && idlType.idlType){
+    if(idlType.sequence && idlType.idlType){
       // todo union types, etc.
-      var arrayDepth = idlType.array;
-      var arrayItemType = this.idlTypeToSchema(idlType.idlType);
-      return this.idlArrayToSchema(arrayDepth, arrayItemType);
+      var sequenceDepth = idlType.sequence;
+      var sequenceItemType = this.idlTypeToSchema(idlType.idlType);
+      return this.idlSequenceToSchema(sequenceDepth, sequenceItemType);
+    } else if(idlType.array > 0){
+      return {"binary": true};
     } else if(idlType.idlType){
       return this.idlTypeToSchema(idlType.idlType);
     }
@@ -425,17 +427,18 @@ AugmentedAST.prototype.idlTypeToSchema = function(idlType){
 };
 
 
-AugmentedAST.prototype.idlArrayToSchema = function(depth, itemType){
+AugmentedAST.prototype.idlSequenceToSchema = function(depth, itemType){
   //pre: itemType needs to be a schema...
   if(depth > 0){
     return {
       "type": "array",
-      "items": this.idlArrayToSchema(depth-1, itemType)
+      "items": this.idlSequenceToSchema(depth-1, itemType)
     };
   } else {
     return itemType;
   }
 };
+
 
 
 AugmentedAST.prototype.getInterfaceArray = function(){

@@ -3,15 +3,16 @@
 #ifndef {{includeDefName}}_H_
 #define {{includeDefName}}_H_
 
-{{#isDictTypes}}
+{{#hasDictTypes}}
 #include "{{moduleName}}Types.h"
 
-{{/isDictTypes}}
+{{/hasDictTypes}}
 #include <vector>
 
 {{#operations}}
-{{^typeIsArray}}{{STDTypeName}}{{/typeIsArray}}{{#typeIsArray}}std::vector<{{STDTypeName}}>{{/typeIsArray}}
-{{name}}({{#arguments}}{{^typeIsArray}}{{STDTypeName}}{{/typeIsArray}}{{#typeIsArray}}std::vector<{{STDTypeName}}>{{/typeIsArray}} {{name}}{{^finalParam}}, {{/finalParam}}{{/arguments}});
+//{{CPPTypeString}}
+{{^typeIsSequence}}{{STDTypeName}}{{/typeIsSequence}}{{#typeIsSequence}}std::vector<{{STDTypeName}}>{{/typeIsSequence}}
+{{name}}({{#arguments}}{{^typeIsSequence}}{{STDTypeName}}{{/typeIsSequence}}{{#typeIsSequence}}std::vector<{{STDTypeName}}>{{/typeIsSequence}} {{name}}{{^finalParam}}, {{/finalParam}}{{/arguments}});
 
 {{/operations}}
 

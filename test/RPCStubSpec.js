@@ -187,7 +187,7 @@ define(["RPCStub", "RPCRuntime", "JSONRPC", "RPCTransport", "fakemodule", "NaClM
     it("should construct functions that adhere to their definitions", function(){
       var stub = new RPCStub(runtimeMock);
 
-      // the most complex thing: an array of dictionaries
+      // the most complex thing: an array of dictionaries, with some binary thrown in the mix :D
       stub.addDictionary({
         "name": "Person",
         "required": ["name", "age"],
@@ -219,6 +219,9 @@ define(["RPCStub", "RPCRuntime", "JSONRPC", "RPCTransport", "fakemodule", "NaClM
               }, {
                 /* Param 2: an IDL type */
                 "$ref": "unsigned long"
+              }, {
+                /* Param 3: Some binary thrown in */
+                "binary": true
               }
             ],
             "returnType": "void"
@@ -230,20 +233,26 @@ define(["RPCStub", "RPCRuntime", "JSONRPC", "RPCTransport", "fakemodule", "NaClM
       var printPeople = stub.getInterface("MyInterface").getFunction("printPeople");
 
       // working cases
-      printPeople([{"id": 12, "person": {"name": "Mohamed", "age": 2}}], 23);
-      printPeople([{"id": 12, "person": {"name": "Mohamed", "age": 2}}], 23, function(){});
-      printPeople([{"id": 12, "person": {"name": "Mohamed", "age": 2}}], 23, function(){}, function(){});
+      printPeople([{"id": 12, "person": {"name": "Mohamed", "age": 2}}], 23, new ArrayBuffer(10));
+      printPeople([{"id": 12, "person": {"name": "Mohamed", "age": 2}}], 23, new Float32Array(12).buffer, function(){});
+      printPeople([{"id": 12, "person": {"name": "Mohamed", "age": 2}}], 23, new Int32Array(10).buffer, function(){}, function(){});
 
 
       // failing cases
+      // 2nd param incorrect
       expect(function(){
-        printPeople([{"id": 12, "person": {"name": "Mohamed", "age": 2}}], "not a number");
+        printPeople([{"id": 12, "person": {"name": "Mohamed", "age": 2}}], "not a number", new ArrayBuffer(10));
       }).toThrow();
 
+      // age incorrect
       expect(function(){
-        printPeople([{"id": 12, "person": {"name": "Mohamed", "age": "not a number"}}], 23);
+        printPeople([{"id": 12, "person": {"name": "Mohamed", "age": "not a number"}}], 23, new ArrayBuffer(10));
       }).toThrow();
 
+      // 3rd param incorrect
+      expect(function(){
+        printPeople([{"id": 12, "person": {"name": "Mohamed", "age": 2}}], 23, 123);
+      }).toThrow();
 
       expect(runtimeMock.sendRequest.calls.count()).toEqual(3);
     });
