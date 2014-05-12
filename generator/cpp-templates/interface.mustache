@@ -10,9 +10,7 @@
 #include <vector>
 
 {{#operations}}
-//{{CPPTypeString}}
-{{^typeIsSequence}}{{STDTypeName}}{{/typeIsSequence}}{{#typeIsSequence}}std::vector<{{STDTypeName}}>{{/typeIsSequence}}
-{{name}}({{#arguments}}{{^typeIsSequence}}{{STDTypeName}}{{/typeIsSequence}}{{#typeIsSequence}}std::vector<{{STDTypeName}}>{{/typeIsSequence}} {{name}}{{^finalParam}}, {{/finalParam}}{{/arguments}});
+{{{STDTypeString}}} {{name}}({{#arguments}} {{{STDTypeString}}} {{name}}{{^finalParam}}, {{/finalParam}}{{/arguments}});
 
 {{/operations}}
 

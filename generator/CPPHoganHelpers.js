@@ -67,8 +67,17 @@ module.exports.getContext = function(ast, moduleName){
 
   return _.assign(context, {
     // functions that depend on previous functions.
-    CPPTypeString: function(){
-      return context.STDTypeName.apply(this);
+
+    STDTypeString: function(){
+      var stdTypeName = context.STDTypeName.apply(this);
+      if(context.typeIsSequence.apply(this)){
+        return "std::vector<"+stdTypeName+">";
+      } else if(context.typeIsArray.apply(this)){
+        return stdTypeName+"*";
+      } else {
+        // normal
+        return stdTypeName;
+      }
     }
   });
 };

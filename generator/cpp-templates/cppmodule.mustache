@@ -58,12 +58,7 @@ ValidType<{{{name}}}> {{{name}}}Type::Extract(const pp::Var& v){
 		{{#members}}
 		/* member: {{{name}}} */
 		if(!vDict.HasKey("{{{name}}}")) return invalid;
-		{{^typeIsSequence}}
-		const ValidType<{{STDTypeName}}>& {{{name}}}Part = {{TypeWrapperName}}Type::Extract(vDict.Get("{{{name}}}"));
-		{{/typeIsSequence}}
-		{{#typeIsSequence}}
-		const ValidType<std::vector<{{STDTypeName}}> >& {{name}}Part = {{TypeWrapperName}}Type::ExtractVector(vDict.Get("{{{name}}}"));
-		{{/typeIsSequence}}
+		const ValidType< {{{STDTypeString}}} >& {{name}}Part = {{TypeWrapperName}}Type::Extract{{#typeIsSequence}}Vector{{/typeIsSequence}}(vDict.Get("{{{name}}}"));
 		if(!{{{name}}}Part.isValid()) return invalid;
 		r.{{{name}}} = {{{name}}}Part.getValue();
 
@@ -89,32 +84,15 @@ public:
 	virtual pp::Var call(const pp::VarArray* params){
 		if(params->GetLength() == {{numParams}}){
 			{{#arguments}}
-			{{^typeIsSequence}}
-			ValidType <{{STDTypeName}}> param_{{name}} = {{TypeWrapperName}}Type::Extract(params->Get({{paramIndex}}));
-			{{/typeIsSequence}}
-			{{#typeIsSequence}}
-			ValidType<std::vector<{{STDTypeName}}> > param_{{name}} = {{TypeWrapperName}}Type::ExtractVector(params->Get({{paramIndex}}));
-			{{/typeIsSequence}}
+			ValidType < {{{STDTypeString}}} > param_{{{name}}} = {{TypeWrapperName}}Type::Extract{{#typeIsSequence}}Vector{{/typeIsSequence}}(params->Get({{paramIndex}}));
 			if(!param_{{name}}.isValid()) return pp::Var();
 			{{/arguments}}
 
-
-			{{^typeIsSequence}}
-			return {{TypeWrapperName}}Type::AsVar({{name}}(
+			return {{TypeWrapperName}}Type::AsVar{{#typeIsSequence}}Array{{/typeIsSequence}}({{name}}(
 				{{#arguments}}
 				param_{{name}}.Extract().getValue(){{^finalParam}},{{/finalParam}}
 				{{/arguments}}
 			));
-			{{/typeIsSequence}}
-
-			{{#typeIsSequence}}
-			return {{TypeWrapperName}}Type::AsVarArray({{name}}(
-				{{#arguments}}
-				param_{{name}}.Extract().getValue(){{^finalParam}},{{/finalParam}}
-				{{/arguments}}
-			));
-			{{/typeIsSequence}}
-
 		}
 		return pp::Var();
 	}
