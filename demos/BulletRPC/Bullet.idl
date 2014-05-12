@@ -13,7 +13,7 @@ dictionary Cube{
 
 dictionary Convex{
 	DOMString name;
-	XYZ[] points;
+	sequence<XYZ> points;
 };
 
 dictionary Sphere{
@@ -31,20 +31,25 @@ dictionary Body{
 	DOMString shapeName;
 	float mass;
 	float friction;
-	float[] transform;
+	sequence<float> transform;
 };
 
 dictionary Scene{
-	Cube[] cubes;
-	Convex[] convices;
-	Sphere[] spheres;
-	Cylinder[] cylinders;
-	Body[] bodies;
+	sequence<Cube> cubes;
+	sequence<Convex> convices;
+	sequence<Sphere> spheres;
+	sequence<Cylinder> cylinders;
+	sequence<Body> bodies;
+};
+
+dictionary SceneUpdate{
+	sequence<float> transform;
+	unsigned long long delta;	
 };
 
 interface BulletInterface {
 	double LoadScene(Scene scene);
-	float[] StepScene(XYZ rayTo, XYZ rayFrom);
+	SceneUpdate StepScene(XYZ rayTo, XYZ rayFrom);
 	boolean PickObject(double index, XYZ pos, XYZ cpos);
 	boolean DropObject();
 };

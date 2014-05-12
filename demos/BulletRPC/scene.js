@@ -324,11 +324,11 @@ function onDocumentKeyDown(event) {
     hold = true;
     var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 );
     projector.unprojectVector( vector, camera );
-    var intersects = (new THREE.Raycaster(camera.position, vector.sub( camera.position ).normalize())).intersectObjects(objects, true);
+    var intersects = (new THREE.Raycaster(camera.position, vector.sub( camera.position ).normalize())).intersectObjects(objects, false);
     if (intersects.length > 0) {
       if (intersects[0].object != plane) {
         SELECTED = intersects[0].object;
-        bullet.BulletInterface.PickObject(SELECTED.objectTableIndex, camera.position, intersects[0].point, function(){
+        bullet.BulletInterface.PickObject(SELECTED.objectTableIndex, intersects[0].point, camera.position, function(){
           console.log("Picked object");
         });
       }
@@ -340,7 +340,7 @@ function onDocumentKeyUp(event) {
   if (event.keyCode == 72) {
     hold = false;
     SELECTED = undefined;
-    bullet.BulletInterface.DropObject();
+    bullet.BulletInterface.DropObject(function(){console.log("Dropped Object")});
   }
 }
 
@@ -360,7 +360,9 @@ function animate() {
   window.requestAnimationFrame(function(){
     setTimeout(function() {
       requestAnimationFrame(animate);
-      bullet.BulletInterface.StepScene(camera.position, offset, function(transformBuffer){
+      bullet.BulletInterface.StepScene(camera.position, offset, function(sceneUpdate){
+        var transformBuffer = sceneUpdate.transform;
+        document.getElementById('simulationTime').innerHTML = '<p>Simulation time: ' + sceneUpdate.delta + ' microseconds</p>';
         if (skipSceneUpdates > 0) {
           skipSceneUpdates--;
           return;

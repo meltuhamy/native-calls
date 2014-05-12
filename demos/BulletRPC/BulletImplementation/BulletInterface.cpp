@@ -8,11 +8,11 @@
 #include <bullet/btBulletCollisionCommon.h>
 #include <bullet/btBulletDynamicsCommon.h>
 
-//static uint64_t microseconds() {
-//	struct timeval tv;
-//	gettimeofday(&tv, NULL);
-//	return tv.tv_sec * 1000000 + tv.tv_usec;
-//}
+static unsigned long long microseconds() {
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	return tv.tv_sec * 1000000 + tv.tv_usec;
+}
 
 class BulletScene {
 public:
@@ -215,8 +215,7 @@ public:
 	void AddBody(const Body& body) {
 		btCollisionShape* shape = boxShape;
 		if (shapes.count(body.shapeName) == 0) {
-//			NaClAMPrintf("Could not find shape %s defaulting to unit cube.",
-//					shapeName.c_str());
+			// TODO: Error callbacks!
 		} else {
 			shape = shapes[body.shapeName];
 		}
@@ -266,20 +265,21 @@ double LoadScene(Scene scene) {
 	return (double) scene.bodies.size();
 }
 
-std::vector<float> StepScene(XYZ rayFrom, XYZ rayTo) {
+SceneUpdate StepScene(XYZ rayFrom, XYZ rayTo) {
 	bulletScene.movePickingConstraint(btVector3(rayFrom.x, rayFrom.y, rayFrom.z), btVector3(rayTo.x, rayTo.y, rayTo.z));
 
-//	uint64_t start = microseconds();
+	uint64_t start = microseconds();
 	// Do work
 	bulletScene.Step();
-//	uint64_t end = microseconds();
-//	uint64_t delta = end - start;
+	uint64_t end = microseconds();
+	uint64_t delta = end - start;
+	SceneUpdate resultSceneUpdate;
+	resultSceneUpdate.delta = delta;
 
 	// Build transform frame
 	if(bulletScene.dynamicsWorld){
 		int numObjects = bulletScene.dynamicsWorld->getNumCollisionObjects();
-		std::vector<float> transformVector;
-		transformVector.reserve((numObjects - 1) * 16);
+		resultSceneUpdate.transform.reserve((numObjects - 1) * 16);
 		// todo this is probably wrong
 		for (int i = 1; i < numObjects; i++) {
 			btCollisionObject* obj = bulletScene.dynamicsWorld->getCollisionObjectArray()[i];
@@ -292,16 +292,15 @@ std::vector<float> StepScene(XYZ rayFrom, XYZ rayTo) {
 				xform.getOpenGLMatrix(bulletTransform);
 				// we just set 16 items, update return vector
 				for(int j = 0; j < 16; j++){
-					transformVector.push_back(bulletTransform[j]);
+					resultSceneUpdate.transform.push_back(bulletTransform[j]);
 				}
 			}
 		}
-
-		return transformVector;
 	} else {
 		// error
-		return std::vector<float>();
 	}
+
+	return resultSceneUpdate;
 
 }
 
