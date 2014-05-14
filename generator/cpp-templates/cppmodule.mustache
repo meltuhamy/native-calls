@@ -85,7 +85,10 @@ public:
 		if(params->GetLength() == {{numParams}}){
 			{{#arguments}}
 			ValidType < {{{STDTypeString}}} > param_{{{name}}} = {{TypeWrapperName}}Type::Extract{{#typeIsSequence}}Vector{{/typeIsSequence}}(params->Get({{paramIndex}}));
-			if(!param_{{name}}.isValid()) return pp::Var();
+			if(!param_{{name}}.isValid()){
+				error.init(-32602, "Invalid Params: Param {{paramIndex}} ({{name}}) has incorrect type. Expected {{{STDTypeString}}}", "");
+				return pp::Var();
+			}
 			{{/arguments}}
 
 			return {{TypeWrapperName}}Type::AsVar{{#typeIsSequence}}Array{{/typeIsSequence}}({{name}}(
@@ -93,6 +96,8 @@ public:
 				param_{{name}}.Extract().getValue(){{^finalParam}},{{/finalParam}}
 				{{/arguments}}{{{ThrowsRPCErrorParamString}}}
 			));
+		} else {
+			error.init(-32602, "Invalid Params: Incorrect number of arguments.", "");
 		}
 		return pp::Var();
 	}
