@@ -20,6 +20,7 @@ namespace pprpc{
 
 class RPCRequest;
 class JSONRPC;
+class RPCError;
 
 class RPCFunctor{
 public:
@@ -31,7 +32,7 @@ public:
 		// fprintf(stdout, "\nRPCFunctor::~RPCFunctor()\n");
 	}
 
-	virtual pp::Var call(const pp::VarArray* params);
+	virtual pp::Var call(const pp::VarArray* params, RPCError& error);
 
 	void setValid(bool v){
 		valid = v;
@@ -53,7 +54,7 @@ public:
 
 	virtual bool AddFunctor(std::string name, RPCFunctor* functor);
 	virtual RPCFunctor* GetFunctor(std::string name);
-	virtual pp::Var CallFunctor(std::string name, const pp::VarArray* params);
+	virtual pp::Var CallFunctor(std::string name, const pp::VarArray* params, RPCError& error);
 
 	virtual bool HandleRequest(const pp::Var& request);
 	virtual bool HandleRequest(const RPCRequest& request);

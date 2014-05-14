@@ -81,7 +81,7 @@ ValidType<{{{name}}}> {{{name}}}Type::Extract(const pp::Var& v){
 /* operation {{{name}}} */
 class Functor_{{{name}}} : public RPCFunctor{
 public:
-	virtual pp::Var call(const pp::VarArray* params){
+	virtual pp::Var call(const pp::VarArray* params, RPCError& error){
 		if(params->GetLength() == {{numParams}}){
 			{{#arguments}}
 			ValidType < {{{STDTypeString}}} > param_{{{name}}} = {{TypeWrapperName}}Type::Extract{{#typeIsSequence}}Vector{{/typeIsSequence}}(params->Get({{paramIndex}}));
@@ -91,7 +91,7 @@ public:
 			return {{TypeWrapperName}}Type::AsVar{{#typeIsSequence}}Array{{/typeIsSequence}}({{name}}(
 				{{#arguments}}
 				param_{{name}}.Extract().getValue(){{^finalParam}},{{/finalParam}}
-				{{/arguments}}
+				{{/arguments}}{{{ThrowsRPCErrorParamString}}}
 			));
 		}
 		return pp::Var();

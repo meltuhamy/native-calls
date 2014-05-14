@@ -1,4 +1,7 @@
 interface Fib {
+  [ThrowsRPCError] unsigned long throwingFib(long x);
+
   unsigned long fib(unsigned long x);
+  
   unsigned long countUp();
 };

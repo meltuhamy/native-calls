@@ -220,7 +220,15 @@ AugmentedAST.prototype.addInterfaceMember = function (interfaceName, interfaceMe
     interfaceMember.schemaType = this.idlTypeToSchema(interfaceMember.idlType);
     interfaceMember.interfaceName = interfaceName;
 
-    for(var i = 0; i < interfaceMember.arguments.length; i++){
+    if(interfaceMember.extAttrs && interfaceMember.extAttrs.length > 0){
+      for(var i = 0; i < interfaceMember.extAttrs.length; i++){
+        if(interfaceMember.extAttrs[i].name == "ThrowsRPCError"){
+          interfaceMember.ThrowsRPCError = interfaceMember.extAttrs[i];
+        }
+      }
+    }
+
+    for(i = 0; i < interfaceMember.arguments.length; i++){
       interfaceMember.arguments[i].schemaType = this.idlTypeToSchema(interfaceMember.arguments[i].idlType);
       interfaceMember.arguments[i].paramIndex = i;
       if(i == interfaceMember.arguments.length-1){

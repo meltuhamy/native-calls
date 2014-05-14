@@ -1,4 +1,5 @@
 #include "Fib.h"
+#include "RPCType.h"
 #include <stdio.h>
 class MyClass{
 public:
@@ -30,6 +31,14 @@ unsigned long fib(unsigned long x) {
 	}
 
 	return fib(x-1)+fib(x-2);
+}
+
+unsigned long throwingFib(long x, pprpc::RPCError& error){
+	if(x < 0){
+		error.init(-1, "Can't find negative fib number!", "");
+		return 0;
+	}
+	return fib((unsigned long) x);
 }
 
 unsigned long countUp(){

@@ -5,12 +5,12 @@
 
 {{#hasDictTypes}}
 #include "{{moduleName}}Types.h"
-
 {{/hasDictTypes}}
+#include "RPCType.h"
 #include <vector>
 
 {{#operations}}
-{{{STDTypeString}}} {{name}}({{#arguments}} {{{STDTypeString}}} {{name}}{{^finalParam}}, {{/finalParam}}{{/arguments}});
+{{{STDTypeString}}} {{name}}({{#arguments}} {{{STDTypeString}}} {{name}}{{^finalParam}}, {{/finalParam}}{{/arguments}}{{{ThrowsRPCErrorParamTypeString}}});
 
 {{/operations}}
 

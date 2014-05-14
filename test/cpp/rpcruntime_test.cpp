@@ -27,7 +27,7 @@ long add(long first, long second){
 
 class Functor_foo : public RPCFunctor{
 public:
-	virtual pp::Var call(const pp::VarArray* params) {
+	virtual pp::Var call(const pp::VarArray* params, RPCError& error) {
 		return pp::Var(foo());
 	}
 };
@@ -35,7 +35,7 @@ public:
 
 class FakeFunctor : public RPCFunctor{
 public:
-	virtual pp::Var call(const pp::VarArray* params){
+	virtual pp::Var call(const pp::VarArray* params, RPCError& error){
 		return pp::Var(true);
 	}
 };
@@ -43,12 +43,12 @@ public:
 
 class MockFunctor : public RPCFunctor{
 public:
-	MOCK_METHOD1(call, pp::Var(const pp::VarArray* params));
+	MOCK_METHOD2(call, pp::Var(const pp::VarArray*, RPCError&));
 
 	// Delegates the default actions of the methods to a FakeFoo object.
 	// This must be called *before* the custom ON_CALL() statements.
 	void DelegateToFake() {
-		ON_CALL(*this, call(_)).WillByDefault(Invoke(&fake_, &FakeFunctor::call));
+		ON_CALL(*this, call(_,_)).WillByDefault(Invoke(&fake_, &FakeFunctor::call));
 	}
 
 private:
@@ -59,13 +59,15 @@ private:
 
 class Functor_add : public RPCFunctor{
 public:
-	virtual pp::Var call(const pp::VarArray* params){
+	virtual pp::Var call(const pp::VarArray* params, RPCError& error){
 		// extract the paramaters and check
 		LongType p0(params->Get(0));
 		LongType p1(params->Get(1));
 		LongType r;
 		if(p0.isValid() && p1.isValid()){
 			r = LongType(add(p0.Extract().getValue() , p1.Extract().getValue()));
+		} else {
+			error.init(-32602, "Invalid Params", "");
 		}
 		return r.AsVar();
 	}
@@ -103,7 +105,8 @@ TEST(RPCRuntimeLayer, CallFunction){
 	// foo returns true!
 	bool added = runtime.AddFunctor("foo", new Functor_foo());
 	EXPECT_TRUE(added==true);
-	pp::Var returnValue = runtime.CallFunctor("foo", new pp::VarArray());
+	RPCError error;
+	pp::Var returnValue = runtime.CallFunctor("foo", new pp::VarArray(), error);
 	EXPECT_TRUE(returnValue.is_bool() == true); // foo returns a bool.
 	EXPECT_TRUE(returnValue.AsBool() == true); // foo returns true.
 }
@@ -118,16 +121,19 @@ TEST(RPCRuntimeLayer, CallFunctionCheckType){
 	correctParams.Set(0, pp::Var(1));
 	correctParams.Set(1, pp::Var(2));
 
-	pp::Var returnValue = runtime.CallFunctor("add", &correctParams);
+	RPCError error;
+	pp::Var returnValue = runtime.CallFunctor("add", &correctParams, error);
 	EXPECT_TRUE(returnValue.AsInt() == 3); // 1+2=3
+	EXPECT_TRUE(error.code == 0);
 
 	// do one with not correct types
 	pp::VarArray incorrectParams;
 	correctParams.Set(0, pp::Var("not a number!"));
 	correctParams.Set(1, pp::Var(2));
-	returnValue = runtime.CallFunctor("add", &correctParams);
-	EXPECT_FALSE(returnValue.AsInt() == 3); // 1+2=3
 
+	returnValue = runtime.CallFunctor("add", &correctParams, error);
+	EXPECT_FALSE(returnValue.AsInt() == 3); // 1+2=3
+	EXPECT_FALSE(error.code == 0);
 
 }
 
@@ -149,7 +155,7 @@ TEST(RPCRuntimeLayer, HandleRequest){
 
 
 	// mockFoo should be called when we call HandleRequest
-	EXPECT_CALL(mockFoo, call(_)).Times(1);
+	EXPECT_CALL(mockFoo, call(_,_)).Times(1);
 
 
 	// the callback should be sent

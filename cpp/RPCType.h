@@ -156,6 +156,32 @@ DEFINE_TYPE_CLASS(NullType,pp::Var::Null)
 DEFINE_TYPE_CLASS(ObjectType,pp::VarDictionary)
 
 typedef NullType VoidType;
+
+// Error Type
+class RPCError {
+public:
+	RPCError(){init(0, "", "");}
+	RPCError(const RPCError& v){init(v);}
+
+	RPCError& init(const RPCError& v){
+		return init(v.code, v.message, v.type);
+	}
+
+	RPCError& init(long code, std::string message, std::string type){
+		this->code = code;
+		this->message = message;
+		this->type = type;
+		return *this;
+	}
+
+	long code;
+	std::string message;
+	std::string type;
+};
+
+DEFINE_TYPE_CLASS(RPCErrorType, RPCError);
+
+
 }
 
 

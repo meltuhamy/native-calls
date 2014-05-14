@@ -7,10 +7,11 @@
 #include <string>
 #include <stdio.h>
 #include "RPCRequest.h"
+#include "RPCType.h"
 
 namespace pprpc{
 
-pp::Var RPCFunctor::call(const pp::VarArray* params) {
+pp::Var RPCFunctor::call(const pp::VarArray* params, RPCError& error) {
 	return pp::Var(); //return undefined by default.
 }
 
@@ -37,6 +38,7 @@ bool RPCRuntime::AddFunctor(std::string name, RPCFunctor* functor) {
 	return false;
 }
 
+
 RPCFunctor* RPCRuntime::GetFunctor(std::string name) {
 	std::map<std::string, RPCFunctor*>::const_iterator pos = functorMap->find(name);
 	if(pos == functorMap->end()){
@@ -50,12 +52,13 @@ RPCFunctor* RPCRuntime::GetFunctor(std::string name) {
 	}
 }
 
-pp::Var RPCRuntime::CallFunctor(std::string name, const pp::VarArray* params) {
+pp::Var RPCRuntime::CallFunctor(std::string name, const pp::VarArray* params, RPCError& error) {
 	pp::Var returnValue; //default undefined
 	RPCFunctor* functor = GetFunctor(name);
 	if(functor->isValid()){
-		returnValue = functor->call(params);
+		returnValue = functor->call(params, error);
 	} else {
+		error.init(-32601, "Method not found", "");
 	}
 	return returnValue;
 }
@@ -65,20 +68,31 @@ bool RPCRuntime::HandleRequest(const pp::Var& requestVar) {
 }
 
 bool RPCRuntime::HandleRequest(const RPCRequest& request) {
+	RPCError runtimeError; // by default, code == 0 == no error
 	bool valid = request.isValid();
 	if(valid){
 		// if an id was given, do a callback
-		pp::Var returned = CallFunctor(request.getMethod(), request.getParams());
+		pp::Var returned = CallFunctor(request.getMethod(), request.getParams(), runtimeError);
+
 		if(request.isHasId()){
 			//if an id was given, do a callback
-			return jsonRPC->SendRPCCallback(jsonRPC->ConstructRPCCallback(request.getId(), returned));
-		} else {
+			if(runtimeError.code != 0){
+				// todo support custom error data.
+				jsonRPC->SendRPCError(jsonRPC->ConstructRPCError(request.getId(), runtimeError.code, runtimeError.message));
+				return false;
+			} else {
+				return jsonRPC->SendRPCCallback(jsonRPC->ConstructRPCCallback(request.getId(), returned));
+			}
 		}
 
 		return true;
 
 	} else {
 		// invalid request!
+		if(request.isHasId()){
+			std::string invalidRequest("Invalid Request");
+			jsonRPC->SendRPCError(jsonRPC->ConstructRPCError(request.getId(), -32600, invalidRequest));
+		}
 		return false;
 	}
 }

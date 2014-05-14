@@ -60,6 +60,36 @@ module.exports.getContext = function(ast, moduleName){
         // it's something else.
         throw "Type case not handled: "+typeName;
       }
+    },
+
+    ThrowsRPCErrorParamTypeString: function(){
+      // pre: context: this is an operation
+      var typeName = "pprpc::RPCError&";
+      if(this.ThrowsRPCError){
+        // it does indeed throw.
+        if(this.arguments.length == 0){
+          // there werent any previous arguments.
+          return typeName;
+        } else {
+          // there were previous arguments
+          return ", "+typeName;
+        }
+      }
+    },
+
+    ThrowsRPCErrorParamString: function(){
+      // pre: context: this is an operation
+      var typeName = "error";
+      if(this.ThrowsRPCError){
+        // it does indeed throw.
+        if(this.arguments.length == 0){
+          // there werent any previous arguments.
+          return typeName;
+        } else {
+          // there were previous arguments
+          return ", "+typeName;
+        }
+      }
     }
 
 

@@ -200,5 +200,62 @@ ValidType<pp::VarDictionary> ObjectType::Extract(const pp::Var& v){
 	}
 }
 
+// error
+pp::Var RPCErrorType::AsVar(const ValidType<RPCError>& v){
+	RPCError value = v.getValue();
+	pp::VarDictionary r;
+	r.Set("code", LongType(value.code).AsVar());
+	r.Set("message", DOMStringType(value.message).AsVar());
+	r.Set("type", DOMStringType(value.type).AsVar());
+	return r;
+}
 
+ValidType<RPCError> RPCErrorType::Extract(const pp::Var& v){
+	ValidType<RPCError> invalid;
+	if(v.is_dictionary()){
+		pp::VarDictionary vDict(v);
+		RPCError r;
+
+		/* member: code */
+		if(!vDict.HasKey("code")) return invalid;
+		const ValidType< long >& codePart = LongType::Extract(vDict.Get("code"));
+		if(!codePart.isValid()) return invalid;
+		r.code = codePart.getValue();
+
+		/* member: message */
+		if(!vDict.HasKey("message")) return invalid;
+		const ValidType< std::string >& messagePart = DOMStringType::Extract(vDict.Get("message"));
+		if(!messagePart.isValid()) return invalid;
+		r.message = messagePart.getValue();
+
+		/* optional member: type */
+		if(vDict.HasKey("type")){
+			const ValidType< std::string >& typePart = DOMStringType::Extract(vDict.Get("type"));
+			r.type = typePart.isValid() ? typePart.getValue() : "";
+		} else {
+			r.type = "";
+		}
+
+		return ValidType<RPCError>(r);
+	}
+	return ValidType<RPCError>();
+}
+
+//pp::Var MyErrorType::AsVar(const ValidType<MyError>& v){
+//	MyError value = v.getValue();
+//	pp::VarDictionary r = pp::VarDictionary(RPCErrorType::AsVar(ValidType<RPCError>(value)));
+//	r.Set("myNumber", FloatType::AsVar(value.myNumber));
+//
+//	return r;
+//}
+//
+//ValidType<MyError> MyErrorType::Extract(const pp::Var& v){
+//	MyError r;
+//	r.init(RPCErrorType::Extract(v).getValue());
+//	if(v.is_dictionary()){
+//		pp::VarDictionary vDict(v);
+//		r.myNumber = FloatType::Extract(vDict.Get("myNumber")).getValue();
+//	}
+//	return ValidType<MyError>(r);
+//}
 }

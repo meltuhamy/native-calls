@@ -246,5 +246,19 @@ describe('Augmented AST', function () {
       checkedNames.push(dictionaryArray[i].name);
     }
   });
+
+
+  it("should export the ThrowsRPCError extended attribute in operations", function(){
+    var ast = parser.parse('' +
+    'interface MyInterface { long myOp( long p); [ThrowsRPCError] long throwingOp(long p); };');
+    var augmentedAST = new AugmentedAST(ast);
+
+    var firstOp = augmentedAST.interfaces.MyInterface.operations[0];
+    var secondOp = augmentedAST.interfaces.MyInterface.operations[1];
+
+    expect(firstOp.ThrowsRPCError).not.toBeDefined();
+    expect(secondOp.ThrowsRPCError).toBeDefined();
+
+  });
 });
 

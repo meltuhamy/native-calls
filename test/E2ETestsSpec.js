@@ -10,13 +10,13 @@ define(["RPCModule", "loglevel"], function(RPCModule, loglevel){
     var FibModule;
     beforeEach(function(done){
       require([E2E.Fib], function(FibRPCModule){
-        ComplexModule = FibRPCModule(TEST_SRC_PREFIX);
-        RPCModule.getModule(ComplexModule).load(function(){
+        FibModule = FibRPCModule(TEST_SRC_PREFIX);
+        RPCModule.getModule(FibModule).load(function(){
           done();
         });
 
         // crash = bad
-        RPCModule.getModule(ComplexModule).on("crash", function(){
+        RPCModule.getModule(FibModule).on("crash", function(){
           if(this.exitCode != 0){
             throw new Error("Module crashed with exit code "+this.exitCode);
           }
@@ -26,8 +26,8 @@ define(["RPCModule", "loglevel"], function(RPCModule, loglevel){
     });
 
     afterEach(function(){
-      if(ComplexModule){
-        var listenerElement = document.getElementById(RPCModule.getModule(ComplexModule).id);
+      if(FibModule){
+        var listenerElement = document.getElementById(RPCModule.getModule(FibModule).id);
         if (listenerElement) {
 
           listenerElement.parentNode.parentNode.removeChild(listenerElement.parentNode);
@@ -38,19 +38,35 @@ define(["RPCModule", "loglevel"], function(RPCModule, loglevel){
     it("should correctly calculate the nth fib number", function(done){
       var n = 7;
       var expected = (function fibjs(v){ return v<2 ? v : fibjs(v-1) + fibjs(v-2); })(n);
-      ComplexModule.Fib.fib(n, function(result){
+      FibModule.Fib.fib(n, function(result){
         expect(result).toBe(expected);
         done();
       });
     });
 
+    it("should do an error callback when finding a negative fib number using throwingFib", function(done){
+      var success = function(){
+        throw "Success should not have been called.";
+      };
+
+      var failure = function(errorObject){
+        // the error object below can be seen in Fib.cpp.
+        expect(errorObject).toEqual({
+          code: -1,
+          message: "Can't find negative fib number!"
+        });
+        done();
+      };
+      FibModule.Fib.throwingFib(-13, success, failure);
+    });
+
 
     it("should increment a counter", function(done){
       // four counts
-      ComplexModule.Fib.countUp(function(){
-        ComplexModule.Fib.countUp(function(){
-          ComplexModule.Fib.countUp(function(){
-            ComplexModule.Fib.countUp(function(result){
+      FibModule.Fib.countUp(function(){
+        FibModule.Fib.countUp(function(){
+          FibModule.Fib.countUp(function(){
+            FibModule.Fib.countUp(function(result){
               expect(result).toBe(3); //starting at 0
               done();
             })
