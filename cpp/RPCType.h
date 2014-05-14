@@ -137,22 +137,22 @@ private:\
 
 // DEFINE SOME IDL TYPES
 namespace pprpc{
-DEFINE_TYPE_CLASS(ByteType,char)
-DEFINE_TYPE_CLASS(OctetType,unsigned char)
-DEFINE_TYPE_CLASS(ShortType,short)
-DEFINE_TYPE_CLASS(UnsignedShortType,unsigned short)
-DEFINE_TYPE_CLASS(LongType,long)
-DEFINE_TYPE_CLASS(UnsignedLongType,unsigned long)
-DEFINE_TYPE_CLASS(LongLongType,long long)
-DEFINE_TYPE_CLASS(UnsignedLongLongType,unsigned long long)
+DEFINE_TYPE_CLASS_WITH_TYPESTRING(ByteType,int8_t,byte)
+DEFINE_TYPE_CLASS_WITH_TYPESTRING(OctetType,uint8_t,octet)
+DEFINE_TYPE_CLASS_WITH_TYPESTRING(ShortType,int16_t,short)
+DEFINE_TYPE_CLASS_WITH_TYPESTRING(UnsignedShortType,uint16_t,unsigned short)
+DEFINE_TYPE_CLASS_WITH_TYPESTRING(LongType,int32_t,long)
+DEFINE_TYPE_CLASS_WITH_TYPESTRING(UnsignedLongType,uint32_t,unsigned long)
+DEFINE_TYPE_CLASS_WITH_TYPESTRING(LongLongType,int64_t,long long)
+DEFINE_TYPE_CLASS_WITH_TYPESTRING(UnsignedLongLongType,uint64_t,unsigned long long)
 
 DEFINE_TYPE_CLASS(FloatType,float)
 DEFINE_TYPE_CLASS(DoubleType,double)
-DEFINE_TYPE_CLASS(DOMStringType,std::string)
+DEFINE_TYPE_CLASS_WITH_TYPESTRING(DOMStringType,std::string,DOMString)
 DEFINE_TYPE_CLASS(BooleanType,bool)
 
 // complex-ish types
-DEFINE_TYPE_CLASS(NullType,pp::Var::Null)
+DEFINE_TYPE_CLASS_WITH_TYPESTRING(NullType,pp::Var::Null,null)
 DEFINE_TYPE_CLASS(ObjectType,pp::VarDictionary)
 
 typedef NullType VoidType;

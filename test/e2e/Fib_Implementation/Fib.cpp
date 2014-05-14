@@ -11,17 +11,17 @@ public:
 
 	}
 
-	unsigned long inc(){
+	uint32_t inc(){
 		return counter++;
 	}
 
 private:
-	unsigned long counter;
+	uint32_t counter;
 };
 
 static MyClass s;
 
-unsigned long fib(unsigned long x) {
+uint32_t fib(uint32_t x) {
 	if (x==0){
 		return 0;
 	}
@@ -33,14 +33,14 @@ unsigned long fib(unsigned long x) {
 	return fib(x-1)+fib(x-2);
 }
 
-unsigned long throwingFib(long x, pprpc::RPCError& error){
+uint32_t throwingFib(int32_t x, pprpc::RPCError& error){
 	if(x < 0){
 		error.init(-1, "Can't find negative fib number!", "");
 		return 0;
 	}
-	return fib((unsigned long) x);
+	return fib((uint32_t) x);
 }
 
-unsigned long countUp(){
+uint32_t countUp(){
 	return s.inc();
 }

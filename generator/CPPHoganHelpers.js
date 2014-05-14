@@ -3,7 +3,17 @@ var _ = require("lodash");
 
 var STDIDLTypeMap = module.exports.STDIDLTypeMap = {
   "DOMString": "std::string",
-  "boolean" : "bool"
+  "boolean" : "bool",
+  "byte" : "int8_t",
+  "octet" : "uint8_t",
+  "short" : "int16_t",
+  "unsigned short" : "uint16_t",
+  "long" : "int32_t",
+  "unsigned long" : "uint32_t",
+  "long long" : "int64_t",
+  "unsigned long long" : "uint64_t",
+  "float" : "float",
+  "double" : "double"
 };
 
 module.exports.getContext = function(ast, moduleName){

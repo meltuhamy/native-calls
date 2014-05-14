@@ -15,108 +15,108 @@ namespace pprpc{
 //TODO - right now all the integer type marshaling is just wrapping the int32_t type!
 
 // byte
-pp::Var ByteType::AsVar(const ValidType<char>& v){
+pp::Var ByteType::AsVar(const ValidType<int8_t>& v){
 	return pp::Var((int) v.getValue());
 }
 
-ValidType<char> ByteType::Extract(const pp::Var& v){
+ValidType<int8_t> ByteType::Extract(const pp::Var& v){
 	if(v.is_int()){
-		return ValidType<char>((char)v.AsInt());
+		return ValidType<int8_t>((int8_t)v.AsInt());
 	} else {
-		return ValidType<char>();
+		return ValidType<int8_t>();
 	}
 }
 
 // octet
-pp::Var OctetType::AsVar(const ValidType<unsigned char>& v){
+pp::Var OctetType::AsVar(const ValidType<uint8_t>& v){
 	return pp::Var((int) v.getValue());
 }
 
-ValidType<unsigned char> OctetType::Extract(const pp::Var& v){
+ValidType<uint8_t> OctetType::Extract(const pp::Var& v){
 	if(v.is_int()){
-		return ValidType<unsigned char>((unsigned char)v.AsInt());
+		return ValidType<uint8_t>((uint8_t)v.AsInt());
 	} else {
-		return ValidType<unsigned char>();
+		return ValidType<uint8_t>();
 	}
 }
 
 // short
-pp::Var ShortType::AsVar(const ValidType<short>& v){
+pp::Var ShortType::AsVar(const ValidType<int16_t>& v){
 	return pp::Var((int) v.getValue());
 }
 
-ValidType<short> ShortType::Extract(const pp::Var& v){
+ValidType<int16_t> ShortType::Extract(const pp::Var& v){
 	if(v.is_int()){
-		return ValidType<short>((short)v.AsInt());
+		return ValidType<int16_t>((int16_t)v.AsInt());
 	} else {
-		return ValidType<short>();
+		return ValidType<int16_t>();
 	}
 }
 
 // ushort
-pp::Var UnsignedShortType::AsVar(const ValidType<unsigned short>& v){
+pp::Var UnsignedShortType::AsVar(const ValidType<uint16_t>& v){
 	return pp::Var((int) v.getValue());
 }
 
-ValidType<unsigned short> UnsignedShortType::Extract(const pp::Var& v){
+ValidType<uint16_t> UnsignedShortType::Extract(const pp::Var& v){
 	if(v.is_int()){
-		return ValidType<unsigned short>((unsigned short)v.AsInt());
+		return ValidType<uint16_t>((uint16_t)v.AsInt());
 	} else {
-		return ValidType<unsigned short>();
+		return ValidType<uint16_t>();
 	}
 }
 
 // long
-pp::Var LongType::AsVar(const ValidType<long>& v){
+pp::Var LongType::AsVar(const ValidType<int32_t>& v){
 	return pp::Var((int) v.getValue());
 }
 
-ValidType<long> LongType::Extract(const pp::Var& v){
+ValidType<int32_t> LongType::Extract(const pp::Var& v){
 	if(v.is_int()){
-		return ValidType<long>((long)v.AsInt());
+		return ValidType<int32_t>((int32_t)v.AsInt());
 	} else {
-		return ValidType<long>();
+		return ValidType<int32_t>();
 	}
 }
 
 // ulong
 
-pp::Var UnsignedLongType::AsVar(const ValidType<unsigned long>& v){
+pp::Var UnsignedLongType::AsVar(const ValidType<uint32_t>& v){
 	return pp::Var((int) v.getValue());
 }
 
-ValidType<unsigned long> UnsignedLongType::Extract(const pp::Var& v){
+ValidType<uint32_t> UnsignedLongType::Extract(const pp::Var& v){
 	if(v.is_int()){
-		return ValidType<unsigned long>((unsigned long)v.AsInt());
+		return ValidType<uint32_t>((uint32_t)v.AsInt());
 	} else {
-		return ValidType<unsigned long>();
+		return ValidType<uint32_t>();
 	}
 }
 
 
 // longlong
-pp::Var LongLongType::AsVar(const ValidType<long long>& v){
+pp::Var LongLongType::AsVar(const ValidType<int64_t>& v){
 	return pp::Var((int) v.getValue());
 }
 
-ValidType<long long> LongLongType::Extract(const pp::Var& v){
+ValidType<int64_t> LongLongType::Extract(const pp::Var& v){
 	if(v.is_int()){
-		return ValidType<long long>((long long)v.AsInt());
+		return ValidType<int64_t>((int64_t)v.AsInt());
 	} else {
-		return ValidType<long long>();
+		return ValidType<int64_t>();
 	}
 }
 
 // ulonglong
-pp::Var UnsignedLongLongType::AsVar(const ValidType<unsigned long long>& v){
+pp::Var UnsignedLongLongType::AsVar(const ValidType<uint64_t>& v){
 	return pp::Var((int) v.getValue());
 }
 
-ValidType<unsigned long long> UnsignedLongLongType::Extract(const pp::Var& v){
+ValidType<uint64_t> UnsignedLongLongType::Extract(const pp::Var& v){
 	if(v.is_int()){
-		return ValidType<unsigned long long>((unsigned long long)v.AsInt());
+		return ValidType<uint64_t>((uint64_t)v.AsInt());
 	} else {
-		return ValidType<unsigned long long>();
+		return ValidType<uint64_t>();
 	}
 }
 
@@ -218,7 +218,7 @@ ValidType<RPCError> RPCErrorType::Extract(const pp::Var& v){
 
 		/* member: code */
 		if(!vDict.HasKey("code")) return invalid;
-		const ValidType< long >& codePart = LongType::Extract(vDict.Get("code"));
+		const ValidType< int32_t >& codePart = LongType::Extract(vDict.Get("code"));
 		if(!codePart.isValid()) return invalid;
 		r.code = codePart.getValue();
 
