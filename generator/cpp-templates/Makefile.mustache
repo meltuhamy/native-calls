@@ -7,7 +7,7 @@ CFLAGS = -I../../../cpp
 include $(NACL_SDK_ROOT)/tools/common.mk
 
 # Need to set SOURCES and TARGET
-LIBS = $(DEPS) RPCRuntime JSONRPC RPCTransport RPCRequest RPCType ppapi_cpp ppapi pthread
+LIBS = $(DEPS) NativeCalls ppapi_cpp ppapi pthread
 
 CFLAGS += -Wall
 

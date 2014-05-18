@@ -4,8 +4,8 @@ VALID_TOOLCHAINS := newlib glibc pnacl
 TOOLCHAIN = newlib
 CONFIG = Debug
 
-SOURCE_NAMES = testing tester_test instance_test transport_test jsonrpc_test rpc_type_test rpcruntime_test
-LINKER_LIBS := RPCRuntime JSONRPC RPCTransport NaClRPCInstance RPCRequest RPCType
+SOURCE_NAMES = testing tester_test transport_test jsonrpc_test rpc_type_test rpcruntime_test
+LINKER_LIBS := NativeCalls
 
 ifeq ($(FORCE),y)
 $(info Forcing make)
