@@ -1,7 +1,7 @@
 #include "gmock/gmock.h"
 #include "ppapi/cpp/var.h"
 #include "ppapi/cpp/var_array.h"
-#include "RPCRuntime.h"
+#include "nativecalls/RPCRuntime.h"
 
 using namespace pprpc;
 class MockRPCRuntime: public RPCRuntime{

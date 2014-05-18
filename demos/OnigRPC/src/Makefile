@@ -5,13 +5,13 @@ SOURCES = OnigRPC.cpp Scanner.cpp onig-cache.cpp onig-reg-exp.cpp onig-result.cp
 TARGET = Onig
 
 OSNAME := $(shell python $(NACL_SDK_ROOT)/tools/getos.py)
-CFLAGS = -I../../../cpp -O3
+CFLAGS = -O3
 
 
 include $(NACL_SDK_ROOT)/tools/common.mk
 
 # Need to set SOURCES and TARGET
-LIBS = $(DEPS) RPCRuntime JSONRPC RPCTransport RPCRequest RPCType ppapi_cpp ppapi pthread onig
+LIBS = $(DEPS) NativeCalls ppapi_cpp ppapi pthread onig
 
 CFLAGS += -Wall
 

@@ -1,7 +1,7 @@
 #include "JSONRPC_mock.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "RPCTransport.h"
+#include "nativecalls/RPCTransport.h"
 #include "ppapi/cpp/instance.h"
 
 using namespace pprpc;

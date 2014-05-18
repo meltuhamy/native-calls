@@ -1,6 +1,6 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "RPCType.h"
+#include "nativecalls/RPCType.h"
 #include <string>
 #include <vector>
 #include <stdio.h>

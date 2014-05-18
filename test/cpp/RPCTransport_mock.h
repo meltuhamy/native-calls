@@ -1,6 +1,6 @@
 #include "gmock/gmock.h"
 #include "ppapi/cpp/var.h"
-#include "RPCTransport.h"
+#include "nativecalls/RPCTransport.h"
 
 using namespace pprpc;
 class MockRPCTransport: public RPCTransport{

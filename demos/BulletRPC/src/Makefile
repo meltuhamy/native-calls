@@ -7,12 +7,12 @@ NACL_ARCH ?= x86_32
 SOURCES = BulletRPC.cpp BulletInterface.cpp 
 TARGET = Bullet
 OSNAME := $(shell python $(NACL_SDK_ROOT)/tools/getos.py)
-CFLAGS = -I../../../cpp -I$(NACL_SDK_ROOT)/toolchain/$(OSNAME)_pnacl/usr/include/bullet -O3
+CFLAGS = -I$(NACL_SDK_ROOT)/toolchain/$(OSNAME)_pnacl/usr/include/bullet -O3
 
 include $(NACL_SDK_ROOT)/tools/common.mk
 
 # Need to set SOURCES and TARGET
-LIBS = $(DEPS) RPCRuntime JSONRPC RPCTransport RPCRequest RPCType ppapi_cpp ppapi pthread BulletSoftBody BulletDynamics BulletCollision LinearMath
+LIBS = $(DEPS) NativeCalls ppapi_cpp ppapi pthread BulletSoftBody BulletDynamics BulletCollision LinearMath
 
 
 

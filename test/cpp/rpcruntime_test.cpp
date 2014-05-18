@@ -1,12 +1,12 @@
 #include "gtest/gtest.h"
 #include "JSONRPC_mock.h"
 #include "ppapi/cpp/instance.h"
-#include "RPCRuntime.h"
+#include "nativecalls/RPCRuntime.h"
 #include "ppapi/cpp/var.h"
 #include "ppapi/cpp/var_array.h"
 #include <string>
 #include <stdio.h>
-#include "RPCType.h"
+#include "nativecalls/RPCType.h"
 #include "gmock/gmock.h"
 
 using ::testing::AtLeast;

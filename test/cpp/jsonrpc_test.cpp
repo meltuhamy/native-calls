@@ -3,11 +3,11 @@
 #include "RPCRuntime_mock.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "JSONRPC.h"
+#include "nativecalls/JSONRPC.h"
 #include "ppapi/cpp/var.h"
 #include "ppapi/cpp/var_array.h"
 #include "ppapi/cpp/var_dictionary.h"
-#include "RPCRequest.h"
+#include "nativecalls/RPCRequest.h"
 
 #include <string>
 

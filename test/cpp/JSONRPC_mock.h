@@ -1,9 +1,9 @@
 #include "gmock/gmock.h"
-#include "JSONRPC.h"
+#include "nativecalls/JSONRPC.h"
 #include "ppapi/cpp/var.h"
 #include "ppapi/cpp/var_array.h"
 #include "ppapi/cpp/var_dictionary.h"
-#include "RPCRequest.h"
+#include "nativecalls/RPCRequest.h"
 
 using namespace pprpc;
 using ::testing::Invoke;
