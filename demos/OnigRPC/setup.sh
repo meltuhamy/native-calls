@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-TARGETNAME=Bullet
-IDLFILES=Bullet.idl
+TARGETNAME=Onig
+IDLFILES=Onig.idl
 
 echo "Removing existing"
 rm -rf $TARGETNAME

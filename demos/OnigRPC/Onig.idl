@@ -1,0 +1,15 @@
+dictionary CaptureIndex{
+	unsigned long start;
+	unsigned long end;
+	unsigned long length;
+};
+
+dictionary OnigMatch{
+	unsigned long index;
+	sequence<CaptureIndex> captureIndices;
+};
+
+interface Scanner{
+	unsigned long newScanner(sequence<DOMString> patterns);
+	OnigMatch findNextMatch(unsigned long scannerID, DOMString string, unsigned long startPosition);
+};

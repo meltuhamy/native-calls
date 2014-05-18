@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Oniguruma RPC</title>
+    <script src="../../scripts/paths.require.js"></script>
+    <script src="../../scripts/lib/requirejs/require.js"></script>
+    <script>
+        // some configuration
+        window.NaClConfig = { CONFIG: 'Release', TOOLCHAIN: 'pnacl', VALIDATION: true };
+        requirejs.config({ baseUrl: '../../scripts', paths: REQUIRE_PATHS});
+        var prefix = "/demos/OnigRPC/";
+
+        require(['loglevel', 'RPCModule', prefix+'Onig/OnigRPC.js'], function (loglevel, RPCModule, OnigRPC) {
+            loglevel.disableAll();
+            window.loglevel = loglevel;
+            window.onig = OnigRPC(prefix);
+
+            // load the module.
+            RPCModule.getModule(onig).load(function(){
+                console.log("module loaded!");
+            });
+        });
+    </script>
+</head>
+<body>
+<h1>Oniguruma RPC</h1>
+<p>Check the console.</p>
+</body>
+</html>
