@@ -4,15 +4,13 @@
 ### scripts/NaClConfig.js - Change the CONFIG and TOOLCHAIN properties.
 
 
-TOOLCHAIN ?= newlib
-CONFIG ?= Debug
-ARCH ?= x86_32
+TOOLCHAIN ?= pnacl
+CONFIG ?= Release
 
 ifneq ($(TOOLCHAIN),pnacl)
 ifneq ($(MAKECMDGOALS),hardclean)
 ifneq ($(TOOLCHAIN),all)
-NACL_ARCH ?= $(ARCH)
-$(info Exporting NACL_ARCH=$(NACL_ARCH))
+NACL_ARCH ?= x86_32
 export NACL_ARCH 
 endif
 endif

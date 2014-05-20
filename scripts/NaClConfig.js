@@ -1,8 +1,8 @@
 define([], function(){
   // allow global setting
   var defaultConfig = {
-    CONFIG: 'Debug',
-    TOOLCHAIN: 'newlib',
+    CONFIG: 'Release',
+    TOOLCHAIN: 'pnacl',
     VALIDATION: true
   };
 

@@ -5,7 +5,7 @@ define(["RPCModule", "loglevel"], function(RPCModule, loglevel){
     Fib: TEST_SRC_PREFIX+"Fib/FibRPC.js",
     Complex: TEST_SRC_PREFIX+"Complex/ComplexRPC.js"
   };
-
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
   describe("FibRPCModule", function(){
     var FibModule;
     beforeEach(function(done){

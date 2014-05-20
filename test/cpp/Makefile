@@ -1,9 +1,3 @@
-VALID_TOOLCHAINS := newlib glibc pnacl
-
-# force newlib for faster builds
-TOOLCHAIN = newlib
-CONFIG = Debug
-
 SOURCE_NAMES = testing tester_test transport_test jsonrpc_test rpc_type_test rpcruntime_test
 LINKER_LIBS := NativeCalls
 
@@ -13,7 +7,6 @@ forceall:
 	$(MAKE) -B FORCE=n
 endif
 
-before_all: $(LINKER_LIBS_LIB_32) $(LINKER_LIBS_LIB_64) $(LINKER_LIBS_LIB_arm) all
 
 
 include $(NACL_SDK_ROOT)/tools/common.mk

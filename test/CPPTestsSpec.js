@@ -1,11 +1,12 @@
 
 
 define(["NaClModule"], function(NaClModule){
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
   describe("C++ Testing Framework", function() {
     var testingModule;
     var moduleExists = false;
 
-    var moduleLocation = 'test/cpp/newlib/Debug/testing.nmf',
+    var moduleLocation = 'test/cpp/pnacl/Release/testing.nmf',
         moduleURL = '/base/'+moduleLocation;
 
     beforeEach(function(done) {
@@ -21,7 +22,6 @@ define(["NaClModule"], function(NaClModule){
           }
         }
       });
-      jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
       // instead of stupidly loading the module, we actually check if it exists first.
       var r = new XMLHttpRequest();
       r.open("GET", moduleURL, true);
@@ -48,7 +48,7 @@ define(["NaClModule"], function(NaClModule){
           name: "testingModule",
           src: moduleURL,
           id: "testingModule",
-          type: "application/x-nacl"
+          type: "application/x-pnacl"
         });
 
         testingModule.on("crash", function(progressEvent){
