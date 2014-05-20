@@ -27,7 +27,8 @@ module.exports = function(config) {
       'scripts/main.js',
       'test/CPPTestsSpec.js',
       'test/E2ETestsSpec.js',
-      'test/node/**/*.js'
+      'test/node/**/*.js',
+      'scripts/lib/**/*Spec.js' // exclude lib specs (not ours).
     ],
 
 
