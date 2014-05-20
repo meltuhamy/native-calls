@@ -83,7 +83,7 @@ std::vector<CaptureIndex> OnigScanner::CaptureIndicesForMatch(OnigResult* result
     }
 
     CaptureIndex r;
-//    r.index = index; // don't really need this.... (?)
+    r.index = index; // don't really need this.... (?)
     r.start = captureStart;
     r.end = captureStart + captureLength;
     r.length = captureLength;

@@ -1,29 +1,70 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>Oniguruma RPC</title>
+    <title>Jasmine Spec Runner</title>
+
+    <link rel="shortcut icon" type="image/png" href="../../scripts/lib/jasmine-standalone-1.3.1/lib/jasmine-1.3.1/jasmine_favicon.png">
+    <link rel="stylesheet" type="text/css" href="../../scripts/lib/jasmine-standalone-1.3.1/lib/jasmine-1.3.1/jasmine.css">
+    <script type="text/javascript" src="../../scripts/lib/jasmine-standalone-1.3.1/lib/jasmine-1.3.1/jasmine.js"></script>
+    <script type="text/javascript" src="../../scripts/lib/jasmine-standalone-1.3.1/lib/jasmine-1.3.1/jasmine-html.js"></script>
     <script src="../../scripts/paths.require.js"></script>
     <script src="../../scripts/lib/requirejs/require.js"></script>
-    <script>
+
+    <!-- include spec files here... -->
+    <script src="spec/onig-scanner-spec.js"></script>
+    <script src="spec/onig-reg-exp-spec.js"></script>
+
+    <script type="text/javascript">
         // some configuration
         window.NaClConfig = { CONFIG: 'Release', TOOLCHAIN: 'pnacl', VALIDATION: true };
         requirejs.config({ baseUrl: '../../scripts', paths: REQUIRE_PATHS});
         var prefix = "/demos/OnigRPC/";
+        (function() {
+            var jasmineEnv = jasmine.getEnv();
+            jasmineEnv.updateInterval = 1000;
 
-        require(['loglevel', 'RPCModule', prefix+'Onig/OnigRPC.js'], function (loglevel, RPCModule, OnigRPC) {
-            loglevel.disableAll();
-            window.loglevel = loglevel;
-            window.onig = OnigRPC(prefix);
+            var htmlReporter = new jasmine.HtmlReporter();
 
-            // load the module.
-            RPCModule.getModule(onig).load(function(){
-                console.log("module loaded!");
-            });
-        });
+            jasmineEnv.addReporter(htmlReporter);
+
+            jasmineEnv.specFilter = function(spec) {
+                return htmlReporter.specFilter(spec);
+            };
+
+            var currentWindowOnload = window.onload;
+
+
+            window.onload = function() {
+                if (currentWindowOnload) {
+                    currentWindowOnload();
+                }
+                // before running specs, load the library.
+                require(['loglevel', 'RPCModule', prefix+'Onig/OnigRPC.js', './oniguruma.js'], function (loglevel, RPCModule, OnigRPC, oniguruma) {
+                    loglevel.enableAll();
+                    window.loglevel = loglevel;
+                    window.OnigRPC = OnigRPC(prefix);
+
+                    // load the module.
+                    RPCModule.getModule(window.OnigRPC).load(function(){
+                        console.log("module loaded!");
+                        window.oniguruma = oniguruma(window.OnigRPC.Scanner);
+                        window.OnigRegExp = window.oniguruma.OnigRegExp;
+                        window.OnigScanner = window.oniguruma.OnigScanner;
+                        execJasmine();
+                    });
+                });
+            };
+
+            function execJasmine() {
+                jasmineEnv.execute();
+            }
+
+        })();
     </script>
+
 </head>
+
 <body>
-<h1>Oniguruma RPC</h1>
-<p>Check the console.</p>
 </body>
 </html>

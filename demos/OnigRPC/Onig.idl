@@ -2,6 +2,7 @@ dictionary CaptureIndex{
 	unsigned long start;
 	unsigned long end;
 	unsigned long length;
+	unsigned long index;
 };
 
 dictionary OnigMatch{
