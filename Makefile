@@ -1,20 +1,11 @@
 # Warning: setting these might break the tests, which currently have hardcoded links:
-# You'll need to change the files below to fix this: 
+# You'll need to change the files below to fix this:
 ### test/CPPTestsSpec.js - Change the testingModule src.
 ### scripts/NaClConfig.js - Change the CONFIG and TOOLCHAIN properties.
 
 
 TOOLCHAIN ?= pnacl
 CONFIG ?= Release
-
-ifneq ($(TOOLCHAIN),pnacl)
-ifneq ($(MAKECMDGOALS),hardclean)
-ifneq ($(TOOLCHAIN),all)
-NACL_ARCH ?= x86_32
-export NACL_ARCH 
-endif
-endif
-endif
 
 
 export TOOLCHAIN
@@ -32,7 +23,7 @@ EETEST_CODE_DIR = test/e2e
 NACL_EXE_STDOUT ?= ${current_dir}/nacl_std_out.log
 
 # Used to easily run npm module binaries (e.g. karma)
-NM_BIN_PATH := ${current_dir}/node_modules/.bin 
+NM_BIN_PATH := ${current_dir}/node_modules/.bin
 RJS_BIN := ./node_modules/requirejs/bin/r.js
 KARMA_BIN := ./node_modules/karma/bin/karma
 KARMA_START := $(KARMA_BIN) start
@@ -45,6 +36,11 @@ KARMA_EE_CONF := karma-e2e.conf.js
 all: .PHONY
 
 .PHONY: libs tests eetests demos
+
+#install
+install: $(NM_BIN_PATH) js
+	$(MAKE) -C $(RPCLIB_DIR) TOOLCHAIN=all CONFIG=Release
+	$(MAKE) -C $(RPCLIB_DIR) TOOLCHAIN=all CONFIG=Debug
 
 # anything that needs an npm module will need to install packages
 $(NM_BIN_PATH):
@@ -83,7 +79,7 @@ onigdemo: js
 	@echo "Building Oniguruma demo:"
 	@cd demos/OnigRPC && ./setup.sh
 
-	
+
 # cleaning
 
 cleanlib:
@@ -133,4 +129,3 @@ jswatch: $(KARMA_BIN)
 # running
 serve: $(NM_BIN_PATH)
 	@npm run serve
-	
