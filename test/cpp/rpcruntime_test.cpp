@@ -132,7 +132,6 @@ TEST(RPCRuntimeLayer, CallFunctionCheckType){
 	correctParams.Set(1, pp::Var(2));
 
 	returnValue = runtime.CallFunctor("add", &correctParams, error);
-	EXPECT_FALSE(returnValue.AsInt() == 3); // 1+2=3
 	EXPECT_FALSE(error.code == 0);
 
 }

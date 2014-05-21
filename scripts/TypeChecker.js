@@ -14,6 +14,7 @@ define(['tv4', 'lodash', 'TagLogger'], function(tv4, _, TagLogger){
     "unsigned long long" : {"type": "integer", "maximum": 18446744073709551615, "minimum": 0},
     "any"                : {},
     "float"              : {"type": "number"},
+    "double"             : {"type": "number"},
     "DOMString"          : {"type": "string"},
     "boolean"            : {"type": "boolean"},
     "object"             : {"type": "object"},
