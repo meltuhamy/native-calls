@@ -1,17 +1,21 @@
 # Native Calls
 
-Native Calls allows developers to write IDL files that get compiled into C++ and JavaScript stubs that implement RPC calls over ```postMessage```. The result is a nice, clean way of using Native Code straight from JavaScript!
+Native Calls allows developers to write IDL files that get compiled into C++ and JavaScript stubs that implement RPC calls over ```postMessage```.
+The result is a nice, clean way of using Native Code straight from JavaScript!
 
 Part of my final year project at Imperial College London.
 
-This is still work in progress. Check the [milestones](https://github.com/meltuhamy/native-calls/issues/milestones) for details.
+This is still work in progress, but feedback is much appreciated!
+
+## Getting started
+[Please read the getting started guide](https://github.com/meltuhamy/native-calls/tree/master/docs/getting-started.md) to see how Native Calls works and how to use it.
 
 ## Build
 To build the project, you'll need the following requirements:
 
 1. The [Native Client SDK](https://developers.google.com/native-client/dev/).
 2. The [NACL_SDK_ROOT](https://developers.google.com/native-client/dev/devguide/devcycle/building) variable set.
-
+3. [node.js](http://nodejs.org/)
 
 To build, simply run ```make``` in this folder. This will get JavaScript dependencies, build the C++ RPC library and build each individual demo.
 
@@ -19,6 +23,10 @@ To build, simply run ```make``` in this folder. This will get JavaScript depende
 To see it in action, make sure you have built the project (see above). Then, type ```make serve```. This will start a server in the project directory.
 
 Visit the index page, by typing http://localhost:3000/ into your browser.
+
+## Install
+To install the C++ library to your SDK, run ```make install```.
+This will build the library for all toolchains and configurations.
 
 # Development
 
@@ -30,7 +38,7 @@ You can also test each component individually:
 * ```make nodetest``` runs generator tests
 * ```make cpptest``` runs C++ rpc framework tests
 * ```make eetest``` runs end-to-end tests
-* ```make jstest``` runs Javascript rpc framework tests
+* ```make jstest``` runs JavaScript rpc framework tests
 
 The tests are run using [karma](https://github.com/karma-runner/karma).
 
