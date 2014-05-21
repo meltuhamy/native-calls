@@ -14,10 +14,12 @@
     <!-- include spec files here... -->
     <script src="spec/onig-scanner-spec.js"></script>
     <script src="spec/onig-reg-exp-spec.js"></script>
+    
+    <!-- set window.NaClConfig -->
+    <script type="text/javascript" src="../../scripts/urlParams.js"></script>
 
     <script type="text/javascript">
         // some configuration
-        window.NaClConfig = { CONFIG: 'Release', TOOLCHAIN: 'pnacl', VALIDATION: true };
         requirejs.config({ baseUrl: '../../scripts', paths: REQUIRE_PATHS});
         var prefix = "/demos/OnigRPC/";
         (function() {
@@ -40,13 +42,13 @@
                     currentWindowOnload();
                 }
                 // before running specs, load the library.
-                require(['loglevel', 'RPCModule', prefix+'Onig/OnigRPC.js', './oniguruma.js'], function (loglevel, RPCModule, OnigRPC, oniguruma) {
-                    loglevel.enableAll();
-                    window.loglevel = loglevel;
+                require(['NativeCalls', prefix+'Onig/OnigRPC.js', './oniguruma.js'], function (NativeCalls, OnigRPC, oniguruma) {
+                    
+                    window.loglevel = NativeCalls.loglevel;
                     window.OnigRPC = OnigRPC(prefix);
-
+                    loglevel.enableAll();
                     // load the module.
-                    RPCModule.getModule(window.OnigRPC).load(function(){
+                    NativeCalls.RPCModule.getModule(window.OnigRPC).load(function(){
                         console.log("module loaded!");
                         window.oniguruma = oniguruma(window.OnigRPC.Scanner);
                         window.OnigRegExp = window.oniguruma.OnigRegExp;

@@ -9,10 +9,6 @@
   "scripts": {
     "test": "npm run nodetest && npm run jstest && npm run cpptest && npm run eetest",
     "nodetest": "./node_modules/.bin/jasmine-node test/node/",
-    "cpptest": "./node_modules/karma/bin/karma start karma-cpp.conf.js --single-run",
-    "eetest": "./node_modules/karma/bin/karma start karma-e2e.conf.js --single-run",
-    "jstest": "./node_modules/karma/bin/karma start karma.conf.js --single-run",
-    "jswatch": "./node_modules/karma/bin/karma start karma.conf.js",
     "install": "./node_modules/.bin/bower install",
     "serve": "./node_modules/.bin/serve"
   },

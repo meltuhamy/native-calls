@@ -6,7 +6,7 @@ define(["NaClModule"], function(NaClModule){
     var testingModule;
     var moduleExists = false;
 
-    var moduleLocation = 'test/cpp/pnacl/Release/testing.nmf',
+    var moduleLocation = 'test/cpp/'+window.NaClConfig.TOOLCHAIN+'/'+window.NaClConfig.CONFIG+'/testing.nmf',
         moduleURL = '/base/'+moduleLocation;
 
     beforeEach(function(done) {
@@ -22,6 +22,7 @@ define(["NaClModule"], function(NaClModule){
           }
         }
       });
+
       // instead of stupidly loading the module, we actually check if it exists first.
       var r = new XMLHttpRequest();
       r.open("GET", moduleURL, true);
@@ -48,7 +49,7 @@ define(["NaClModule"], function(NaClModule){
           name: "testingModule",
           src: moduleURL,
           id: "testingModule",
-          type: "application/x-pnacl"
+          type: "application/x-"+(window.NaClConfig.TOOLCHAIN == "pnacl" ? "pnacl" : "nacl")
         });
 
         testingModule.on("crash", function(progressEvent){

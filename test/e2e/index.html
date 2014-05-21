@@ -3,6 +3,9 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title></title>
+        <!-- set window.NaClConfig -->
+    <script type="text/javascript" src="../../scripts/urlParams.js"></script>
+
     <script src="../../scripts/paths.require.js"></script>
     <script src="../../scripts/lib/requirejs/require.js"></script>
     <script>
@@ -11,23 +14,64 @@
             paths: REQUIRE_PATHS
         });
         require(['RPCModule',
-                 'loglevel',
-                 '/test/e2e/Fib/FibRPC.js',
-                 '/test/e2e/Complex/ComplexRPC.js'],
-                function(RPCModule, loglevel, FibRPC, ComplexRPC){
+                    'loglevel',
+                    '/test/e2e/Fib/FibRPC.js',
+                    '/test/e2e/Complex/ComplexRPC.js'],
+                function (RPCModule, loglevel, FibRPC, ComplexRPC) {
+                    loglevel.disableAll();
+                    window.RPCModule = RPCModule;
+                    window.loglevel = loglevel;
+                    window.Fib = FibRPC('/test/e2e/');
+                    window.Complex = ComplexRPC('/test/e2e/');
 
-            loglevel.enableAll();
-            window.RPCModule = RPCModule;
-            window.loglevel = loglevel;
-            window.Fib = FibRPC('/test/e2e/');
-            window.Complex = ComplexRPC('/test/e2e/');
+                    window.FibModule = RPCModule.getModule(window.Fib);
+                    window.ComplexModule = RPCModule.getModule(window.Complex);
 
-            window.FibModule  = RPCModule.getModule(window.Fib);
-            window.FibModule  = RPCModule.getModule(window.Complex);
-        });
+                    console.log("\n\n\nPlay around with the Fib and Complex modules. Examples:\n" +
+                    "\n" +
+                    "//Calculate the 20th fibonaccii number, and alert the result\n" +
+                    "Fib.Fib.fib( 20, function(result){\n" +
+                    "  alert(result);\n" +
+                    "});\n" +
+                    "\n" +
+                    "// Calculate the result of adding the complex numbers (10 + 10i) and (-2 + 5i), and log the result\n" +
+                    "Complex.Calculator.add({real: 10, imaginary: 10}, {real:-2, imaginary:5}, function(result){\n" +
+                    "  console.log(result);\n" +
+                    "})\n\n" +
+                    "\n//Turn on debug information\n" +
+                    "loglevel.enableAll();\n" +
+                    "//Turn off debug information\n" +
+                    "loglevel.disableAll();\n" +
+                    "\n\nLook at the idl files for the interfaces.\n\n\n" +
+                    "If when running the example the modules fail to load, it may be that you haven't built them or the " +
+                    "toolchain/config is incorrect.\n\n" +
+                    "To build the tests, type 'make eetests' in the project root directory. " +
+                    "The default toolchain and config is pnacl Release. \n\n" +
+                    "To build for another toolchain, e.g. newlib type 'make eetests TOOLCHAIN=newlib CONFIG=Debug'\n\n" +
+                    "Allowed toolchains are pnacl, newlib and glibc. Allowed configs are Release and Debug.\n\n" +
+                    "Once you have built the tests for a toolchain other than pnacl Release, you can load it by changing the URL query.\n" +
+                    "You can use the links on the page to easily change toolchain/config.\n\n\n");
+                });
     </script>
 </head>
 <body>
+<h1>End to end tests</h1>
+
+<p>This page includes some NaCl modules that are run in the end to end tests.</p>
+
+<p>You can play with the modules using the console.</p>
+
+<p>Make sure you're running the correct module. The default module is pnacl release</p>
+
+<p>If you built the module using a different toolchain and config, you can change it using the url</p>
+<ul>
+    <li><a href="?TOOLCHAIN=pnacl&CONFIG=Release">pnacl Release</a></li>
+    <li><a href="?TOOLCHAIN=pnacl&CONFIG=Debug">pnacl Debug</a></li>
+    <li><a href="?TOOLCHAIN=newlib&CONFIG=Release">newlib Release</a></li>
+    <li><a href="?TOOLCHAIN=newlib&CONFIG=Debug">newlib Debug</a></li>
+    <li><a href="?TOOLCHAIN=glibc&CONFIG=Release">glibc Release</a></li>
+    <li><a href="?TOOLCHAIN=glibc&CONFIG=Debug">glibc Debug</a></li>
+</ul>
 
 </body>
 </html>

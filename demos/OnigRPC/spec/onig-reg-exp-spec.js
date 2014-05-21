@@ -36,7 +36,7 @@ describe('OnigRegExp', function() {
         return expect(result).toBeNull();
       });
     });
-    describe('when the string being searched contains a unicode character', function() {
+    xdescribe('when the string being searched contains a unicode character', function() {
       return it('returns correct indices and lengths', function() {
         var regex, searchCallback;
         regex = new OnigRegExp('a');
@@ -63,7 +63,7 @@ describe('OnigRegExp', function() {
         });
       });
     });
-    return describe('when the string being searched contains non-Basic Multilingual Plane characters', function() {
+    xdescribe('when the string being searched contains non-Basic Multilingual Plane characters', function() {
       return it('returns correct indices and matches', function() {
         var regex, searchCallback;
         regex = new OnigRegExp("'");
@@ -102,7 +102,7 @@ describe('OnigRegExp', function() {
     });
   });
   describe('::test(string, callback)', function() {
-    return it('calls back with true if the string matches the pattern', function() {
+    it('calls back with true if the string matches the pattern', function() {
       var testCallback;
       testCallback = jasmine.createSpy('testCallback');
       new OnigRegExp("a[b-d]c").test('aec', testCallback);

@@ -1,10 +1,10 @@
 /* AUTOMATICALLY GENERATED ON {{timestamp}} */
 
-define(['RPCModule', 'NaClModule'], function(RPCModule, NaClModule){
+define(['NativeCalls'], function(NativeCalls){
     return function(srcPrefix){
         srcPrefix=srcPrefix?srcPrefix:'';
-        return new RPCModule({
-            "module": new NaClModule({name:"{{{name}}}", srcPrefix: srcPrefix}),
+        return new NativeCalls.RPCModule({
+            "module": new NativeCalls.NaClModule({name:"{{{name}}}", srcPrefix: srcPrefix}),
             "interfaces": [
                 {{#interfaces}}
                     {

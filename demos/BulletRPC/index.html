@@ -12,21 +12,24 @@
     <script src="scenes.js"></script>
 
     <script src="../../scripts/lib/requirejs/require.js"></script>
+
+    <!-- set window.NaClConfig -->
+    <script type="text/javascript" src="../../scripts/urlParams.js"></script>
     <script>
         // some configuration
-        window.NaClConfig = { CONFIG: 'Debug', TOOLCHAIN: 'newlib', VALIDATION: false };
+        window.NaClConfig.VALIDATION = false;
         requirejs.config({ baseUrl: '../../scripts', paths: REQUIRE_PATHS});
         var prefix = "/demos/BulletRPC/";
 
         var fps = 60;
 
-        require(['loglevel', 'RPCModule', prefix+'Bullet/BulletRPC.js'], function (loglevel, RPCModule, BulletRPC) {
-            loglevel.disableAll();
-            window.loglevel = loglevel;
+        require(['NativeCalls', prefix+'Bullet/BulletRPC.js'], function (NativeCalls, BulletRPC) {
+            window.loglevel = NativeCalls.loglevel;
             window.bullet = BulletRPC(prefix);
 
+            loglevel.disableAll();
             // load the module.
-            RPCModule.getModule(bullet).load(function(){
+            NativeCalls.RPCModule.getModule(bullet).load(function(){
                 console.log("module loaded!");
                 init();
                 // load the scene then animate

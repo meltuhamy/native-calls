@@ -1,3 +1,15 @@
+// we use karma's client.args to determine the module's toolchain and config.
+window.NaClConfig = {};
+if(window.__karma__.config.args){
+  // first argument: toolchain
+  if(window.__karma__.config.args.length >= 1){
+    window.NaClConfig.TOOLCHAIN = window.__karma__.config.args[0];
+  }
+  // second argument: config
+  if(window.__karma__.config.args.length >= 2){
+    window.NaClConfig.CONFIG = window.__karma__.config.args[1];
+  }
+}
 var tests = [];
 for (var file in window.__karma__.files) {
   if (window.__karma__.files.hasOwnProperty(file)) {

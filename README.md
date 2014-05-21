@@ -20,15 +20,19 @@ To see it in action, make sure you have built the project (see above). Then, typ
 
 Visit the index page, by typing http://localhost:3000/ into your browser.
 
+# Development
+
 ## Test
 To run all tests, type ```make test```. This will test JavaScript front end, back end (generators), and C++ tests.
+You can also test each component individually:
 
-To test only the generator tests, type ```make nodetest```.
+* ```make test``` runs all tests
+* ```make nodetest``` runs generator tests
+* ```make cpptest``` runs C++ rpc framework tests
+* ```make eetest``` runs end-to-end tests
+* ```make jstest``` runs Javascript rpc framework tests
 
-### TDD with karma
-The project uses karma to enable a fast and easy test-driven-development approach. Karma is used to test both the C++ and client-side JavaScript code. To run it, simply run ```karma start``` in the project root. Or if ```karma``` isn't installed, you can run it from the ```node_modules``` directory, by running ```./node_modules/.bin/karma start``` instead. Karma will run the C++ tests using a modified version of the gtest module provided in the SDK. This means you will need to make sure that the module is built by typing ```make```.
-
-Every time a client-side JavaScript file is modified, the tests are automatically re-run. This also happens when the C++ tests are built.
+The tests are run using [karma](https://github.com/karma-runner/karma).
 
 ## Docs
 

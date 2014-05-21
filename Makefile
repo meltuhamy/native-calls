@@ -33,24 +33,37 @@ NACL_EXE_STDOUT ?= ${current_dir}/nacl_std_out.log
 
 # Used to easily run npm module binaries (e.g. karma)
 NM_BIN_PATH := ${current_dir}/node_modules/.bin 
+RJS_BIN := ./node_modules/requirejs/bin/r.js
+KARMA_BIN := ./node_modules/karma/bin/karma
+KARMA_START := $(KARMA_BIN) start
+KARMA_WATCH_ARGS := --client.args=$(TOOLCHAIN) --client.args=$(CONFIG)
+KARMA_RUN_ARGS := $(KARMA_WATCH_ARGS) --single-run
+KARMA_CPP_CONF := karma-cpp.conf.js
+KARMA_JS_CONF := karma-js.conf.js
+KARMA_EE_CONF := karma-e2e.conf.js
 
 all: .PHONY
 
-.PHONY: libs tests eetests
+.PHONY: libs tests eetests demos
 
 # anything that needs an npm module will need to install packages
 $(NM_BIN_PATH):
 	npm install
 
-# Make each part
+$(KARMA_BIN) $(RJS_BIN):
+	npm install
 
-libs: 
+# Make each part
+js:
+	$(RJS_BIN) -o scripts/build/build.require.js
+
+libs:
 	$(MAKE) -C $(RPCLIB_DIR)
 
 tests: libs
 	$(MAKE) -C $(TEST_CODE_DIR)
 
-eetests: libs
+eetests: libs js
 	$(MAKE) -C $(EETEST_CODE_DIR)
 
 # Use this to re-link tests with the libraries
@@ -60,7 +73,17 @@ rebuildtests: libs
 rebuildee: libs
 	$(MAKE) -C $(EETEST_CODE_DIR) FORCE=y
 
+demos: bulletdemo onigdemo
 
+bulletdemo: js
+	@echo "Building Bullet demo:"
+	@cd demos/BulletRPC && ./setup.sh
+
+onigdemo: js
+	@echo "Building Oniguruma demo:"
+	@cd demos/OnigRPC && ./setup.sh
+
+	
 # cleaning
 
 cleanlib:
@@ -88,24 +111,24 @@ nodetest: $(NM_BIN_PATH)
 	@echo "\n\n** RUNNING NODE.JS TESTS **\n\n"
 	@npm run nodetest
 
-cpptest: libs tests $(NM_BIN_PATH)
+cpptest: libs tests $(KARMA_BIN)
 	@echo "\n\n** RUNNING C++ TESTS **\n\n"
 	@touch $(NACL_EXE_STDOUT)
-	@export NACL_EXE_STDOUT="$(NACL_EXE_STDOUT)" ; tail -n 0 -f $(NACL_EXE_STDOUT) & TAILPID=$$! && npm run cpptest ; kill $$TAILPID
+	@export NACL_EXE_STDOUT="$(NACL_EXE_STDOUT)" ; tail -n 0 -f $(NACL_EXE_STDOUT) & TAILPID=$$! && $(KARMA_START) $(KARMA_CPP_CONF) $(KARMA_RUN_ARGS) ; kill $$TAILPID
 
-eetest: libs eetests $(NM_BIN_PATH)
+eetest: libs eetests js $(KARMA_BIN)
 	@echo "\n\n** RUNNING E2E TESTS **\n\n"
 	@touch $(NACL_EXE_STDOUT)
-	@export NACL_EXE_STDOUT="$(NACL_EXE_STDOUT)" ; tail -n 0 -f $(NACL_EXE_STDOUT) & TAILPID=$$! && npm run eetest ; kill $$TAILPID
+	@export NACL_EXE_STDOUT="$(NACL_EXE_STDOUT)" ; tail -n 0 -f $(NACL_EXE_STDOUT) & TAILPID=$$! && $(KARMA_START) $(KARMA_EE_CONF) $(KARMA_RUN_ARGS) ; kill $$TAILPID
 
 
 
-jstest: $(NM_BIN_PATH)
+jstest: $(KARMA_BIN)
 	@echo "\n\n** RUNNING JAVASCRIPT TESTS **\n\n"
-	@npm run jstest
+	@$(KARMA_START) $(KARMA_JS_CONF) $(KARMA_RUN_ARGS)
 
-jswatch: $(NM_BIN_PATH)
-	@npm run jswatch
+jswatch: $(KARMA_BIN)
+	@$(KARMA_START) $(KARMA_JS_CONF) $(KARMA_WATCH_ARGS)
 
 # running
 serve: $(NM_BIN_PATH)
