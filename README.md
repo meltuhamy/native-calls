@@ -3,7 +3,7 @@
 Native Calls allows developers to write IDL files that get compiled into C++ and JavaScript stubs that implement RPC calls over ```postMessage```.
 The result is a nice, clean way of using Native Code straight from JavaScript!
 
-Part of my final year project at Imperial College London.
+Part of my final year project at [Imperial College London](http://www3.imperial.ac.uk/computing/).
 
 This is still work in progress, but feedback is much appreciated!
 
@@ -18,6 +18,8 @@ To build the project, you'll need the following requirements:
 3. [node.js](http://nodejs.org/)
 
 To build, simply run ```make``` in this folder. This will get JavaScript dependencies, build the C++ RPC library and build each individual demo.
+
+** Note: ** I have only tested this on Mac OSX and linux. Compiling on Windows will probably break.
 
 ## Run
 To see it in action, make sure you have built the project (see above). Then, type ```make serve```. This will start a server in the project directory.
