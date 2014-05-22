@@ -3,21 +3,44 @@
 This guide shows how to create a simple C++ library using Native Calls.
 We will create a complex number calculator using a C++ native module. I've written this tutorial in a way such that you can follow along and write the module yourself.
 
+## Introduction
+
+### Google Native Client (NaCl)
+
+Native Client is a type of plugin for the browser (currently only Chrome) that allows you to run native binary programs inside a browser sandbox without worrying about security and portability. This means you get the high performance features of a native application, with the portability and security of the web. You can read all about it [here](https://developer.chrome.com/native-client), where you'll also find documentation and demos of what it can do.
+
+Native Client applications can communicate with JavaScript using ```postMessage```, a simple message-passing API that uses [```pp::Var```](https://developer.chrome.com/native-client/pepper_stable/cpp/classpp_1_1_var) in C++ to interface with JavaScript values and objects.
+
+### 90% Web App, Native Performance Where You Need It
+
+Although you can use NaCl to do many things, one interesting use case for it is the ability to use it in your web application to make it have native performance. "90% Web App, Native Performance Where You Need It" was John McCutchan's slogan for his [Native Client Acceleration Modules](http://www.johnmccutchan.com/2012/10/bullet-native-client-acceleration-module.html) idea. The basic idea was to use Native Client to create fast, native *libraries* that you can access from JavaScript. He wrote a nice demo, a physics simulation, using the bullet physics engine on C++ but everything else was a web application (including the 3D rendering).
+
+### Native Calls libraries
+
+John McCutchan's Acceleration Modules idea was really nice, but it was a bit tedious to write. The C++ developer had to convert JavaScript types into the C++ types they were used to. Moreover, although there was a library to make it slightly easier to send and receive data from JavaScript, the developer had to use it still as a message passing interface.
+
+Native Calls was created to make it very easy for C++ developers to create native modules that are both easy to use from JavaScript, and easy to write in C++. It works by having Remote Procedure Call (RPC) libraries on both the JavaScript and C++. The libraries are built on top of the message passing ```postMessage``` API, and use the simple [JSONRPC protocol](http://www.jsonrpc.org/specification). Native Calls supports automatic JavaScript/C++ type conversions built on top of the ```pp::Var``` API.
+
+Essentially, as we will see below, the C++ developer writes their application normally, and Native Calls will generate a full JavaScript library that interfaces with the C++.
+
+To demonstrate how easy it is to use, I have ported John McCutchan's [bullet physics demo](https://github.com/meltuhamy/native-calls/tree/master/demos/BulletRPC) to use Native Calls as well as [GitHub](https://github.com/atom/node-oniguruma)'s node-oniguruma [regular expression library](https://github.com/meltuhamy/native-calls/tree/master/demos/OnigRPC) to use Native Client. This tutorial will give you a feel of how easy it is to write a Native Client library that can be used from JavaScript.
+
 ## Requirements and setting up
 
 ### NaCl SDK
-Since this will be a [Native Client](https://developer.chrome.com/native-client) (NaCl) module, we will need to download and set up the NaCl SDK.
+Since this will be a [Native Client](https://developer.chrome.com/native-client) module, we will need to download and set up the NaCl SDK.
 You can download the SDK from [here](https://developer.chrome.com/native-client/sdk/download).
-Follow the instructions in to download the latest stable Pepper release.
+Follow the instructions given in the link to download and install the latest stable Pepper release.
 
 ### Setting ```$NACL_SDK_ROOT```
-Once you have set up the SDK, you'll need to set the $NACL_SDK_ROOT environment variable.
-This should point to your Pepper installation. For example, for pepper34 this would be:
+Once you have set up the SDK, you'll need to set the ```$NACL_SDK_ROOT``` environment variable.
+This should point to your Pepper installation. For example, for pepper 34 this would be:
 ```/path/to/nacl_sdk/pepper_34```. You can set it up by adding this line to your ```.bashrc``` file:
 
 ```bash
 export NACL_SDK_ROOT="/path/to/nacl_sdk/pepper34"
 ```
+
 and restarting your terminal or ```source .bashrc```.
 
 ### Node.js
@@ -247,6 +270,8 @@ This build process is actually included from ```$(NACL_SDK_ROOT)/tools/common.mk
 
 In the end, a ```.pexe``` file is generated along with the [NaCl Manifest](https://developer.chrome.com/native-client/reference/nacl-manifest-format) (```Complex.nmf```).
 
+Interestingly, we can package the whole Complex folder into a zip or tar file and distribute it for any JavaScript developer to use on their website, without even needing to compile it.
+
 ## Using our library from JavaScript
 
 We now have a binary native client application that we can include into our web application. To include it, we will use the Native Calls JavaScript library. The Native Calls JavaScript library was generated when we installed the Native Calls library using ```make install```. The generated file can be found in ```~/native-calls/scripts/build/NativeCalls.js```. We need to put this file into our html file, along with the generated RPC module (```complexCalculator/Complex/ComplexRPC.js```).
@@ -372,12 +397,12 @@ Now, when we refresh and make a remote procedure call with incorrect types, the 
 
 ```js
 var success = function(result){ console.log(result); };
-var error = function(error){ console.error(JSON.stringify(error)); };
+var error = function(error){ console.error("ERROR! "+JSON.stringify(error)); };
 Complex.Calculator.add({r:12,i:23},{r:3,i:"not a number"}, success, error);
 ```
 
 ```
-{"code":-32602,"message":"Invalid Params: Param 1 (y) has incorrect type. Expected complex"}
+ERROR! {"code":-32602,"message":"Invalid Params: Param 1 (y) has incorrect type. Expected complex"}
 ```
 
 Turning off JS Validation can increase performance, especially for applications that perform many requests per second.
