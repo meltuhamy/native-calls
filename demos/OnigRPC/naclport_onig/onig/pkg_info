@@ -1,0 +1,5 @@
+NAME=onig
+VERSION=5.9.5
+URL=http://www.geocities.jp/kosako3/oniguruma/archive/onig-5.9.5.tar.gz
+LICENSE=BSD
+SHA1=804132e1324ef8b940414324c741547d7ecf24e8
