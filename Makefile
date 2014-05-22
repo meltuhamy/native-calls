@@ -35,7 +35,7 @@ KARMA_EE_CONF := karma-e2e.conf.js
 
 all: .PHONY
 
-.PHONY: libs tests eetests demos
+.PHONY: $(NM_BIN_PATH) libs tests eetests demos
 
 #install
 install: $(NM_BIN_PATH) js
