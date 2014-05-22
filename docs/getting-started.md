@@ -3,6 +3,18 @@
 This guide shows how to create a simple C++ library using Native Calls.
 We will create a complex number calculator using a C++ native module. I've written this tutorial in a way such that you can follow along and write the module yourself.
 
+## Contents
+
+*  [Introduction](#introduction)
+*  [Requirements and setting up](#requirements-and-setting-up)
+*  [Writing our interface using Web IDL](#writing-our-interface-using-web-idl)
+*  [Generating the RPC module](#generating-the-rpc-module)
+*  [Implementing the interface](#implementing-the-interface)
+*  [Building our RPC Module](#building-our-rpc-module)
+*  [Using our library from JavaScript](#using-our-library-from-javascript)
+*  [Making remote procedure calls from JavaScript](#making-remote-procedure-calls-from-javascript)
+*  [Next steps](#what-now)
+
 ## Introduction
 
 ### Google Native Client (NaCl)
