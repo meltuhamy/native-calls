@@ -8,17 +8,11 @@ The library is generated using the .idl file.
 
 #Setup
 
-## Install oniguruma port for NaCl
+Running ```./setup.sh``` should build everything for you. It should:
 
-1. Clone the [naclports](https://code.google.com/p/naclports/wiki/HowTo_Checkout?tm=4) project. The naclports project is already set up as a git submodule for this project. You can clone it by running ```git submodule update --init```, and you'll find it in the root project folder.
-2. Copy the ```onig``` folder in the ```naclport_onig``` folder, and put it into the ```naclports/ports``` folder.
-   ```cp -r naclport_onig/onig ../../naclports/ports/```
-3. Run the naclports installation script: ```cd ../../naclports && ./make-all.sh onig```
-4. This will download the oniguruma c library and install it in your ```$NACL_SDK_ROOT```.
+* clone naclports if you haven't already (using the git submodule)
+* copy the onig naclport included (```naclport_onig/onig```).
+* build and install the nacl port
+* build the rpc module
 
-## Install Native Calls and build demo
-
-1. Install Native Calls RPC Library for pnacl release toolchain (```make TOOLCHAIN=pnacl CONFIG=Release``` at project root)
-2. Generate RPC Library using ```./setup.sh```
-3. Run the server at project root (```make serve```)
-4. Navigate to ```http://localhost:3000/demos/OnigRPC/```
+For this reason, it might take a while to compile your first build. Subsequent builds should take less time.

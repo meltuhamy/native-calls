@@ -7,6 +7,20 @@ TARGET = Onig
 OSNAME := $(shell python $(NACL_SDK_ROOT)/tools/getos.py)
 CFLAGS = -O3
 
+# onig nacl port
+PROJECT_ROOT :=  $(abspath ../../../)
+NACLPORTS_LOC := $(PROJECT_ROOT)/naclports
+
+everything: $(NACL_SDK_ROOT)/toolchain/$(OSNAME)_pnacl/usr/include/oniguruma.h all
+
+$(NACLPORTS_LOC)/make_all.sh:
+	cd $(PROJECT_ROOT) &&  git submodule update --init
+
+$(NACL_SDK_ROOT)/toolchain/$(OSNAME)_pnacl/usr/include/oniguruma.h: $(NACLPORTS_LOC)/make_all.sh
+	cp -rf ../naclport_onig/onig $(NACLPORTS_LOC)/ports/
+	cd $(NACLPORTS_LOC) && ./make_all.sh onig
+
+
 
 include $(NACL_SDK_ROOT)/tools/common.mk
 
