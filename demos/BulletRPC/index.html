@@ -21,8 +21,6 @@
         requirejs.config({ baseUrl: '../../scripts', paths: REQUIRE_PATHS});
         var prefix = "/demos/BulletRPC/";
 
-        var fps = 60;
-
         require(['NativeCalls', prefix+'Bullet/BulletRPC.js'], function (NativeCalls, BulletRPC) {
             window.loglevel = NativeCalls.loglevel;
             window.bullet = BulletRPC(prefix);

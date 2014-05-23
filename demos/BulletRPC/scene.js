@@ -358,29 +358,26 @@ function onDocumentMouseMove( event ) {
 //
 function animate() {
   window.requestAnimationFrame(function(){
-    setTimeout(function() {
-      requestAnimationFrame(animate);
-      bullet.BulletInterface.StepScene(camera.position, offset, function(sceneUpdate){
-        var transformBuffer = sceneUpdate.transform;
-        document.getElementById('simulationTime').innerHTML = '<p>Simulation time: ' + sceneUpdate.delta + ' microseconds</p>';
-        if (skipSceneUpdates > 0) {
-          skipSceneUpdates--;
-          return;
-        }
-        var numTransforms = transformBuffer.length / 16;
-        for (var i = 0; i < numTransforms; i++) {
-          if(objects[i]){
-            for (var j = 0; j < 16; j++) {
-              if(objects[i].matrixWorld){
-                objects[i].matrixWorld.elements[j] = transformBuffer[i*16+j];
-              }
+    requestAnimationFrame(animate);
+    bullet.BulletInterface.StepScene(camera.position, offset, function(sceneUpdate){
+      var transformBuffer = sceneUpdate.transform;
+      document.getElementById('simulationTime').innerHTML = '<p>Simulation time: ' + sceneUpdate.delta + ' microseconds</p>';
+      if (skipSceneUpdates > 0) {
+        skipSceneUpdates--;
+        return;
+      }
+      var numTransforms = transformBuffer.length / 16;
+      for (var i = 0; i < numTransforms; i++) {
+        if(objects[i]){
+          for (var j = 0; j < 16; j++) {
+            if(objects[i].matrixWorld){
+              objects[i].matrixWorld.elements[j] = transformBuffer[i*16+j];
             }
           }
         }
-      });
-      render();
-
-    }, 1000 / fps);
+      }
+    });
+    render();
   });
 
 }
