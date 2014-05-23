@@ -17,7 +17,7 @@ Fib: $(Fib_Imps)
 	@echo Removing folder $@
 	@rm -rf $@
 	@echo Generating package $@
-	@node ../../generator/generator-cli.js --package=$@ $^
+	@../../generator/pprpcgen.js --package=$@ $^
 	ln -s $(wildcard $(mkfile_path)$@_Implementation/*) $@/
 	$(MAKE) -C $@
 
@@ -26,7 +26,7 @@ Complex: $(Complex_Imps)
 	@echo Removing folder $@
 	@rm -rf $@
 	@echo Generating package $@
-	@node ../../generator/generator-cli.js --package=$@ $^
+	@../../generator/pprpcgen.js --package=$@ $^
 	ln -s $(wildcard $(mkfile_path)$@_Implementation/*) $@/
 	$(MAKE) -C $@
 

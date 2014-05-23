@@ -39,19 +39,22 @@ all: .PHONY
 
 #install
 install: $(NM_BIN_PATH) js
-	$(MAKE) -C $(RPCLIB_DIR) TOOLCHAIN=all CONFIG=Release
-	$(MAKE) -C $(RPCLIB_DIR) TOOLCHAIN=all CONFIG=Debug
+	@echo "Installing libNativeCalls to $(NACL_SDK_ROOT)"
+	@$(MAKE) -C $(RPCLIB_DIR) TOOLCHAIN=all CONFIG=Release -s > /dev/null 2>&1 || echo "Failed. `make cpp` for details"
+	@$(MAKE) -C $(RPCLIB_DIR) TOOLCHAIN=all CONFIG=Debug -s > /dev/null 2>&1 || echo "Failed. `make cpp` for details"
+	@echo "Installing pprpcgen globally"
+	@npm install -g ./ --loglevel silent > /dev/null 2>&1 && echo "pprpcgen installed." || echo "pprcpgen installation failed. You may need sudo."
 
 # anything that needs an npm module will need to install packages
 $(NM_BIN_PATH):
-	npm install
+	@npm install
 
 $(KARMA_BIN) $(RJS_BIN):
-	npm install
+	@npm install
 
 # Make each part
 js:
-	$(RJS_BIN) -o scripts/build/build.require.js
+	@$(RJS_BIN) -o scripts/build/build.require.js > /dev/null 2>&1 && echo "NativeCalls.js built" || echo "Failed to build NativeCalls.js"
 
 libs:
 	$(MAKE) -C $(RPCLIB_DIR)
@@ -105,7 +108,7 @@ test: nodetest jstest cpptest eetest
 
 nodetest: $(NM_BIN_PATH)
 	@echo "\n\n** RUNNING NODE.JS TESTS **\n\n"
-	@npm run nodetest
+	@npm test
 
 cpptest: libs tests $(KARMA_BIN)
 	@echo "\n\n** RUNNING C++ TESTS **\n\n"

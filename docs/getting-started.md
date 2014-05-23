@@ -57,7 +57,7 @@ and restarting your terminal or ```source .bashrc```.
 
 ### Node.js
 
-Native Calls uses a generator that is written for the node.js platform.
+Native Calls uses a generator called ```pprpcgen``` that is written for the node.js platform.
 Therefore, you will need to download install node.js from the [official website](http://nodejs.org/).
 
 ### Install Native Calls
@@ -73,6 +73,7 @@ make install
 ```
 This will get all node.js dependencies, and will compile and install the library for all available toolchains for both Debug and Release configurations.
 It will also build a unified JavaScript file that we will use on our html page.
+Finally, it will install the ```pprpcgen``` generator globally.
 
 We're finally ready to create our native library!
 
@@ -122,12 +123,17 @@ Meanwhile, ```sum_all``` takes a ```sequence``` type. Sequences get converted in
 
 ## Generating the RPC module
 
-Now that we've defined the interface for the module, we now pass it to the generator. The generator lives in ```native-calls/generator/generator-cli.js``` and is executed using ```node```. In the ```complexCalculator``` folder, generate the code like this:
+Now that we've defined the interface for the module, we now pass it to the generator. The generator lives in ```native-calls/generator/pprpcgen.js``` and can be executed directly. In the ```complexCalculator``` folder, generate the code like this:
 
 ```bash
-node ~/native-calls/generator/generator-cli.js --package=Complex complex.idl
+~/native-calls/generator/pprpcgen.js --package=Complex complex.idl
 ```
-The generator will create a folder called Complex (matching the ```--package``` option). Let's take a look inside.
+
+**NOTE**: If you installed the package using ```make install```, you should have the ```pprpcgen``` command installed globally.
+If so, you can just type ```pprpcgen --package=Complex complex.idl```, and use ```pprpcgen``` from any directory.
+You can also install only the generator globally, without cloning the repo, by typing ```npm install -g native-calls```.
+
+```pprpcgen``` will create a folder called Complex (matching the ```--package``` option). Let's take a look inside.
 
 ```bash
 cd Complex

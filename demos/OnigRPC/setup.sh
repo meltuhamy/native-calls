@@ -8,7 +8,7 @@ echo "Removing existing"
 rm -rf $TARGETNAME
 
 echo "Generating RPC Library..."
-node ../../generator/generator-cli.js --package=$TARGETNAME $IDLFILES
+../../generator/pprpcgen.js --package=$TARGETNAME $IDLFILES
 
 echo "Removing generated Makefile"
 rm -f $TARGETNAME/Makefile

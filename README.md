@@ -19,7 +19,7 @@ To build the project, you'll need the following requirements:
 
 To build, simply run ```make``` in this folder. This will get JavaScript dependencies, build the C++ RPC library and build each individual demo.
 
-** Note: ** I have only tested this on Mac OSX and linux. Compiling on Windows will probably break.
+**Note:** I have only tested this on Mac OSX and linux. Compiling on Windows will probably break.
 
 ## Run
 To see it in action, make sure you have built the project (see above). Then, type ```make serve```. This will start a server in the project directory.
@@ -29,6 +29,9 @@ Visit the index page, by typing http://localhost:3000/ into your browser.
 ## Install
 To install the C++ library to your SDK, run ```make install```.
 This will build the library for all toolchains and configurations.
+This will also install the generator, ```pprpcgen``` globally.
+
+If you want to only install ```pprpcgen``` without cloning this repository, you can type ```npm install -g native-calls```.
 
 # Development
 
@@ -43,6 +46,15 @@ You can also test each component individually:
 * ```make jstest``` runs JavaScript rpc framework tests
 
 The tests are run using [karma](https://github.com/karma-runner/karma).
+
+## TODO
+
+If you're interested in contributing, here are some things that still need to be done...
+
+* Generating JS skeletons for the Emscripten code (possibly in combination pepper.js) and provide automatic fallback for browsers which don't support Native Client
+* Performance optimization, in particular efficient use of binary arrays
+* Generating C++ stubs and JS skeletons to allow calls from native into JS code
+* Support for transferring binary
 
 ## Docs
 

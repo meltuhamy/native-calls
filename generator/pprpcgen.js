@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 var argv = require('minimist')(process.argv.slice(2)),
     parser = require('webidl2'),
     qfs = require('q-io/fs'),
@@ -12,9 +13,8 @@ var argv = require('minimist')(process.argv.slice(2)),
     genName = argv['name'],
     genPackage = argv['package'],
 
-    cwd = process.cwd();
-
-var Q = require('q');
+    cwd = process.cwd(),
+    Q = require('q');
 
 // create an ast
 var augAST = new AugmentedAST((parser.parse(reader.readFiles(files))));
