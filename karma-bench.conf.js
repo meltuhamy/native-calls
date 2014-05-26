@@ -16,9 +16,10 @@ module.exports = function(config) {
     files: [
       'scripts/paths.require.js',
       {pattern: 'scripts/**/*.js', included: false},
-      {pattern: 'test/CPPTestsSpec.js', included: false},
-      {pattern: 'test/cpp/**/*.nmf', included: false},
-      {pattern: 'test/cpp/**/*.*exe', included: false, watched: false},
+      {pattern: 'test/benchmark/*.js', included: false},
+      {pattern: 'test/benchmark/**/*.nmf', included: false},
+      {pattern: 'test/benchmark/**/*.*exe', included: false, watched: false},
+      {pattern: 'test/benchmark/**/*.js', included: false},
       {pattern: 'test/lib/**/*.js', included: false},
       'test/test-main.js'
     ],
@@ -47,7 +48,9 @@ module.exports = function(config) {
 
     // level of logging
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
+
     logLevel: config.LOG_INFO,
+    captureConsole: true,
 
 
     // enable / disable watching file and executing tests whenever any file changes
@@ -62,18 +65,20 @@ module.exports = function(config) {
     // - Safari (only Mac; has to be installed with `npm install karma-safari-launcher`)
     // - PhantomJS
     // - IE (only Windows; has to be installed with `npm install karma-ie-launcher`)
-    browsers: ['chrome --no-sandbox'],
+    browsers: ['chromenacl'],
 
     customLaunchers: {
-      "chrome --no-sandbox": {
+      "chromenacl": {
         base: 'Chrome',
-        flags: ['--no-sandbox', '--enable-nacl', '--enable-pnacl']
+        flags: ['--no-sandbox', '--enable-benchmarking', '--enable-nacl', '--enable-pnacl']
       }
     },
 
 
     // If browser does not capture in given timeout [ms], kill it
-    captureTimeout: 60000,
+    captureTimeout: 300000,
+    browserDisconnectTimeout: 300000,
+    browserNoActivityTimeout: 300000,
 
 
     // Continuous Integration mode

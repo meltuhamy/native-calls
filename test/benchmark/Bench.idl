@@ -1,0 +1,28 @@
+dictionary dict {
+  DOMString str;
+  double d;
+  boolean b;
+};
+
+dictionary nestedDict {
+  DOMString topStr;
+  double topD;
+  boolean topB;
+  dict nested;
+};
+
+interface Benchmark{
+  long bench_long(long v);
+  double bench_double(double v);
+  DOMString bench_DOMString(DOMString v);
+  dict bench_dict(dict v);
+  nestedDict bench_nestedDict(nestedDict v);
+
+  sequence<long> bench_seq_long(sequence<long> v);
+  sequence<double> bench_seq_double(sequence<double> v);
+  sequence<DOMString> bench_seq_DOMString(sequence<DOMString> v);
+  sequence<dict> bench_seq_dict(sequence<dict> v);
+  sequence<nestedDict> bench_seq_nestedDict(sequence<nestedDict> v);
+
+  boolean printSeperator(DOMString tag);
+};

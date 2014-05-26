@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script type="text/javascript" src="../../scripts/urlParams.js"></script>
+
+    <script src="../../scripts/paths.require.js"></script>
+    <script src="../../scripts/lib/requirejs/require.js"></script>
+    <script>
+        requirejs.config({
+            baseUrl: '../../scripts',
+            paths: REQUIRE_PATHS
+        });
+        require(["NativeCalls","Bench/BenchRPC.js"], function(NC,BRPC){
+            window.NC = NC;
+            window.Bench = BRPC();
+        });
+    </script>
+</head>
+<body>
+
+</body>
+</html>

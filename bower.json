@@ -13,6 +13,7 @@
     "loglevel": "~0.6.0",
     "tv4": "~1.0.17",
     "threejs": "*",
-    "jasmine-standalone-1.3.1": "https://github.com/pivotal/jasmine/raw/master/dist/jasmine-standalone-1.3.1.zip"
+    "jasmine-standalone-1.3.1": "https://github.com/pivotal/jasmine/raw/master/dist/jasmine-standalone-1.3.1.zip",
+    "benchmark": "~1.0.0"
   }
 }

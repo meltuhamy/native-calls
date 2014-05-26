@@ -30,6 +30,7 @@ KARMA_START := $(KARMA_BIN) start
 KARMA_WATCH_ARGS := --client.args=$(TOOLCHAIN) --client.args=$(CONFIG)
 KARMA_RUN_ARGS := $(KARMA_WATCH_ARGS) --single-run
 KARMA_CPP_CONF := karma-cpp.conf.js
+KARMA_BENCH_CONF := karma-bench.conf.js
 KARMA_JS_CONF := karma-js.conf.js
 KARMA_EE_CONF := karma-e2e.conf.js
 
@@ -40,8 +41,8 @@ all: .PHONY
 #install
 install: $(NM_BIN_PATH) js
 	@echo "Installing libNativeCalls to $(NACL_SDK_ROOT)"
-	@$(MAKE) -C $(RPCLIB_DIR) TOOLCHAIN=all CONFIG=Release -s > /dev/null 2>&1 || echo "Failed. `make cpp` for details"
-	@$(MAKE) -C $(RPCLIB_DIR) TOOLCHAIN=all CONFIG=Debug -s > /dev/null 2>&1 || echo "Failed. `make cpp` for details"
+	@$(MAKE) -C $(RPCLIB_DIR) TOOLCHAIN=all CONFIG=Release -s > /dev/null || echo "Failed. Try make libs TOOLCHAIN=all"
+	@$(MAKE) -C $(RPCLIB_DIR) TOOLCHAIN=all CONFIG=Debug -s > /dev/null || echo "Failed. Try make libs TOOLCHAIN=all"
 	@echo "Installing pprpcgen globally"
 	@npm install -g ./ --loglevel silent > /dev/null 2>&1 && echo "pprpcgen installed." || echo "pprcpgen installation failed. You may need sudo."
 
@@ -61,6 +62,9 @@ libs:
 
 tests: libs
 	$(MAKE) -C $(TEST_CODE_DIR)
+
+benchs: libs
+	$(MAKE) -C test/benchmark
 
 eetests: libs js
 	$(MAKE) -C $(EETEST_CODE_DIR)
@@ -114,6 +118,12 @@ cpptest: libs tests $(KARMA_BIN)
 	@echo "\n\n** RUNNING C++ TESTS **\n\n"
 	@touch $(NACL_EXE_STDOUT)
 	@export NACL_EXE_STDOUT="$(NACL_EXE_STDOUT)" ; tail -n 0 -f $(NACL_EXE_STDOUT) & TAILPID=$$! && $(KARMA_START) $(KARMA_CPP_CONF) $(KARMA_RUN_ARGS) ; kill $$TAILPID
+
+bench: libs benchs $(KARMA_BIN)
+	@echo "\n\n** RUNNING BENCHMARKS **\n\n"
+	@touch $(NACL_EXE_STDOUT)
+	@export NACL_EXE_STDOUT="$(NACL_EXE_STDOUT)" ; tail -n 0 -f $(NACL_EXE_STDOUT) & TAILPID=$$! && $(KARMA_START) $(KARMA_BENCH_CONF) $(KARMA_RUN_ARGS) ; kill $$TAILPID
+
 
 eetest: libs eetests js $(KARMA_BIN)
 	@echo "\n\n** RUNNING E2E TESTS **\n\n"

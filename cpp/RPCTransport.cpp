@@ -6,6 +6,7 @@
 #include "JSONRPC.h"
 
 #include <stdio.h>
+#include "Bench.h"
 
 namespace pprpc{
 RPCTransport::RPCTransport(PP_Instance instance) : Instance(instance) {
@@ -18,9 +19,11 @@ RPCTransport::RPCTransport(PP_Instance instance, JSONRPC* jsonRPC) : Instance(in
 
 
 void RPCTransport::HandleMessage(const pp::Var& message) {
+	uint64_t start = Bench::start("RPCTransport::HandleMessage");
 	if(hasJSONRPC){
 		jsonRPC->HandleRPC(message);
 	}
+	Bench::end(start);
 }
 
 void RPCTransport::PostMessage(const pp::Var& message) {

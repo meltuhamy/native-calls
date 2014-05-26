@@ -118,7 +118,7 @@ define(['RPCTransport', 'lodash', "TagLogger"], function(RPCTransport, _, TagLog
       }
     } else{
       // it's not a rpc response.
-      logger.warn("Received non-rpc message", rpcObject);
+      logger.warn("NON-RPC: ", rpcObject);
       return false;
     }
   };
