@@ -165,7 +165,7 @@ define(['Benchmark', 'NativeCalls'], function (Benchmark, NativeCalls) {
 
 
     it("runs the benchmark for dict type", function(done){
-      Bench.Benchmark.printSeperator(" BEGIN nestedDict BENCHMARK ", function(){
+      Bench.Benchmark.printSeperator(" BEGIN dict BENCHMARK ", function(){
         var suite = new Benchmark.Suite;
         suite.add('dict', {
           defer: true,
