@@ -1,0 +1,119 @@
+Only in BulletNaClAM/data: NaClAM.js
+Only in BulletNaClAM/data: NaClAMBullet.js
+Only in BulletNaClAM/data: common.js
+Only in BulletNaClAM/data: example.js
+diff -r BulletNaClAM/data/scene.js BulletRPC/data/scene.js
+31c31
+<   NaClAMBulletDropObject();
+---
+>   bullet.BulletInterface.DropObject();
+34c34
+< function loadShape(shape) {
+---
+> function loadShape(shape, rpcScene) {
+39a40
+>     rpcScene.cubes.push(shape);
+44a46
+>     var rpcConvex = {name: shape.name, points: []};
+47c49,51
+<       vertices.push(new THREE.Vector3(shape['points'][i][0], shape['points'][i][1], shape['points'][i][2]));
+---
+>       var currentShapePoints = shape['points'][i];
+>       rpcConvex.points.push({x:currentShapePoints[0], y:currentShapePoints[1], z:currentShapePoints[2]});
+>       vertices.push(new THREE.Vector3(currentShapePoints[0], currentShapePoints[1], currentShapePoints[2]));
+48a53
+>     rpcScene.convices.push(rpcConvex);
+53a59
+>     rpcScene.cylinders.push(shape);
+58a65
+>     rpcScene.spheres.push(shape);
+66c73,79
+< function loadBody(body) {
+---
+> function loadBody(body, rpcScene) {
+>   var rpcBody = {
+>     shapeName: body.shape,
+>     mass: body.mass,
+>     friction: body.friction,
+>     transform: []
+>   };
+101a115
+>   rpcBody.transform = T;
+109c123
+< 
+---
+>   rpcScene.bodies.push(rpcBody); 
+113c127
+< function loadWorld(worldDescription) {
+---
+> function loadWorld(worldDescription, callback ) {
+115a130,136
+>   var rpcScene = {
+>     cubes: [],
+>     convices: [],
+>     spheres: [],
+>     cylinders: [],
+>     bodies: []
+>   };
+119c140
+<     if (loadShape(shapes[i]) == undefined) {
+---
+>     if (loadShape(shapes[i], rpcScene) == undefined) {
+125c146
+<     if (loadBody(bodies[i]) == undefined) {
+---
+>     if (loadBody(bodies[i], rpcScene) == undefined) {
+130,134d150
+<   var r = verifyWorldDescription(worldDescription);
+<   if (r == false) {
+<     alert('Invalid scene description. See console.');
+<     return;
+<   }
+136c152,155
+<   NaClAMBulletLoadScene(worldDescription);
+---
+>   bullet.BulletInterface.LoadScene(rpcScene, function(result){
+>     console.log("Scene loaded "+ result);
+>     if(callback)callback();
+>   });
+245c264,265
+<     if (intersects[0].object != plane) {
+---
+>     var intersects0 = intersects[0];
+>     if (intersects0.object != plane) {
+247c267
+<       SELECTED = intersects[0].object;
+---
+>       SELECTED = intersects0.object;
+249c269,271
+<       NaClAMBulletPickObject(SELECTED.objectTableIndex, camera.position, intersects[0].point);
+---
+>       bullet.BulletInterface.PickObject(SELECTED.objectTableIndex, intersects0.point, camera.position, function(){
+>         console.log("Picked object");
+>       });
+262c284
+<     NaClAMBulletDropObject();
+---
+>     bullet.BulletInterface.DropObject(function(){console.log("Dropped Object")});
+289c311,328
+<   aM.sendMessage('stepscene', {rayFrom: [camera.position.x, camera.position.y, camera.position.z], rayTo: [offset.x, offset.y, offset.z]});
+---
+>   bullet.BulletInterface.StepScene(camera.position, offset, function(sceneUpdate){
+>       var transformBuffer = sceneUpdate.transform;
+>       document.getElementById('simulationTime').innerHTML = '<p>Simulation time: ' + sceneUpdate.delta + ' microseconds</p>';
+>       if (skipSceneUpdates > 0) {
+>         skipSceneUpdates--;
+>         return;
+>       }
+>       var numTransforms = transformBuffer.length / 16;
+>       for (var i = 0; i < numTransforms; i++) {
+>         if(objects[i]){
+>           for (var j = 0; j < 16; j++) {
+>             if(objects[i].matrixWorld){
+>               objects[i].matrixWorld.elements[j] = transformBuffer[i*16+j];
+>             }
+>           }
+>         }
+>       }
+>   });
+Only in BulletNaClAM/data: world.js

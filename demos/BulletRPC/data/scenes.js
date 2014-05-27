@@ -1,4 +1,8 @@
-function randomCubeScene(numObjects) {
+// Copyright (c) 2013 The Chromium Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+function randomCubeScene(numObjects, zwidth) {
   var worldDescription = {};
   worldDescription.shapes = [];
   worldDescription.shapes.push({
@@ -13,9 +17,9 @@ function randomCubeScene(numObjects) {
     var body = {};
     body.shape = 'box';
     body.position = {};
-    body.position.x = Math.random() * 10 - 25;
-    body.position.y = Math.random() * 50 + 1;
-    body.position.z = Math.random() * 40 - 20;
+    body.position.x = Math.random() * 30 - 15;
+    body.position.y = Math.random() * 50 + 10;
+    body.position.z = Math.random() * zwidth - (zwidth/2);
     body.rotation = {};
     body.rotation.x = ( Math.random() * 360 ) * Math.PI / 180;
     body.rotation.y = ( Math.random() * 360 ) * Math.PI / 180;
@@ -27,7 +31,7 @@ function randomCubeScene(numObjects) {
   return worldDescription;
 }
 
-function randomCylinderScene(numObjects) {
+function randomCylinderScene(numObjects, zwidth) {
   var worldDescription = {};
   worldDescription.shapes = [];
   worldDescription.shapes.push({
@@ -41,9 +45,9 @@ function randomCylinderScene(numObjects) {
     var body = {};
     body.shape = 'box';
     body.position = {};
-    body.position.x = Math.random() * 10 - 25;
-    body.position.y = Math.random() * 50 + 1;
-    body.position.z = Math.random() * 40 - 20;
+    body.position.x = Math.random() * 30 - 15;
+    body.position.y = Math.random() * 50 + 10;
+    body.position.z = Math.random() * zwidth - (zwidth/2);
     body.rotation = {};
     body.rotation.x = ( Math.random() * 360 ) * Math.PI / 180;
     body.rotation.y = ( Math.random() * 360 ) * Math.PI / 180;
@@ -144,12 +148,12 @@ function randomShapeScene(numObjects) {
     name: 'tri',
     type: 'convex',
     points: [
-      [0.0, 0.0, 0.0],
-      [0.0, 1.0, 0.0],
-      [0.0, 0.0, 1.0],
-      [0.0, 0.0, 1.0],
-      [2.0, 5.0, 1.0],
-      [1.0, 1.0, 1.0]
+    [0.0, 0.0, 0.0],
+    [0.0, 1.0, 0.0],
+    [0.0, 0.0, 1.0],
+    [0.0, 0.0, 1.0],
+    [2.0, 5.0, 1.0],
+    [1.0, 1.0, 1.0]
     ]
   });
 
@@ -167,9 +171,9 @@ function randomShapeScene(numObjects) {
       body.shape = 'tri';
     }
     body.position = {};
-    body.position.x = Math.random() * 10 - 25;
+    body.position.x = Math.random() * 30 - 15;
     body.position.y = Math.random() * 50 + 1;
-    body.position.z = Math.random() * 40 - 20;
+    body.position.z = Math.random() * 10 - 5;
     body.rotation = {};
     body.rotation.x = ( Math.random() * 360 ) * Math.PI / 180;
     body.rotation.y = ( Math.random() * 360 ) * Math.PI / 180;
@@ -179,11 +183,6 @@ function randomShapeScene(numObjects) {
     worldDescription.bodies.push(body);
   }
   return worldDescription;
-}
-
-
-function loadJenga5() {
-  loadWorld(jengaScene(5));
 }
 
 function loadJenga10() {
@@ -198,12 +197,20 @@ function loadRandomShapes() {
   loadWorld(randomShapeScene(100));
 }
 
-function load400RandomCubes() {
-  loadWorld(randomCubeScene(400));
+function load250RandomCubes() {
+  loadWorld(randomCubeScene(250, 10));
 }
 
-function load400RandomCylinders() {
-  loadWorld(randomCylinderScene(400));
+function load500RandomCylinders() {
+  loadWorld(randomCylinderScene(500, 15));
+}
+
+function load1000RandomCubes() {
+  loadWorld(randomCubeScene(1000, 20));
+}
+
+function load2000RandomCubes() {
+  loadWorld(randomCubeScene(2000, 20));
 }
 
 function loadTextScene(evt) {

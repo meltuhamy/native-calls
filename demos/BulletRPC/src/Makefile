@@ -1,9 +1,5 @@
 # AUTOMATICALLY GENERATED ON Thu May 08 2014 21:38:16 GMT+0100 (BST) #
 
-CONFIG ?= Debug
-TOOLCHAIN ?= newlib
-NACL_ARCH ?= x86_32
-
 SOURCES = BulletRPC.cpp BulletInterface.cpp 
 TARGET = Bullet
 OSNAME := $(shell python $(NACL_SDK_ROOT)/tools/getos.py)
@@ -46,4 +42,3 @@ $(eval $(call LINK_RULE,$(TARGET),$(SOURCES),$(LIBS),$(DEPS)))
 endif
 
 $(eval $(call NMF_RULE,$(TARGET),))
-

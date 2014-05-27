@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script type="text/javascript" src="data/json2.min.js"></script>
+    <script type="text/javascript" src="data/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="data/jstorage.min.js"></script>
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+    <script src="http://code.highcharts.com/modules/exporting.js"></script>
+
+    <script>
+    var updateSeries, updateSeriesNaClAM;
+    $.jStorage.subscribe("sync-stats", function(channel, payload){
+        // looks like this:
+        // {"frames":0,"total_simTime":0,"num_sims":0,"total_tripTime":0,"num_trips":0,"interval":1000,"trips":null,"publishTime":1401206581519} from sync-stats 
+        if(typeof updateSeries == "function"){
+            updateSeries("frames", payload.publishTime, 1000/payload.frames);
+            updateSeries("simtime", payload.publishTime, payload.total_simTime / (payload.num_sims * 1000));
+            updateSeries("trips", payload.publishTime, 1000/payload.num_trips);
+        }
+        $('#fpscounter').html(payload.frames + " fps");
+    });
+    $.jStorage.subscribe("sync-stats-naclam", function(channel, payload){
+        // looks like this:
+        // {"frames":0,"total_simTime":0,"num_sims":0,"total_tripTime":0,"num_trips":0,"interval":1000,"trips":null,"publishTime":1401206581519} from sync-stats 
+        if(typeof updateSeriesNaClAM == "function"){
+            updateSeriesNaClAM("frames", payload.publishTime, 1000/payload.frames);
+            updateSeriesNaClAM("simtime", payload.publishTime, payload.total_simTime / (payload.num_sims * 1000));
+            updateSeriesNaClAM("trips", payload.publishTime, 1000/payload.num_trips);
+        }
+        $('#fpscounter-naclam').html(payload.frames + " fps");
+    });
+
+    </script>
+</head>
+<body>
+<p><strong>Scenes: </strong> 
+<button class="scenechange" value="loadJenga10">Jenga 10</button>
+<button class="scenechange" value="loadJenga20">Jenga 20</button>
+<button class="scenechange" value="loadRandomShapes">Random Shapes</button>
+<button class="scenechange" value="load250RandomCubes">250 Cubes</button>
+<button class="scenechange" value="load500RandomCylinders">500 Cylinders</button>
+<button class="scenechange" value="load1000RandomCubes">1000 Cubes</button>
+<button class="scenechange" value="load2000RandomCubes">2000 Cubes</button>
+</p>
+<h3>Native Calls</h3>
+<div id="fpscounter" style="">0 fps</div>
+<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+
+<h3>NaClAM</h3>
+<div id="fpscounter-naclam" style="">0 fps</div>
+<div id="container-naclam" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+
+<script type="text/javascript">
+$(document).ready(function(){
+    var chart;
+    var createChart = function(id, updator){
+        $(id).highcharts({
+            chart: {
+                type: 'spline',
+                animation: {duration: 100},
+                marginRight: 10,
+                events: {
+                    load: function() {
+                        // set up the updating of the chart each second
+                        var items = {
+                            frames: this.series[0],
+                            simtime: this.series[1],
+                            trips: this.series[2]
+                        };
+                        window[updator] = function(item, x,y){
+                            var series = items[item];
+                            if(series.data.length > 30){
+                                series.addPoint([x, y], true, true);
+                            } else {
+                                series.addPoint([x, y], true, false);
+                            }
+                        };
+                    }
+                }
+            },
+            title: {
+                text: 'Performance'
+            },
+            xAxis: {
+                type: 'datetime',
+                tickPixelInterval: 100
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'milliseconds'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                formatter: function() {
+                    return '<b>'+ this.series.name +'</b><br/>'+
+                    Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) +'<br/>'+
+                    Highcharts.numberFormat(this.y, 2);
+                }
+            },
+            legend: {
+                enabled: true
+            },
+            exporting: {
+                enabled: false
+            },
+            series: [{
+                name: 'frame rendering',
+                data: []
+            }, {
+                name: 'physics simulation time',
+                data: []
+            }, {
+                name: 'RPC round trip time',
+                data: []
+            }]
+        });
+    }
+
+    createChart('#container', "updateSeries");
+    createChart('#container-naclam', "updateSeriesNaClAM");
+    $.jStorage.publish("bench-command", "start");
+    $('.scenechange').click(function(){$.jStorage.publish("bench-command", $(this).val());});
+});
+
+</script>
+</body>
+</html>

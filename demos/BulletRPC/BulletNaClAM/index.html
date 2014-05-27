@@ -5,56 +5,35 @@ Use of this source code is governed by a BSD-style license that can be
 found in the LICENSE file.
 -->
 <head>
-  <title>Bullet Physics Native Calls</title>
-  <script src="../../scripts/paths.require.js"></script>
+  <title>Bullet Physics NaClAM</title>
+  <script type="text/javascript" src="data/common.js"></script>
+  <script type="text/javascript" src="data/example.js"></script>
+  <script type="text/javascript" src="data/NaClAM.js"></script>
+  <script type="text/javascript" src="data/NaClAMBullet.js"></script>
   <script type="text/javascript" src="data/three.min.js"></script>
   <script type="text/javascript" src="data/scene.js"></script>
+  <script type="text/javascript" src="data/world.js"></script>
   <script type="text/javascript" src="data/scenes.js"></script>
-
-  <!-- stats -->
-  <script type="text/javascript" src="data/json2.min.js"></script>
-  <script type="text/javascript" src="data/jstorage.min.js"></script>
-  <script type="text/javascript" src="data/stats.js"></script>
-  
-  <script src="../../scripts/lib/requirejs/require.js"></script>
-  <!-- set window.NaClConfig -->
-  <script type="text/javascript" src="../../scripts/urlParams.js"></script>
-  <script>
-    // some configuration
-    window.NaClConfig.VALIDATION = true;
-    requirejs.config({ baseUrl: '../../scripts', paths: REQUIRE_PATHS});
-    var prefix = "/demos/BulletRPC/";
-
-    require(['NativeCalls', prefix+'Bullet/BulletRPC.js'], function (NativeCalls, BulletRPC) {
-        window.loglevel = NativeCalls.loglevel;
-        window.bullet = BulletRPC(prefix);
-
-        loglevel.disableAll();
-        // load the module.
-        NativeCalls.RPCModule.getModule(bullet).load(function(){
-            NCStats.trips++;
-            console.log("module loaded!");
-            init();
-            // load the scene then animate
-            loadWorld(jengaScene(20), animate);
-        });
-
-        $.jStorage.subscribe("bench-command", function(channel, payload){
-          if(payload == "start"){
-            startPublishingStats("sync-stats");
-            return;
-          }
-          fn = window[payload];
-          if(typeof fn == "function"){
-            fn();
-          }
-        });
-
+  <script type="text/javascript" src="../data/json2.min.js"></script>
+  <script type="text/javascript" src="../data/jstorage.min.js"></script>
+  <script type="text/javascript" src="../data/stats.js"></script>
+  <script type="text/javascript">
+    $.jStorage.subscribe("bench-command", function(channel, payload){
+      if(payload == "start"){
+        startPublishingStats("sync-stats-naclam");
+        console.log("started");
+        return;
+      }
+      fn = window[payload];
+      if(typeof fn == "function"){
+        fn();
+      }
     });
   </script>
 </head>
-<body>
+<body data-name="NaClAMBullet" data-width="0" data-height="0" data-tools="pnacl newlib emscripten" data-configs="Release Debug" data-path="{tc}/{config}">
   <h1>Bullet Physics</h1>
+  <p><b>Status:</b> <span id="statusField">no status</span></p>
   <div id="config">
     <select id="scene">
       <option value="jenga10">Block Tower (10 blocks)</option>
@@ -67,7 +46,6 @@ found in the LICENSE file.
     </select>
     <button id="reload">Reload Scene</button>
   </div>
-  <a href="bench.html" target="_blank">Performance (right click and open in new window)</a>
   <ul>
     <li>Click and drag an object to move it</li>
     <li>Click and drag elsewhere to rotate the camera</li>

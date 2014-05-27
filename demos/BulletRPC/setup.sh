@@ -17,4 +17,7 @@ echo "Linking implementation"
 ln -s $(pwd)/src/* $(pwd)/$TARGETNAME/
 
 echo "Making..."
-cd $TARGETNAME && make
+make -C $TARGETNAME
+
+echo "Making NaClAMBase version..."
+make -C BulletNaClAM
