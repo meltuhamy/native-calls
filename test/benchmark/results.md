@@ -96,5 +96,18 @@ The table below shows the average time, in microseconds, it takes to process an 
 | 45000        | 50532.42  | 50843.33    | 359133.64      | 1418791.67| 3242286.00      |
 | 100000       | 104087.22 | 114020.00   | 799742.86      | 3319250.00| 7347985.00      |
 
+
+## JS Library performance
+The JS library performance **without** validation has also been measured, however its performance impact is negligible.
+The slowest benchmark was found to take approx 3 microseconds (269,253 ops/sec ±1.90%).
+
 ## Analysis
-Analysis coming soon! 
+From the data, we can see that for small types, the most contributing factor to performance is the browser (e.g. event system, etc.) and PPAPI libraries (how PPAPI implements postMessage).
+For example, sending a single long type takes 2392.34 microseconds (.002 seconds), but our library only spends 105.5 microseconds processing the call (less than 5% of the time).
+
+
+For large and complicated data, the impact of using the library becomes higher and higher.
+For example, sending 45000 nested objects (which are actually quite simple) has a total round-trip time of 6.67s, and a whole 3.24 seconds of this is spent in our library (i.e. half the time).
+
+
+More analysis, graphs and reasoning soon :)
