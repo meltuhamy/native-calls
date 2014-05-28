@@ -1,9 +1,9 @@
+window.NaClConfig = {
+  VALIDATION: false
+};
 define(['Benchmark', 'NativeCalls'], function (Benchmark, NativeCalls) {
   //todo
   jasmine.DEFAULT_TIMEOUT_INTERVAL = 300000; // 5 minutes
-  window.NaClConfig = {
-    VALIDATION: false
-  };
   NativeCalls.loglevel.setLevel("WARN");
   describe('Roundtrip Benchmark', function () {
     var Bench;
@@ -67,7 +67,7 @@ define(['Benchmark', 'NativeCalls'], function (Benchmark, NativeCalls) {
     // test data
     var testArrays = {
       intervals: [10, 45, 100, 450, 1000, 4500, 10000, 45000, 100000],
-      max: 1024
+      max: 100000
     };
     var intervals = testArrays.intervals;
     for (var i = 0; i < intervals.length; i++) {
