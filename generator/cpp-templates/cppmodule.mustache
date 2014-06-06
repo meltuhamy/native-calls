@@ -79,7 +79,7 @@ ValidType<{{{name}}}> {{{name}}}Type::Extract(const pp::Var& v){
 /* interface {{{name}}} */
 {{#operations}}
 /* operation {{{name}}} */
-class Functor_{{{name}}} : public RPCFunctor{
+class ServerStub_{{interfaceName}}_{{{name}}} : public RPCServerStub{
 public:
 	virtual pp::Var call(const pp::VarArray* params, RPCError& error){
 		if(params->GetLength() == {{numParams}}){
@@ -124,7 +124,7 @@ public:
 		// add methods
 		{{#interfaces}}
 		{{#operations}}
-		rpcRuntime->AddFunctor("{{interfaceName}}::{{name}}", new Functor_{{name}});
+		rpcRuntime->AddFunctor("{{interfaceName}}::{{name}}", new ServerStub_{{interfaceName}}_{{name}});
 		{{/operations}}
 		{{/interfaces}}
 		return rpcTransport;

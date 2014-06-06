@@ -25,7 +25,7 @@ long add(long first, long second){
 	return first+second;
 }
 
-class Functor_foo : public RPCFunctor{
+class Functor_foo : public RPCServerStub{
 public:
 	virtual pp::Var call(const pp::VarArray* params, RPCError& error) {
 		return pp::Var(foo());
@@ -33,7 +33,7 @@ public:
 };
 
 
-class FakeFunctor : public RPCFunctor{
+class FakeFunctor : public RPCServerStub{
 public:
 	virtual pp::Var call(const pp::VarArray* params, RPCError& error){
 		return pp::Var(true);
@@ -41,7 +41,7 @@ public:
 };
 
 
-class MockFunctor : public RPCFunctor{
+class MockFunctor : public RPCServerStub{
 public:
 	MOCK_METHOD2(call, pp::Var(const pp::VarArray*, RPCError&));
 
@@ -57,7 +57,7 @@ private:
 };
 
 
-class Functor_add : public RPCFunctor{
+class Functor_add : public RPCServerStub{
 public:
 	virtual pp::Var call(const pp::VarArray* params, RPCError& error){
 		// extract the paramaters and check
@@ -93,7 +93,7 @@ TEST(RPCRuntimeLayer, GetFunction){
 	RPCRuntime runtime(&mockJSONRPC);
 	bool added = runtime.AddFunctor("foo", new Functor_foo());
 	EXPECT_TRUE(added==true);
-	RPCFunctor* functor = runtime.GetFunctor("foo");
+	RPCServerStub* functor = runtime.GetFunctor("foo");
 	EXPECT_TRUE(functor->isValid() == true);
 
 

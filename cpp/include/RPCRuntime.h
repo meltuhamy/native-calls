@@ -22,13 +22,13 @@ class RPCRequest;
 class JSONRPC;
 class RPCError;
 
-class RPCFunctor{
+class RPCServerStub{
 public:
-	RPCFunctor(){
+	RPCServerStub(){
 		setValid(false);
 	}
 
-	virtual ~RPCFunctor(){
+	virtual ~RPCServerStub(){
 		// fprintf(stdout, "\nRPCFunctor::~RPCFunctor()\n");
 	}
 
@@ -52,15 +52,15 @@ public:
 	RPCRuntime(JSONRPC* jsonRPC);
 	virtual ~RPCRuntime();
 
-	virtual bool AddFunctor(std::string name, RPCFunctor* functor);
-	virtual RPCFunctor* GetFunctor(std::string name);
+	virtual bool AddFunctor(std::string name, RPCServerStub* functor);
+	virtual RPCServerStub* GetFunctor(std::string name);
 	virtual pp::Var CallFunctor(std::string name, const pp::VarArray* params, RPCError& error);
 
 	virtual bool HandleRequest(const pp::Var& request);
 	virtual bool HandleRequest(const RPCRequest& request);
 private:
 	JSONRPC *jsonRPC;
-	std::map<std::string, RPCFunctor*> *functorMap;
+	std::map<std::string, RPCServerStub*> *functorMap;
 };
 
 } /*namespace pprpc*/

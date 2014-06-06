@@ -11,7 +11,7 @@
 
 namespace pprpc{
 
-pp::Var RPCFunctor::call(const pp::VarArray* params, RPCError& error) {
+pp::Var RPCServerStub::call(const pp::VarArray* params, RPCError& error) {
 	return pp::Var(); //return undefined by default.
 }
 
@@ -27,23 +27,23 @@ RPCRuntime::~RPCRuntime() {
 RPCRuntime::RPCRuntime(JSONRPC* jsonRPC) {
 	this->jsonRPC = jsonRPC;
 	this->jsonRPC->setRuntime(this);
-	this->functorMap = new std::map<std::string, RPCFunctor*>();
+	this->functorMap = new std::map<std::string, RPCServerStub*>();
 }
 
-bool RPCRuntime::AddFunctor(std::string name, RPCFunctor* functor) {
+bool RPCRuntime::AddFunctor(std::string name, RPCServerStub* functor) {
 	if(functorMap->find(name) == functorMap->end()){
-		functorMap->insert(std::pair<std::string,RPCFunctor*>(name, functor));
+		functorMap->insert(std::pair<std::string,RPCServerStub*>(name, functor));
 		return true;
 	}
 	return false;
 }
 
 
-RPCFunctor* RPCRuntime::GetFunctor(std::string name) {
-	std::map<std::string, RPCFunctor*>::const_iterator pos = functorMap->find(name);
+RPCServerStub* RPCRuntime::GetFunctor(std::string name) {
+	std::map<std::string, RPCServerStub*>::const_iterator pos = functorMap->find(name);
 	if(pos == functorMap->end()){
 		// not found
-		RPCFunctor* invalid = new RPCFunctor();
+		RPCServerStub* invalid = new RPCServerStub();
 		invalid->setValid(false);
 		return invalid;
 	} else {
@@ -54,7 +54,7 @@ RPCFunctor* RPCRuntime::GetFunctor(std::string name) {
 
 pp::Var RPCRuntime::CallFunctor(std::string name, const pp::VarArray* params, RPCError& error) {
 	pp::Var returnValue; //default undefined
-	RPCFunctor* functor = GetFunctor(name);
+	RPCServerStub* functor = GetFunctor(name);
 	if(functor->isValid()){
 		returnValue = functor->call(params, error);
 	} else {

@@ -259,6 +259,7 @@ AugmentedAST.prototype.addInterfaceMembers = function (interfaceName, interfaceM
  */
 AugmentedAST.prototype.addNewInterface = function (newInterface) {
   newInterface.operations = [];
+  newInterface.interfaceName = newInterface.name;
   this.interfaces[newInterface.name] = newInterface;
   this.addInterfaceMembers(newInterface.name, newInterface.members);
 };
