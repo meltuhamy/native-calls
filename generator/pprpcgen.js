@@ -62,14 +62,14 @@ if(typeof genPackage == "string"){
         var returned = [];
         for(var interfaceName in augAST.interfaces){
           headerString = Generator.genInterfaceString(augAST, interfaceName, genPackage);
-          headerFilename = packagePath + "/" + interfaceName + ".h";
+          headerFilename = packagePath + "/PPRPCGEN_" + interfaceName + ".h";
           console.log("Creating header file... (" + headerFilename + ")");
           returned.push(qfs.write(headerFilename, headerString));
         }
 
         if(Object.keys(augAST.dictionaries).length > 0){
           // we'll need to generate the types
-          headerFilename = packagePath + "/" + genPackage + "Types.h";
+          headerFilename = packagePath + "/PPRPCGEN_" + genPackage + "Types.h";
           headerString = Generator.genDictionaryTypesString(augAST, genPackage);
           console.log("IDL defines some dictionary types.\nCreating header file... (" + headerFilename + ")");
           returned.push(qfs.write(headerFilename, headerString));

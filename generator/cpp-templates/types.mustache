@@ -1,12 +1,13 @@
 /* AUTOMATICALLY GENERATED ON {{timestamp}} */
 
-#ifndef {{includeDefName}}TYPES_H_
-#define {{includeDefName}}TYPES_H_
+#ifndef PPRPCGEN_{{moduleName}}_TYPES_H_
+#define PPRPCGEN_{{moduleName}}_TYPES_H_
 
 // these are included to simplify generator. Remove if not needed.
 #include <string>
 #include <vector>
 
+namespace pprpcgen{
 {{#dictionaries}}
 typedef struct {
 	{{#members}}
@@ -16,4 +17,6 @@ typedef struct {
 
 {{/dictionaries}}
 
-#endif /* {{includeDefName}}TYPES_H_ */
+}
+
+#endif /* PPRPCGEN_{{moduleName}}_TYPES_H_ */

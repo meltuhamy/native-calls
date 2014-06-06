@@ -1,8 +1,10 @@
-#include "Calculator.h"
+#include "PPRPCGEN_Calculator.h"
 
 #include <complex>
 #include <vector>
 
+namespace pprpcgen{
+namespace Calculator{
 complex_double add(complex_double x, complex_double y){
 	complex_double cd;
 	std::complex<double> std_cd = std::complex<double>(x.real, x.imaginary) + std::complex<double>(y.real, y.imaginary);
@@ -60,4 +62,7 @@ std::vector<double> map_abs(std::vector<complex_double> contents){
 	    r.push_back(abs(std::complex<double>(current_cd.real, current_cd.imaginary)));
 	}
 	return r;
+}
+
+}
 }

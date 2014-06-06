@@ -1,5 +1,5 @@
-#include "BulletInterface.h"
-#include "BulletTypes.h"
+#include "PPRPCGEN_BulletInterface.h"
+#include "PPRPCGEN_BulletTypes.h"
 
 #include <string>
 #include <map>
@@ -7,6 +7,9 @@
 
 #include <bullet/btBulletCollisionCommon.h>
 #include <bullet/btBulletDynamicsCommon.h>
+
+namespace pprpcgen{
+namespace BulletInterface{
 
 static unsigned long long microseconds() {
 	struct timeval tv;
@@ -323,3 +326,6 @@ bool DropObject() {
 	return true;
 }
 
+
+}
+}

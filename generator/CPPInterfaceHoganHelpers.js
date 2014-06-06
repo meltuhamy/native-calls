@@ -9,7 +9,7 @@ module.exports.getContext = function(ast, moduleName, interfaceName){
   context = _.assign(context, ast.interfaces[interfaceName]);
 
   // add the include def name
-  context = _.assign(context, { includeDefName: interfaceName.toUpperCase() });
+  context = _.assign(context, { includeDefName: "PPRPCGEN_"+interfaceName.toUpperCase() });
 
   return context;
 };

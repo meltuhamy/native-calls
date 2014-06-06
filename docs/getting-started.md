@@ -141,16 +141,16 @@ ls
 ```
 Using the IDL file, we can see that the generator generated the following files:
 
-* ```Calculator.h``` This is the C++ interface that we need to implement
+* ```PPRPCGEN_Calculator.h``` This is the C++ interface that we need to implement
 * ```ComplexRPC.cpp``` This is the C++ RPC library, specific to our Complex number calculator
 * ```ComplexRPC.js``` The javascript file that we can include in our HTML to interface with the C++ library.
-* ```ComplexTypes.h``` Since we defined some extra types, (the ```complex``` dictionary type), this file is generated and includes the corresponding C++ ```struct```.
+* ```PPRPCGEN_ComplexTypes.h``` Since we defined some extra types, (the ```complex``` dictionary type), this file is generated and includes the corresponding C++ ```struct```.
 * ```Makefile``` Finally, a makefile is generated for us to be used as a template.
 
 Take a look at each file to see how the RPC library works. Most importantly let's see what's inside ```Calculator.h``` and ```ComplexTypes.h```.
 
 ```bash
-less ComplexTypes.h
+less PPRPCGEN_ComplexTypes.h
 ```
 
 ```cpp
@@ -165,14 +165,15 @@ typedef struct {
 As we expected, the dictionary was converted into an equivalent ```struct```.
 
 ```bash
-less Calculator.h
+less PPRPCGEN_Calculator.h
 ```
 
 ```cpp
 #include "ComplexTypes.h"
 #include "nativecalls/RPCType.h"
 #include <vector>
-
+namespace pprpcgen{
+namespace Calculator{
 complex add( complex x,  complex y);
 
 complex subtract( complex x,  complex y);
@@ -184,6 +185,9 @@ complex sum_all( std::vector<complex> contents);
 complex multiply_all( std::vector<complex> contents);
 
 std::vector<double> map_abs( std::vector<complex> contents);
+
+}
+}
 
 ```
 
@@ -198,68 +202,72 @@ vim Calculator.cpp
 ```
 
 ```cpp
-#include "Calculator.h"
+#include "PPRPCGEN_Calculator.h"
 
 #include <complex>
 #include <vector>
-
+namespace pprpcgen{
+namespace Calculator{
 complex add(complex x, complex y){
-	complex cd;
-	std::complex<double> std_cd = std::complex<double>(x.r, x.i) + std::complex<double>(y.r, y.i);
-	cd.r = std_cd.real();
-	cd.i = std_cd.imag();
-	return cd;
+  complex cd;
+  std::complex<double> std_cd = std::complex<double>(x.r, x.i) + std::complex<double>(y.r, y.i);
+  cd.r = std_cd.real();
+  cd.i = std_cd.imag();
+  return cd;
 }
 
 complex subtract(complex x, complex y){
-	complex cd;
-	std::complex<double> std_cd = std::complex<double>(x.r, x.i) - std::complex<double>(y.r, y.i);
-	cd.r = std_cd.real();
-	cd.i = std_cd.imag();
-	return cd;
+  complex cd;
+  std::complex<double> std_cd = std::complex<double>(x.r, x.i) - std::complex<double>(y.r, y.i);
+  cd.r = std_cd.real();
+  cd.i = std_cd.imag();
+  return cd;
 }
 
 complex multiply(complex x, complex y){
-	complex cd;
-	std::complex<double> std_cd = std::complex<double>(x.r, x.i) * std::complex<double>(y.r, y.i);
-	cd.r = std_cd.real();
-	cd.i = std_cd.imag();
-	return cd;
+  complex cd;
+  std::complex<double> std_cd = std::complex<double>(x.r, x.i) * std::complex<double>(y.r, y.i);
+  cd.r = std_cd.real();
+  cd.i = std_cd.imag();
+  return cd;
 }
 
 complex sum_all(std::vector<complex> contents){
-	std::complex<double> currentSum(0,0);
-	complex sum;
-	for(std::vector<complex>::iterator it = contents.begin(); it != contents.end(); ++it) {
-		complex current_cd = *it;
-	    currentSum += std::complex<double>(current_cd.r, current_cd.i);
-	}
-	sum.r = currentSum.real();
-	sum.i = currentSum.imag();
-	return sum;
+  std::complex<double> currentSum(0,0);
+  complex sum;
+  for(std::vector<complex>::iterator it = contents.begin(); it != contents.end(); ++it) {
+    complex current_cd = *it;
+      currentSum += std::complex<double>(current_cd.r, current_cd.i);
+  }
+  sum.r = currentSum.real();
+  sum.i = currentSum.imag();
+  return sum;
 }
 
 
 complex multiply_all(std::vector<complex> contents){
-	std::complex<double> currentSum(1,0);
-	complex sum;
-	for(std::vector<complex>::iterator it = contents.begin(); it != contents.end(); ++it) {
-		complex current_cd = *it;
-	    currentSum *= std::complex<double>(current_cd.r, current_cd.i);
-	}
-	sum.r = currentSum.real();
-	sum.i = currentSum.imag();
-	return sum;
+  std::complex<double> currentSum(1,0);
+  complex sum;
+  for(std::vector<complex>::iterator it = contents.begin(); it != contents.end(); ++it) {
+    complex current_cd = *it;
+      currentSum *= std::complex<double>(current_cd.r, current_cd.i);
+  }
+  sum.r = currentSum.real();
+  sum.i = currentSum.imag();
+  return sum;
 }
 
 
 std::vector<double> map_abs(std::vector<complex> contents){
-	std::vector<double> r;
-	for(std::vector<complex>::iterator it = contents.begin(); it != contents.end(); ++it) {
-		complex current_cd = *it;
-	    r.push_back(abs(std::complex<double>(current_cd.r, current_cd.i)));
-	}
-	return r;
+  std::vector<double> r;
+  for(std::vector<complex>::iterator it = contents.begin(); it != contents.end(); ++it) {
+    complex current_cd = *it;
+      r.push_back(abs(std::complex<double>(current_cd.r, current_cd.i)));
+  }
+  return r;
+}
+
+}
 }
 
 ```

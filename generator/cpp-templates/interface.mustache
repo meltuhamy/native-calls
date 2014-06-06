@@ -4,14 +4,17 @@
 #define {{includeDefName}}_H_
 
 {{#hasDictTypes}}
-#include "{{moduleName}}Types.h"
+#include "PPRPCGEN_{{moduleName}}Types.h"
 {{/hasDictTypes}}
 #include "nativecalls/RPCType.h"
 #include <vector>
-
+namespace pprpcgen {
+namespace {{name}}{
 {{#operations}}
 {{{STDTypeString}}} {{name}}({{#arguments}} {{{STDTypeString}}} {{name}}{{^finalParam}}, {{/finalParam}}{{/arguments}}{{{ThrowsRPCErrorParamTypeString}}});
 
 {{/operations}}
+}
+}
 
 #endif /* {{includeDefName}}_H_ */

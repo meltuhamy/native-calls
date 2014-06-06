@@ -2,11 +2,11 @@
 
 // user
 {{#hasDictTypes}}
-#include "{{{moduleName}}}Types.h"
+#include "PPRPCGEN_{{{moduleName}}}Types.h"
 {{/hasDictTypes}}
 
 {{#interfaces}}
-#include "{{{name}}}.h"
+#include "PPRPCGEN_{{{name}}}.h"
 {{/interfaces}}
 
 //ppapi
@@ -22,6 +22,7 @@
 #include "nativecalls/RPCType.h"
 
 using namespace pprpc;
+using namespace pprpcgen;
 
 //std
 #include <stdio.h>
@@ -91,7 +92,7 @@ public:
 			}
 			{{/arguments}}
 
-			return {{TypeWrapperName}}Type::AsVar{{#typeIsSequence}}Array{{/typeIsSequence}}({{name}}(
+			return {{TypeWrapperName}}Type::AsVar{{#typeIsSequence}}Array{{/typeIsSequence}}(pprpcgen::{{interfaceName}}::{{name}}(
 				{{#arguments}}
 				param_{{name}}.Extract().getValue(){{^finalParam}},{{/finalParam}}
 				{{/arguments}}{{{ThrowsRPCErrorParamString}}}

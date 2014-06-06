@@ -1,7 +1,7 @@
 {
   "name": "native-calls",
-  "version": "0.1.0",
-  "description": "A JavaScript - C++ RPC client",
+  "version": "0.2.0",
+  "description": "A JavaScript - C++ RPC library generator",
   "main": "generator/Generator.js",
   "directories": {
     "test": "test"

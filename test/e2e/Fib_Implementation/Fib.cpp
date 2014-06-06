@@ -1,6 +1,8 @@
-#include "Fib.h"
+#include "PPRPCGEN_Fib.h"
 #include "nativecalls/RPCType.h"
 #include <stdio.h>
+namespace pprpcgen{
+namespace Fib{
 class MyClass{
 public:
 	MyClass(){
@@ -43,4 +45,7 @@ uint32_t throwingFib(int32_t x, pprpc::RPCError& error){
 
 uint32_t countUp(){
 	return s.inc();
+}
+
+}
 }

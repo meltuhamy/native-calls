@@ -7,10 +7,12 @@
 #include <vector>
 #include <memory>
 #include <map>
-#include "OnigTypes.h"
+#include "PPRPCGEN_OnigTypes.h"
 
 class OnigRegExp;
 class OnigResult;
+
+using namespace pprpcgen;
 
 class OnigScanner {
   public:
