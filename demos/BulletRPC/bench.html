@@ -2,40 +2,58 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
-    <title></title>
-    <script type="text/javascript" src="data/json2.min.js"></script>
+    <title>Performance</title>
     <script type="text/javascript" src="data/jquery-2.1.1.min.js"></script>
-    <script type="text/javascript" src="data/jstorage.min.js"></script>
-    <script src="http://code.highcharts.com/highcharts.js"></script>
-    <script src="http://code.highcharts.com/modules/exporting.js"></script>
+    <script type="text/javascript" src="data/highcharts.js"></script>
+    <script type="text/javascript" src="data/highcharts-exporting.js"></script>
+    <script type="text/javascript" src="data/pmrpc.js"></script>
 
-    <script>
+
+    <script type="text/javascript">
     var updateSeries, updateSeriesNaClAM;
-    $.jStorage.subscribe("sync-stats", function(channel, payload){
-        // looks like this:
-        // {"frames":0,"total_simTime":0,"num_sims":0,"total_tripTime":0,"num_trips":0,"interval":1000,"trips":null,"publishTime":1401206581519} from sync-stats 
-        if(typeof updateSeries == "function"){
-            updateSeries("frames", payload.publishTime, 1000/payload.frames);
-            updateSeries("simtime", payload.publishTime, payload.total_simTime / (payload.num_sims * 1000));
-            updateSeries("trips", payload.publishTime, 1000/payload.num_trips);
+    var nativeCallsPopup, naClAmPopup;
+    pmrpc.register({
+        publicProcedureName: "syncStats",
+        procedure: function(payload){
+            // looks like this:
+            // {"frames":0,"total_simTime":0,"num_sims":0,"total_tripTime":0,"num_trips":0,"interval":1000,"trips":null,"publishTime":1401206581519} from sync-stats
+            if(typeof updateSeries == "function"){
+                updateSeries("frames", payload.publishTime, 1000/payload.frames);
+                updateSeries("simtime", payload.publishTime, payload.total_simTime / (payload.num_sims * 1000));
+                updateSeries("trips", payload.publishTime, 1000/payload.num_trips);
+            }
+            $('#fpscounter').html(payload.frames + " fps");
         }
-        $('#fpscounter').html(payload.frames + " fps");
     });
-    $.jStorage.subscribe("sync-stats-naclam", function(channel, payload){
-        // looks like this:
-        // {"frames":0,"total_simTime":0,"num_sims":0,"total_tripTime":0,"num_trips":0,"interval":1000,"trips":null,"publishTime":1401206581519} from sync-stats 
-        if(typeof updateSeriesNaClAM == "function"){
-            updateSeriesNaClAM("frames", payload.publishTime, 1000/payload.frames);
-            updateSeriesNaClAM("simtime", payload.publishTime, payload.total_simTime / (payload.num_sims * 1000));
-            updateSeriesNaClAM("trips", payload.publishTime, 1000/payload.num_trips);
+
+    pmrpc.register({
+        publicProcedureName: "syncStatsNaClAM",
+        procedure: function(payload){
+            // looks like this:
+            // {"frames":0,"total_simTime":0,"num_sims":0,"total_tripTime":0,"num_trips":0,"interval":1000,"trips":null,"publishTime":1401206581519} from sync-stats
+            if(typeof updateSeriesNaClAM == "function"){
+                updateSeriesNaClAM("frames", payload.publishTime, 1000/payload.frames);
+                updateSeriesNaClAM("simtime", payload.publishTime, payload.total_simTime / (payload.num_sims * 1000));
+                updateSeriesNaClAM("trips", payload.publishTime, 1000/payload.num_trips);
+            }
+            $('#fpscounter-naclam').html(payload.frames + " fps");
         }
-        $('#fpscounter-naclam').html(payload.frames + " fps");
     });
+
+
+    var benchCommand = function(command){
+        pmrpc.call({
+            destination: [nativeCallsPopup, naClAmPopup],
+            publicProcedureName: "benchCommand",
+            params: [command]
+        });
+    }
 
     </script>
 </head>
 <body>
-<p><strong>Scenes: </strong> 
+<p><strong>Scenes: </strong>
+<button id="startrecording" value="start">Start Recording</button>
 <button class="scenechange" value="loadJenga10">Jenga 10</button>
 <button class="scenechange" value="loadJenga20">Jenga 20</button>
 <button class="scenechange" value="loadRandomShapes">Random Shapes</button>
@@ -43,6 +61,7 @@
 <button class="scenechange" value="load500RandomCylinders">500 Cylinders</button>
 <button class="scenechange" value="load1000RandomCubes">1000 Cubes</button>
 <button class="scenechange" value="load2000RandomCubes">2000 Cubes</button>
+
 </p>
 <h3>Native Calls</h3>
 <div id="fpscounter" style="">0 fps</div>
@@ -89,6 +108,7 @@ $(document).ready(function(){
             },
             yAxis: {
                 min: 0,
+                max: 80,
                 title: {
                     text: 'milliseconds'
                 },
@@ -122,12 +142,34 @@ $(document).ready(function(){
                 data: []
             }]
         });
-    }
+    };
 
     createChart('#container', "updateSeries");
     createChart('#container-naclam', "updateSeriesNaClAM");
-    $.jStorage.publish("bench-command", "start");
-    $('.scenechange').click(function(){$.jStorage.publish("bench-command", $(this).val());});
+    $('.scenechange').click(function(){benchCommand($(this).val());});
+    $('#startrecording').click(function(){
+        // make sure two popups are open.
+        if(!nativeCallsPopup) {
+            // open popup
+            nativeCallsPopup = window.open("index.html");
+            if(!nativeCallsPopup){
+                alert("Make sure you've allowed popups");
+            }
+        }
+
+        if(!naClAmPopup){
+            // open popup
+            naClAmPopup = window.open("BulletNaClAM/index.html");
+            if(!naClAmPopup){
+                alert("Make sure you've allowed popups");
+            }
+        }
+
+        if(nativeCallsPopup && naClAmPopup){
+            benchCommand('start');
+        }
+
+    });
 });
 
 </script>

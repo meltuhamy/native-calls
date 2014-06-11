@@ -12,8 +12,7 @@ found in the LICENSE file.
   <script type="text/javascript" src="data/scenes.js"></script>
 
   <!-- stats -->
-  <script type="text/javascript" src="data/json2.min.js"></script>
-  <script type="text/javascript" src="data/jstorage.min.js"></script>
+  <script type="text/javascript" src="data/pmrpc.js"></script>
   <script type="text/javascript" src="data/stats.js"></script>
 
   <script src="../../scripts/lib/requirejs/require.js"></script>
@@ -39,24 +38,37 @@ found in the LICENSE file.
             loadWorld(jengaScene(20), animate);
         });
 
-        $.jStorage.subscribe("bench-command", function(channel, payload){
-          if(payload == "start"){
-            startPublishingStats("sync-stats");
-            return;
-          }
-          fn = window[payload];
-          if(typeof fn == "function"){
-            fn();
-          }
+        pmrpc.register({
+            publicProcedureName: "benchCommand",
+            procedure: function(data){
+                if(data == "start"){
+                    startPublishingStats("syncStats");
+                    return;
+                }
+                fn = window[data];
+                if(typeof fn === "function"){
+                    fn();
+                }
+            }
         });
+
+
 
     });
   </script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height:100%
+        }
+    </style>
 </head>
 <body>
-  <h1>Bullet Physics</h1>
-  <div id="config">
-    <select id="scene">
+  <div id="config" style="position: absolute">
+      <h1 style="font-size: medium; margin-bottom: 0; display: inline">Bullet Physics Native Calls</h1>
+
+      <select id="scene">
       <option value="jenga10">Block Tower (10 blocks)</option>
       <option value="jenga20" selected>Block Tower (20 blocks)</option>
       <option value="randomShapes">Random Shapes</option>
@@ -66,29 +78,11 @@ found in the LICENSE file.
       <option value="randomCube2000">Random Cubes (2000)</option>
     </select>
     <button id="reload">Reload Scene</button>
+    <span><span id="simulationTime">0</span>&mu;s</span>
+
   </div>
-  <a href="bench.html" target="_blank">Performance (right click and open in new window)</a>
-  <ul>
-    <li>Click and drag an object to move it</li>
-    <li>Click and drag elsewhere to rotate the camera</li>
-    <li>Use the mousewheel to zoom in/out</li>
-  </ul>
-  <div id="rendererContainer" style="position: static; width: 512px; height: 512px"></div>
-  <p>
-    More info about Bullet Physics can be found at <a
-    href="http://bulletphysics.org/">http://bulletphysics.org</a>.
-  </p>
-  <p>
-    This demo was implemented by <a
-      href="http://www.johnmccutchan.com">John McCutchan</a>.  Read his
-    blog post about Native Client acceleration modules <a
-      href="http://www.johnmccutchan.com/2012/10/bullet-native-client-acceleration-module.html">here</a>,
-    and see the source for this demo <a
-      href="https://github.com/binji/NaClAMBase">here</a>.
-  </p>
-  <p>
-    Simulation time: <span id="simulationTime">0</span>&mu;s.
-  </p>
+
+  <div id="rendererContainer" style="position: static; width: 100%; height: 200px; min-height: 100%"></div>
   <div id="listener"></div>
 </body>
 </html>

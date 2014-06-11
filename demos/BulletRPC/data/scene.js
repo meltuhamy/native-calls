@@ -316,7 +316,7 @@ function animate() {
       NCStats.total_simTime += sceneUpdate.delta;
 
       var transformBuffer = sceneUpdate.transform;
-      document.getElementById('simulationTime').innerHTML = '<p>Simulation time: ' + sceneUpdate.delta + ' microseconds</p>';
+      document.getElementById('simulationTime').innerHTML = sceneUpdate.delta;
       if (skipSceneUpdates > 0) {
         skipSceneUpdates--;
         return;
