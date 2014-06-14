@@ -2,6 +2,9 @@ var largeText = "return jQuery.merge( [], parsed.childNodes );\n};\n\n\n// Keep 
 var OnigScanner = require('oniguruma').OnigScanner;
 var scanner = new OnigScanner(['this', 'var', 'selector', 'window']);
 
+// run everything 1000 times
+var numRuns = 1000;
+
 
 var lines = largeText;
 var startTime = Date.now();
@@ -15,16 +18,19 @@ var callback = function(error, match) {
     matches++;
   }
   if (--callsInProgress === 0) {
-    console.log("async: " + matches + " matches in " + (Date.now() - startTime) + "ms");
+    console.log("async: " + matches/numRuns + " matches in " + ((Date.now() - startTime)/numRuns) + "ms");
   }
 };
 
 startTime = Date.now();
 
-for(var i = 0; i < lines.length; i++){
-  var line = lines[i];
-  for(var position = 0; position < line.length; position++){
-    callsInProgress++;
-    scanner.findNextMatch(line, position, callback);
+
+for(var runCount = 0; runCount < numRuns; runCount++){
+  for(var i = 0; i < lines.length; i++){
+    var line = lines[i];
+    for(var position = 0; position < line.length; position++){
+      callsInProgress++;
+      scanner.findNextMatch(line, position, callback);
+    }
   }
 }
