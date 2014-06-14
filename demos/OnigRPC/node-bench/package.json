@@ -1,0 +1,7 @@
+{
+  "name": "node-onig-bench-custom",
+  "version": "0.0.1",
+  "dependencies": {
+    "oniguruma": "~2.0.0"
+  }
+}
