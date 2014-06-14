@@ -8,8 +8,20 @@
     <script type="text/javascript" src="data/jstorage.min.js"></script>
     <script src="http://code.highcharts.com/highcharts.js"></script>
     <script src="http://code.highcharts.com/modules/exporting.js"></script>
+    <script src="data/export-csv.js"></script>
+
 
     <script>
+    window.dumpData = function(which){
+        if(which === 'nativecalls'){
+            // dump nc
+            console.log($('#container').highcharts().getCSV());
+        } else if(which === 'naclam') {
+            // dump naclam
+            console.log($('#container-naclam').highcharts().getCSV());
+
+        }
+    };
     var updateSeries, updateSeriesNaClAM;
     $.jStorage.subscribe("sync-stats", function(channel, payload){
         // looks like this:
@@ -35,7 +47,10 @@
     </script>
 </head>
 <body>
-<p><strong>Scenes: </strong> 
+<p>
+    <button class="scenechange" value="start">Start</button>
+    <button class="scenechange" value="stop">Stop</button>
+    <strong>Scenes: </strong>
 <button class="scenechange" value="loadJenga10">Jenga 10</button>
 <button class="scenechange" value="loadJenga20">Jenga 20</button>
 <button class="scenechange" value="loadRandomShapes">Random Shapes</button>
@@ -44,11 +59,8 @@
 <button class="scenechange" value="load1000RandomCubes">1000 Cubes</button>
 <button class="scenechange" value="load2000RandomCubes">2000 Cubes</button>
 </p>
-<h3>Native Calls</h3>
 <div id="fpscounter" style="">0 fps</div>
 <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-
-<h3>NaClAM</h3>
 <div id="fpscounter-naclam" style="">0 fps</div>
 <div id="container-naclam" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
 
@@ -81,16 +93,23 @@ $(document).ready(function(){
                 }
             },
             title: {
-                text: 'Performance'
+                text: (id=='#container' ? 'Native Calls' : 'NaClAM')+' Performance'
             },
             xAxis: {
                 type: 'datetime',
-                tickPixelInterval: 100
+                tickPixelInterval: 1000000,
+                labels: {
+                    enabled: false
+                },
+                title: {
+                    text: "Time Elapsed"
+                }
             },
             yAxis: {
                 min: 0,
+                max: 100,
                 title: {
-                    text: 'milliseconds'
+                    text: 'Processing Time / ms'
                 },
                 plotLines: [{
                     value: 0,
@@ -109,20 +128,20 @@ $(document).ready(function(){
                 enabled: true
             },
             exporting: {
-                enabled: false
+                enabled: true
             },
             series: [{
-                name: 'frame rendering',
+                name: 'Frame Time',
                 data: []
             }, {
-                name: 'physics simulation time',
+                name: 'Physics Simulation Time',
                 data: []
             }, {
-                name: 'RPC round trip time',
+                name: 'RPC Round Trip Time',
                 data: []
             }]
         });
-    }
+    };
 
     createChart('#container', "updateSeries");
     createChart('#container-naclam', "updateSeriesNaClAM");
