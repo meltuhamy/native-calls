@@ -2,6 +2,8 @@
   "name": "node-onig-bench-custom",
   "version": "0.0.1",
   "dependencies": {
-    "oniguruma": "~2.0.0"
+    "oniguruma": "~2.0.0",
+    "socket.io": "~1.0.4",
+    "express": "~4.4.3"
   }
 }
