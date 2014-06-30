@@ -1,11 +1,13 @@
 # Native Calls
 
 Native Calls allows developers to write IDL files that get compiled into C++ and JavaScript stubs that implement RPC calls over ```postMessage```.
-The result is a nice, clean way of using Native Code straight from JavaScript!
+The result is a nice, clean way of using Native Code straight from JavaScript! You can look at the presentation [here](https://github.com/meltuhamy/native-calls-presentation) and read the final report [here](https://github.com/meltuhamy/native-calls-report).
 
 Part of my final year project at [Imperial College London](http://www3.imperial.ac.uk/computing/).
 
 This is still work in progress, but feedback is much appreciated!
+
+
 
 ## Getting started
 [Please read the getting started guide](https://github.com/meltuhamy/native-calls/tree/master/docs/getting-started.md) to see how Native Calls works and how to use it.
