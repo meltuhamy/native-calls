@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Native-calls : JavaScript - Native Client RPC " />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Native-calls</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/meltuhamy/native-calls">View on GitHub</a>
+
+          <h1 id="project_title">Native-calls</h1>
+          <h2 id="project_tagline">JavaScript - Native Client RPC </h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/meltuhamy/native-calls/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/meltuhamy/native-calls/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="native-calls" class="anchor" href="#native-calls"><span class="octicon octicon-link"></span></a>Native Calls</h1>
+
+<p>Native Calls allows developers to write IDL files that get compiled into C++ and JavaScript stubs that implement RPC calls over <code>postMessage</code>.
+The result is a nice, clean way of using Native Code straight from JavaScript! You can look at the presentation <a href="https://github.com/meltuhamy/native-calls-presentation">here</a> and read the final report <a href="https://github.com/meltuhamy/native-calls-report">here</a>.</p>
+
+<p>Part of my final year project at <a href="http://www3.imperial.ac.uk/computing/">Imperial College London</a>.</p>
+
+<p>This is still work in progress, but feedback is much appreciated!</p>
+
+<h2>
+<a name="getting-started" class="anchor" href="#getting-started"><span class="octicon octicon-link"></span></a>Getting started</h2>
+
+<p><a href="https://github.com/meltuhamy/native-calls/tree/master/docs/getting-started.md">Please read the getting started guide</a> to see how Native Calls works and how to use it.</p>
+
+<h2>
+<a name="build" class="anchor" href="#build"><span class="octicon octicon-link"></span></a>Build</h2>
+
+<p>To build the project, you'll need the following requirements:</p>
+
+<ol>
+<li>The <a href="https://developers.google.com/native-client/dev/">Native Client SDK</a>.</li>
+<li>The <a href="https://developers.google.com/native-client/dev/devguide/devcycle/building">NACL_SDK_ROOT</a> variable set.</li>
+<li><a href="http://nodejs.org/">node.js</a></li>
+</ol><p>To build, simply run <code>make</code> in this folder. This will get JavaScript dependencies, build the C++ RPC library and build each individual demo.</p>
+
+<p><strong>Note:</strong> I have only tested this on Mac OSX and linux. Compiling on Windows will probably break.</p>
+
+<h2>
+<a name="run" class="anchor" href="#run"><span class="octicon octicon-link"></span></a>Run</h2>
+
+<p>To see it in action, make sure you have built the project (see above). Then, type <code>make serve</code>. This will start a server in the project directory.</p>
+
+<p>Visit the index page, by typing http://localhost:3000/ into your browser.</p>
+
+<h2>
+<a name="install" class="anchor" href="#install"><span class="octicon octicon-link"></span></a>Install</h2>
+
+<p>To install the C++ library to your SDK, run <code>make install</code>.
+This will build the library for all toolchains and configurations.
+This will also install the generator, <code>pprpcgen</code> globally.</p>
+
+<p>If you want to only install <code>pprpcgen</code> without cloning this repository, you can type <code>npm install -g native-calls</code>.</p>
+
+<h1>
+<a name="development" class="anchor" href="#development"><span class="octicon octicon-link"></span></a>Development</h1>
+
+<h2>
+<a name="test" class="anchor" href="#test"><span class="octicon octicon-link"></span></a>Test</h2>
+
+<p>To run all tests, type <code>make test</code>. This will test JavaScript front end, back end (generators), and C++ tests.
+You can also test each component individually:</p>
+
+<ul>
+<li>
+<code>make test</code> runs all tests</li>
+<li>
+<code>make nodetest</code> runs generator tests</li>
+<li>
+<code>make cpptest</code> runs C++ rpc framework tests</li>
+<li>
+<code>make eetest</code> runs end-to-end tests</li>
+<li>
+<code>make jstest</code> runs JavaScript rpc framework tests</li>
+</ul><p>The tests are run using <a href="https://github.com/karma-runner/karma">karma</a>.</p>
+
+<h2>
+<a name="todo" class="anchor" href="#todo"><span class="octicon octicon-link"></span></a>TODO</h2>
+
+<p>If you're interested in contributing, here are some things that still need to be done...</p>
+
+<ul>
+<li>Generating JS skeletons for the Emscripten code (possibly in combination pepper.js) and provide automatic fallback for browsers which don't support Native Client</li>
+<li>Performance optimization, in particular efficient use of binary arrays</li>
+<li>Generating C++ stubs and JS skeletons to allow calls from native into JS code</li>
+<li>Support for transferring binary</li>
+</ul><h2>
+<a name="docs" class="anchor" href="#docs"><span class="octicon octicon-link"></span></a>Docs</h2>
+
+<p>You can read some design docs in the <a href="https://github.com/meltuhamy/native-calls/tree/master/docs">docs folder</a>.</p>
+
+<p>The full project report (in progress) is written in TeX and is found in the <a href="https://github.com/meltuhamy/native-calls-report">report repo</a>.</p>
+
+<h2>
+<a name="eclipse" class="anchor" href="#eclipse"><span class="octicon octicon-link"></span></a>Eclipse</h2>
+
+<p>How to set up the Native Calls project in Eclipse.</p>
+
+<p>A project has already been created and is in the repository. All you need to do is to configure it with your <code>NACL_SDK_ROOT</code>.</p>
+
+<ol>
+<li>Download <a href="http://goo.gl/Rymz93">eclipse CDT</a>
+</li>
+<li>Clone the <a href="http://goo.gl/qarpeD">Native Calls project</a>.</li>
+<li>Copy the <code>.cproject.sample</code> file and save it as <code>.cproject</code>.</li>
+<li>Open eclipse</li>
+<li>Import the project. <code>File</code> -&gt; <code>Import...</code> -&gt; <code>Existing Project into Workspace</code>
+</li>
+<li>Right click on the project and click properties.</li>
+<li>Under <code>C/C++ Build</code> -&gt; <code>Enivronment</code>, set the <code>NACL_SDK_ROOT</code> variable to be the NaCl SDK location. Save for all configurations.</li>
+<li>Under <code>C/C++ Build</code> -&gt; <code>Build Variables</code>, set the <code>NACL_SDK_ROOT</code> variable to be a directory pointing to your NaCl SDK location. Save for all configurations.</li>
+<li>Right click on the project and choose <code>Index</code> -&gt; <code>Rebuild</code> to rebuild the index.</li>
+<li>Done! Clicking the build button runs <code>make</code>.</li>
+</ol><p>You can also set up eclipse to debug the C/C++ application. This is shown in the <a href="http://www.chromium.org/nativeclient/how-tos/debugging-documentation/debugging-with-debug-stub-recommended/debugging-nacl-apps-in-eclipse-cdt">chromium how-to</a>.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Native-calls maintained by <a href="https://github.com/meltuhamy">meltuhamy</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
